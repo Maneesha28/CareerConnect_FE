@@ -1,0 +1,31 @@
+/* SignIn.css */
+/* SignIn.css */
+.signInContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.signInForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center items horizontally within the form */
+}
+
+.signInButton {
+  padding: 0.5rem 1rem;
+  font-size: 16px;
+  background-color: blue;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 1rem; /* Add margin to the button to create some space */
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 16px;
+  margin-bottom: 1rem;
+}
