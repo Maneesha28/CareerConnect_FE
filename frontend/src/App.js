@@ -8,6 +8,7 @@ import SignUp from "./pages/Signup";
 import SignIn from "./pages/SignIn";
 import { useEffect } from "react";
 import JobSeekerProfile from "./pages/JobSeekerProfile";
+import CompanyProfile from "./pages/CompanyProfile";
 
 function App() {
   const action = useNavigationType();
@@ -50,6 +51,7 @@ function App() {
       <Route path="/auth/login" element={<SignIn />} />
       <Route path="/auth/register" element={<SignUp />} />
       <Route path="/jobseeker/:jobseeker_id" element={<JobSeekerProfile />} />
+      <Route path="/company/:company_id" element={<CompanyProfile />} />
     </Routes>
   );
 }

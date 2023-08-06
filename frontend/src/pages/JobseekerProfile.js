@@ -203,7 +203,17 @@ const PublicationsTab = ({publicationsData}) => {
                   <td>{publication.authors}</td>
                   <td>{publication.journal}</td>
                   <td>{publication.publication_date}</td>
-                  <td><a href={publication.pdf_link} target="_blank" rel="noopener noreferrer">paper Link</a></td>
+                  {publication.pdf_link ? (
+                        <td> 
+                        <a
+                          href={publication.pdf_link.startsWith('http') ? publication.pdf_link : `http://${publication.pdf_link}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                        PDF Link
+                        </a>
+                    </td>) : 
+                    (<td></td>)}
                 </tr>
               ))}
             </tbody>
@@ -240,8 +250,16 @@ const ProjectTab = ({projectData}) => {
                     <td>{project.description}</td>
                     <td>{project.technologies}</td>
                     {project.project_link ? (
-                        <td><a href={project.project_link} target="_blank" rel="noopener noreferrer">project Link</a></td>) : 
-                        (<td></td>)}
+                        <td> 
+                        <a
+                          href={project.project_link.startsWith('http') ? project.project_link : `http://${project.project_link}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                        Project Link
+                        </a>
+                    </td>) : 
+                    (<td></td>)}
                     <td>{project.start_date}</td>
                     <td>{project.end_date}</td>
                   </tr>

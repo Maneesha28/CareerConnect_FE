@@ -1,0 +1,74 @@
+/* CompanyProfile.css */
+/* body font size */
+.company-profile {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: var(--font-inter);
+    font-size: 28px;
+  }
+  
+  .company-profile h2 {
+    margin-bottom: 10px;
+  }
+  
+  .company-profile table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .company-profile th,
+  .company-profile td {
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
+  
+  .company-profile th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+  }
+  
+  .company-profile tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .company-profile tr:hover {
+    background-color: #f5f5f5;
+  }
+  
+/* CompanyProfile.css */
+
+/* ... (existing styles) */
+
+.tab {
+    display: flex;
+    margin-bottom: 10px;
+  }
+  
+  .tab-button {
+    cursor: pointer;
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px 5px 0 0;
+    background-color: #f0f0f0;
+  }
+  
+  .tab-button.active {
+    background-color: #fff;
+    border-bottom: none;
+  }
+  
+  .tab-content {
+    border: 1px solid #ccc;
+    border-radius: 0 0 5px 5px;
+    padding: 20px;
+  }
+  .logout {
+    margin-top: 10px;
+    margin-right: 10px;
+    align-self: flex-end; /* Align the div to the end (right) of the container */
+    cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+    color: blue; /* Add any desired text color */
+  }
+  
