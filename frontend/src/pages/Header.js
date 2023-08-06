@@ -1,21 +1,18 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // If using React Router for navigation
+// Create a new file called Header.js
 
-const Header = () => {
+import React from 'react';
+import './Header.css'; // You can create a CSS file for styling the header
+
+const Header = ({ logo, loggedInUserId }) => {
   return (
-    <header className="header">
-      <div className="header-left">
-        <h1 className="website-name">Your Website Name</h1>
+    <div className="header">
+      <div className="logo">
+        <img src={logo} alt="Website Logo" />
       </div>
-      <div className="header-right">
-        <Link to="/signup" className="signup-link">
-          Sign Up
-        </Link>
-        <Link to="/signin" className="signin-link">
-          Sign In
-        </Link>
+      <div className="user-id">
+        {loggedInUserId ? `Logged In User: ${loggedInUserId}` : 'Not Logged In'}
       </div>
-    </header>
+    </div>
   );
 };
 

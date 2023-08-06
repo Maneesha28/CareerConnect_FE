@@ -10,16 +10,12 @@ body {
   --font-jacques-francois-shadow: "Jacques Francois Shadow";
 
   /* font sizes */
-  --font-size-9xl: 28px;
-  --font-size-5xl: 24px;
-  --font-size-13xl: 32px;
+  --font-size-9xl: 40px;
+  --font-size-5xl: 32px;
 
   /* Colors */
   --color-white: #fff;
-  --color-gray: #8e8e8e;
   --color-black: #000;
   --color-darkslategray-100: #235857;
-
-  /* border radiuses */
-  --br-xs: 12px;
+  --color-darkslategray-200: rgba(35, 88, 87, 0.2);
 }

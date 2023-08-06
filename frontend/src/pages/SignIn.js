@@ -35,13 +35,22 @@ function SignIn() {
       });
       if (response.data.status === 'Wrong email') {
         setErrorMessage('Invalid email address. Please try again.');
-      } else if (response.data.status === 'Wrong password') {
+      } 
+      else if (response.data.status === 'Wrong password') {
         setErrorMessage('Invalid password. Please try again.');
-      } else {
-        window.location.href = '/jobseeker/profile';
+      } 
+      else if (response.data.jobseeker_id) {
+        console.log(response.data);
+        window.location.href = '/jobseeker/'+response.data.jobseeker_id;
       }
+      else if (response.data.company_id) {
+        window.location.href = '/company/'+response.data.company_id;
+      }
+      
+        
       // Redirect or update state to reflect successful login
     } catch (error) {
+      console.log(error);
       // Handle login error, show error message, etc.
     }
   };
