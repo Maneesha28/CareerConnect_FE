@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
-import './SignIn.css';
+import { Alert, Button, TextField, Link, Paper, Box, CssBaseline, Grid, Typography } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 function SignIn() {
   const location = useLocation();
@@ -55,36 +56,105 @@ function SignIn() {
     }
   };
 
+  const defaultTheme = createTheme(
+    {
+      typography: {
+        fontSize: 20
+      }
+    }
+  );
+
   return (
-    <div className="signInContainer">
-      {successMessage && <div>{successMessage}</div>}
-      {errorMessage && <div>{errorMessage}</div>}
-      <form onSubmit={handleSubmit} className="signInForm">
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Enter your email"
-          />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Enter your password"
-          />
-        </div>
-        <button type="submit" className="signInButton">
-          Sign In
-        </button>
-      </form>
-    </div>
+    <ThemeProvider theme={defaultTheme}>
+      <Grid container component="main" sx={{
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundImage: 'url(/background2.jpg)',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+      }}>
+        <CssBaseline />
+        <Grid item xs={12} sm={8} md={3} component={Paper} elevation={6} sx={{
+          backgroundColor: 'rgba(255, 255, 255, 1)',
+        }}>
+          <Box
+            sx={{
+              my: 8,
+              mx: 4,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Typography component="h1" variant="h5" sx={{
+              fontWeight: 'bold',
+              fontFamily:  'Baskerville Old Face',
+              color: '#12131',
+              fontSize: '40px',       
+              }}>
+              SIGN IN
+            </Typography>
+            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+              {errorMessage &&
+              <Alert severity="error">
+                <strong>{errorMessage}</strong>
+              </Alert>}
+              {successMessage &&
+              <Alert severity="success">
+                <strong>{successMessage}</strong>
+              </Alert>}
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                value={formData.email}
+                onChange={handleChange}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ mt: 3, mb: 2, mx: 'auto', display: 'block'}}
+              >
+                Sign In
+              </Button>
+              <Grid container sx={{
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+                {/* <Grid item xs>
+                  <Link href="#" variant="body2">
+                    Forgot password?
+                  </Link>
+                </Grid> */}
+                <Grid item>
+                  <Link href="/auth/register" variant="body2">
+                    {"Don't have an account? Sign Up"}
+                  </Link>
+                </Grid>
+              </Grid>
+            </Box>
+          </Box>
+        </Grid>
+      </Grid>
+    </ThemeProvider>
   );
 }
 

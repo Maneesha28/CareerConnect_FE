@@ -183,7 +183,7 @@ const AboutTab = ({ companyData, onFormSubmit,onCancel }) => {
 
 const CompanyProfile = () => {
     const navigate = useNavigate();
-
+    
     const [companyData, setCompanyData] = useState(null);
     
     const [isLoadingCompany, setIsLoadingCompany] = useState(true);
