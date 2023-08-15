@@ -9,7 +9,7 @@ import SignIn from "./pages/SignIn";
 import { useEffect } from "react";
 import JobSeekerProfile from "./pages/JobSeekerProfile";
 import CompanyProfile from "./pages/CompanyProfile";
-
+// changed by any
 function App() {
   const action = useNavigationType();
   const location = useLocation();
