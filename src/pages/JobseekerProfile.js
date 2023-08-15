@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './JobSeekerProfile.css';
 import { useParams } from 'react-router-dom';
-import Header from './Header'
 
 // Helper components for each tab
 const AboutTab = ({ jobseekerData }) => {
@@ -273,7 +272,7 @@ const ProjectTab = ({projectData}) => {
     );
   };
 
-const JobseekerProfile = () => {
+const JobSeekerProfile = () => {
     const [jobseekerData, setJobseekerData] = useState(null);
     const [workExperienceData, setWorkExperienceData] = useState(null);
     const [educationData, setEducationData] = useState(null);
@@ -519,4 +518,4 @@ const JobseekerProfile = () => {
   };
   
 
-export default JobseekerProfile;
+export default JobSeekerProfile;
