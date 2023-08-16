@@ -2,275 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './JobSeekerProfile.css';
 import { useParams } from 'react-router-dom';
-
-// Helper components for each tab
-const AboutTab = ({ jobseekerData }) => {
-  // Render the about tab content
-  return (
-    <div>
-      <h3>About</h3>
-      <table>
-        <tbody>
-          <tr>
-            <th>Name:</th>
-            <td>{jobseekerData.name}</td>
-          </tr>
-          <tr>
-            <th>Gender:</th>
-            <td>{jobseekerData.gender}</td>
-          </tr>
-          <tr>
-            <th>Address:</th>
-            <td>{jobseekerData.address}</td>
-          </tr>
-          <tr>
-            <th>Date of Birth:</th>
-            <td>{jobseekerData.date_of_birth || 'Not available.'}</td>
-          </tr>
-          <tr>
-            <th>Phone No:</th>
-            <td>{jobseekerData.phone_no || 'Not available.'}</td>
-          </tr>
-          <tr>
-            <th>Nationality:</th>
-            <td>{jobseekerData.nationality || 'Not available.'}</td>
-          </tr>
-          {/* Add more rows for other general information */}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
-const WorkExperienceTab = ({ workExperienceData }) => {
-    return (
-      <div>
-        <h3>Work Experience</h3>
-        {workExperienceData.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>Designation</th>
-                <th>Organization</th>
-                <th>Employment Type</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {workExperienceData.map((experience, index) => (
-                <tr key={index}>
-                  <td>{experience.designation}</td>
-                  <td>{experience.organization}</td>
-                  <td>{experience.employment_type}</td>
-                  <td>{experience.start_date || 'Not available.'}</td>
-                  <td>{experience.end_date || 'Not available.'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div>No work experiences available.</div>
-        )}
-      </div>
-    );
-  };  
-
-const EducationTab = ({educationData}) => {
-  // Fetch education data and render the content
-  // ...
-  return (
-    <div>
-        <h3>Education</h3>
-        {educationData.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>Degree</th>
-                <th>Subject</th>
-                <th>Institution</th>
-                <th>Result</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {educationData.map((education, index) => (
-                <tr key={index}>
-                  <td>{education.degree}</td>
-                  <td>{education.subject}</td>
-                  <td>{education.institution}</td>
-                  <td>{education.result}</td>
-                  <td>{education.start_date || 'Not available.'}</td>
-                  <td>{education.end_date || 'Not available.'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div>No education information available.</div>
-        )}
-      </div>
-  );
-};
-
-const SkillsTab = ({skillsData}) => {
-  // Fetch skills data and render the content
-  // ...
-  return (
-    <div>
-        <h3>Skills</h3>
-        {skillsData.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Expertise Level</th>
-              </tr>
-            </thead>
-            <tbody>
-              {skillsData.map((skill, index) => (
-                <tr key={index}>
-                  <td>{skill.skill_name}</td>
-                  <td>{skill.expertise_level}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div>No skill information available.</div>
-        )}
-      </div>
-  );
-};
-
-const AchievementsTab = ({achievementsData}) => {
-  // Fetch achievements data and render the content
-  // ...
-  return (
-    <div>
-        <h3>Achievements</h3>
-        {achievementsData.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>Achievement Name</th>
-                <th>Position</th>
-                <th>Organization</th>
-                <th>Achievement Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {achievementsData.map((achievement, index) => (
-                <tr key={index}>
-                  <td>{achievement.achievement_name}</td>
-                  <td>{achievement.position}</td>
-                  <td>{achievement.organized_by}</td>
-                  <td>{achievement.achievement_date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div>No achievement available.</div>
-        )}
-      </div>
-  );
-};
-
-const PublicationsTab = ({publicationsData}) => {
-  // Fetch publications data and render the content
-  // ...
-  return (
-    <div>
-        <h3>Publications</h3>
-        {publicationsData.length > 0 ? (
-          <table>
-            <thead>
-              <tr>
-                <th>Paper Title</th>
-                <th>Author(s)</th>
-                <th>Journal</th>
-                <th>Publication Date</th>
-                <th>PDF Link</th>
-              </tr>
-            </thead>
-            <tbody>
-              {publicationsData.map((publication, index) => (
-                <tr key={index}>
-                  <td>{publication.title}</td>
-                  <td>{publication.authors}</td>
-                  <td>{publication.journal}</td>
-                  <td>{publication.publication_date}</td>
-                  {publication.pdf_link ? (
-                        <td> 
-                        <a
-                          href={publication.pdf_link.startsWith('http') ? publication.pdf_link : `http://${publication.pdf_link}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                        PDF Link
-                        </a>
-                    </td>) : 
-                    (<td></td>)}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div>No publication available.</div>
-        )}
-      </div>
-  );
-};
-
-const ProjectTab = ({projectData}) => {
-    // Fetch publications data and render the content
-    // ...
-    return (
-      <div>
-          <h3>Projects</h3>
-          {projectData.length > 0 ? (
-            <table>
-              <thead>
-                <tr>
-                  <th>Project Title</th>
-                  <th>Description</th>
-                  <th>Technologies</th>
-                  <th>Project Link</th>
-                  <th>Start Date</th>
-                  <th>End Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {projectData.map((project, index) => (
-                  <tr key={index}>
-                    <td>{project.title}</td>
-                    <td>{project.description}</td>
-                    <td>{project.technologies}</td>
-                    {project.project_link ? (
-                        <td> 
-                        <a
-                          href={project.project_link.startsWith('http') ? project.project_link : `http://${project.project_link}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                        Project Link
-                        </a>
-                    </td>) : 
-                    (<td></td>)}
-                    <td>{project.start_date}</td>
-                    <td>{project.end_date}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div>No project available.</div>
-          )}
-        </div>
-    );
-  };
+import Header from '../components/Header';
+import { Box, Paper, Grid, Typography, Avatar, Button, IconButton, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 
 const JobSeekerProfile = () => {
     const [jobseekerData, setJobseekerData] = useState(null);
@@ -289,9 +23,40 @@ const JobSeekerProfile = () => {
     const [isLoadingPublications, setIsLoadingPublications] = useState(true);
     const [isLoadingProject, setIsLoadingProject] = useState(true);
 
+    const sections = [
+      {
+        id: 'education',
+        label: 'Education Background',
+        data: educationData,
+      },
+      {
+        id: 'work-experience',
+        label: 'Work Experience',
+        data: workExperienceData,
+      },
+      {
+        id: 'skills',
+        label: 'Skills',
+        data: skillsData,
+      },
+      {
+        id: 'achievements',
+        label: 'Achievements',
+        data: achievementsData,
+      },
+      {
+        id: 'publications',
+        label: 'Publications',
+        data: publicationsData,
+      },
+      {
+        id: 'projects',
+        label: 'Projects',
+        data: projectData,
+      }
+    ];
+    const [activeSection, setActiveSection] = useState(sections[0].id);
     const [error, setError] = useState('');
-    const [activeTab, setActiveTab] = useState('about'); // Initial active tab
-  
     const id = useParams().jobseeker_id;
   
     useEffect(() => {
@@ -310,101 +75,64 @@ const JobSeekerProfile = () => {
           setIsLoadingJobseeker(false);
         }
       };
-  
-      const fetchWorkExperienceData = async () => {
+
+      const fetchAndModifySectionData = async (endpoint, setIdFunction, setIsLoadingFunction, setErrorFunction) => {
         try {
-          const response = await axios.get(`http://localhost:3000/api/workexperience/all/${id}`, {
+          const response = await axios.get(endpoint, {
             headers: {
               'Content-Type': 'application/json',
             },
             withCredentials: true,
           });
-          setWorkExperienceData(response.data);
-          setIsLoadingWorkExperience(false);
+      
+          // Modify data (e.g., remove columns containing "_id")
+          const modifiedData = response.data.map(item => {
+            const filteredItem = {};
+            for (const key in item) {
+              if (!key.includes('_id')) {
+                filteredItem[key] = item[key];
+              }
+            }
+            return filteredItem;
+          });
+      
+          // Set state and loading status
+          setIdFunction(modifiedData);
+          setIsLoadingFunction(false);
         } catch (error) {
-          setError('Error fetching work experience information.');
-          setIsLoadingWorkExperience(false);
+          setErrorFunction(`Error fetching information.`);
+          setIsLoadingFunction(false);
         }
+      };
+      
+      const fetchWorkExperienceData = async () => {
+        const endpoint = `http://localhost:3000/api/workexperience/all/${id}`;
+        fetchAndModifySectionData(endpoint, setWorkExperienceData, setIsLoadingWorkExperience, setError);
       };
 
     const fetchEducationData = async () => {
-        try {
-            const response = await axios.get(`http://localhost:3000/api/education/all/${id}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                withCredentials: true,
-            });
-            setEducationData(response.data);
-            setIsLoadingEducation(false);
-        } catch (error) {
-            setError('Error fetching work experience information.');
-            setIsLoadingEducation(false);
-        }
+      const endpoint = `http://localhost:3000/api/education/all/${id}`;
+      fetchAndModifySectionData(endpoint, setEducationData, setIsLoadingEducation, setError);
     };
 
     const fetchSkillsData = async () => {
-        try {
-            const response = await axios.get(`http://localhost:3000/api/skill/all/${id}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                withCredentials: true,
-            });
-            setSkillsData(response.data);
-            setIsLoadingSkills(false);
-        } catch (error) {
-            setError('Error fetching work experience information.');
-            setIsLoadingSkills(false);
-        }
+        const endpoint = `http://localhost:3000/api/skill/all/${id}`;
+        fetchAndModifySectionData(endpoint, setSkillsData, setIsLoadingSkills, setError);
     };
 
     const fetchAchievementsData = async () => {
-        try {
-            const response = await axios.get(`http://localhost:3000/api/achievement/all/${id}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                withCredentials: true,
-            });
-            setAchievementsData(response.data);
-            setIsLoadingAchievements(false);
-        } catch (error) {
-            setError('Error fetching work experience information.');
-            setIsLoadingAchievements(false);
-        }
+        const endpoint = `http://localhost:3000/api/achievement/all/${id}`;
+        fetchAndModifySectionData(endpoint, setAchievementsData, setIsLoadingAchievements, setError);
     };
 
     const fetchPublicationsData = async () => {
-        try {
-            const response = await axios.get(`http://localhost:3000/api/publication/all/${id}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                withCredentials: true,
-            });
-            setPublicationsData(response.data);
-            setIsLoadingPublications(false);
-        } catch (error) {
-            setError('Error fetching work experience information.');
-            setIsLoadingPublications(false);
-        }
+        const endpoint = `http://localhost:3000/api/publication/all/${id}`;
+        fetchAndModifySectionData(endpoint, setPublicationsData, setIsLoadingPublications, setError);
     };
 
     const fetchProjectData = async () => {
-        try {
-            const response = await axios.get(`http://localhost:3000/api/project/all/${id}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                withCredentials: true,
-            });
-            setProjectData(response.data);
-            setIsLoadingProject(false);
-        } catch (error) {
-            setError('Error fetching work experience information.');
-            setIsLoadingProject(false);
-        }
+        const endpoint = `http://localhost:3000/api/project/all/${id}`;
+        fetchAndModifySectionData(endpoint, setProjectData, setIsLoadingProject, setError);
     };
   
     fetchJobseekerData();
@@ -452,68 +180,140 @@ const JobSeekerProfile = () => {
       };
   
     return (
-      <div className="jobseeker-profile">
-        {/* add a logout button on the top right corner */}
-        <div className="logout" onClick={handleLogout}>
-        Logout
-      </div>
-        <h2>Jobseeker Profile</h2>
-        <div className="tab">
-          <div
-            className={`tab-button ${activeTab === 'about' ? 'active' : ''}`}
-            onClick={() => handleTabChange('about')}
-          >
-            About
-          </div>
-          <div
-            className={`tab-button ${activeTab === 'work-experience' ? 'active' : ''}`}
-            onClick={() => handleTabChange('work-experience')}
-          >
-            Work Experience
-          </div>
-          <div
-            className={`tab-button ${activeTab === 'education' ? 'active' : ''}`}
-            onClick={() => handleTabChange('education')}
-          >
-            Education
-          </div>
-          <div
-            className={`tab-button ${activeTab === 'skills' ? 'active' : ''}`}
-            onClick={() => handleTabChange('skills')}
-          >
-            Skills
-          </div>
-          <div
-            className={`tab-button ${activeTab === 'achievements' ? 'active' : ''}`}
-            onClick={() => handleTabChange('achievements')}
-          >
-            Achievements
-          </div>
-          <div
-            className={`tab-button ${activeTab === 'publications' ? 'active' : ''}`}
-            onClick={() => handleTabChange('publications')}
-          >
-            Publications
-          </div>
-          <div
-            className={`tab-button ${activeTab === 'project' ? 'active' : ''}`}
-            onClick={() => handleTabChange('project')}
-          >
-            Projects
-          </div>
-        </div>
-  
-        <div className="tab-content">
-          {/* Render the content of the selected tab */}
-          {activeTab === 'about' && <AboutTab jobseekerData={jobseekerData} />}
-          {activeTab === 'work-experience' && <WorkExperienceTab workExperienceData={workExperienceData} />}
-          {activeTab === 'education' && <EducationTab educationData={educationData}/>}
-          {activeTab === 'skills' && <SkillsTab skillsData={skillsData} />}
-          {activeTab === 'achievements' && <AchievementsTab achievementsData={achievementsData} />}
-          {activeTab === 'publications' && <PublicationsTab publicationsData={publicationsData}/>}
-          {activeTab === 'project' && <ProjectTab projectData={projectData}/>}
-        </div>
-      </div>
+      <>
+        <Header />
+        <Box p={0}>
+          <Paper elevation={3}>
+            <Box p={3}>
+              <Grid container spacing={3}>
+                {/* Left side - Image */}
+                <Grid item xs={12} md={4}>
+                  <Box display="flex" justifyContent="center">
+                    <Avatar
+                      alt="Profile Image"
+                      src={jobseekerData.image}
+                      sx={{ width: 200, height: 200, boxShadow: 3 }}
+                    />
+                  </Box>
+                  {/* <Typography align="center" variant="subtitle1">
+                    Following: {jobseekerData.following}
+                  </Typography> */}
+                </Grid>
+
+                {/* Right side - Profile Info */}
+                <Grid item xs={12} md={8}>
+                <Box display="flex" justifyContent="flex-end">
+                      <IconButton
+                          color="inherit"
+                          component="a" // Use the component prop to turn the IconButton into a link
+                          href="/accountInfo" // Specify the link URL
+                          sx={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }} // Style for the link appearance
+                      >
+                      <EditIcon />
+                      <Typography variant="subtitle1" sx={{ marginLeft: 1 }}>
+                          Edit Info
+                      </Typography>
+                      </IconButton>
+                  </Box>
+                  <Typography variant="h6" gutterBottom>
+                    Profile Information
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Name:</strong> {jobseekerData.name}
+                    <br />
+                    <strong>Gender:</strong> {jobseekerData.gender}
+                    <br />
+                    <strong>Date of Birth:</strong> {jobseekerData.dateOfBirth}
+                    <br />
+                    <strong>Nationality:</strong> {jobseekerData.nationality}
+                    <br />
+                    <strong>NID:</strong> {jobseekerData.nid}
+                    <br />
+                    <strong>Address:</strong> {jobseekerData.address}
+                    <br />
+                    <strong>Phone No:</strong> {jobseekerData.phoneNo}
+                    <br />
+                    {/* <strong>Github Link:</strong>{' '}
+                    <a href={jobseekerData.githubLink} target="_blank" rel="noopener noreferrer">
+                      {jobseekerData.githubLink}
+                    </a> */}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Box>
+          </Paper>
+        </Box>
+        <Box p={0}>
+        <Paper elevation={3}>
+          <Box p={3}>
+            <Grid container spacing={3}>
+              {/* Left side - Dashboard Sections */}
+              <Grid item xs={12} md={4}>
+                {sections.map((section) => (
+                  <Button
+                    key={section.id}
+                    variant="text"
+                    onClick={() => setActiveSection(section.id)}
+                    sx={{
+                      width: '100%',
+                      textAlign: 'left',
+                      backgroundColor: section.id === activeSection ? '#f0f0f0' : 'inherit'
+                    }}
+                  >
+                    {section.label}
+                  </Button>
+                ))}
+              </Grid>
+
+              {/* Right side - Section Info */}
+              <Grid item xs={12} md={8}>
+                {sections.map((section) => (
+                  section.id === activeSection && section.data[0] && (
+                    <Box key={section.id}>
+                      <Box display="flex" justifyContent="flex-end">
+                      </Box>
+                      <Typography variant="h6" gutterBottom>
+                        {section.label}
+                      </Typography>
+                      <TableContainer component={Paper}>
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              {Object.keys(section.data[0]).map((key) => (
+                                <TableCell key={key} style={{ fontWeight: 'bold', textDecoration: 'underline' }}>
+                                    {key.replace('_', ' ')}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {section.data.map((item, index) => (
+                              <TableRow key={index}>
+                                {Object.entries(item).map(([key, value], index) => (
+                                    <TableCell key={index}>
+                                        {key.includes('link') ? (
+                                            <a href={value} target="_blank" rel="noopener noreferrer">
+                                                {value}
+                                            </a>
+                                        ) : (
+                                            value
+                                        )}
+                                    </TableCell>
+                                ))}
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </Box>
+                  )
+                ))}
+              </Grid>
+            </Grid>
+          </Box>
+        </Paper>
+      </Box>
+      </>
     );
   };
   

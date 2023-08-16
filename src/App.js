@@ -5,8 +5,8 @@ import {
   useNavigationType,
   useLocation,
 } from "react-router-dom";
-import SignUp from "./pages/Signup";
-import SignIn from "./pages/SignIn";
+import SignUp from "./pages/Authentication/Signup";
+import SignIn from "./pages/Authentication/SignIn";
 import { useEffect } from "react";
 import JobSeekerProfile from "./pages/JobSeekerProfile";
 import CompanyProfile from "./pages/CompanyProfile";
