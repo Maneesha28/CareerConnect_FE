@@ -14,6 +14,21 @@ import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import AccountInfo from './pages/JobSeeker/AccountInfo';
 
+import CompanyAccountInfo from './pages/Company/CompanyAccountInfo';
+import CompanyInfo from './pages/Company/CompanyInfo';
+import CompanyPage from './pages/Company/CompanyPage';
+import CompanyReviews from './pages/Company/CompanyReviews';
+import CompanyVacancy from './pages/Company/CompanyVacancy';
+
+import AddJobPost from './pages/Company/AddJobPost';
+import CompanyViewJobPost from './pages/Company/CompanyViewJobPost';
+
+import ViewCompanyPage from './pages/JobSeeker/ViewCompanyPage';
+import ViewJobPost from './pages/JobSeeker/ViewJobPost';
+import ViewCompanyReviews from './pages/JobSeeker/ViewCompanyReviews';
+import ViewCompanyVacancies from './pages/JobSeeker/ViewCompanyVacancies';
+import ViewShortListedJobs from './pages/JobSeeker/ViewShortListedJobs';
+
 // changed by any
 function App() {
   const action = useNavigationType();
@@ -63,6 +78,21 @@ function App() {
       <Route path="/company/:company_id" element={<CompanyProfile />} />
       <Route path="/" element={<Home/>}/>
       <Route path="/jobseeker/:jobseeker_id/accountInfo" element={<AccountInfo/>}/>
+      
+      <Route path="/companyPage" element={<CompanyPage/>}/>
+      <Route path="/companyInfo" element={<CompanyInfo/>}/>
+      <Route path="/companyAccountInfo" element={<CompanyAccountInfo/>}/>
+      <Route path="/companyReviews" element={<CompanyReviews/>}/>
+      <Route path="/companyVacancy" element={<CompanyVacancy/>}/>
+
+      <Route path="/addJobPost" element={<AddJobPost/>}/>
+      <Route path="/companyViewJobPost/*" element={<CompanyViewJobPost/>}/>
+
+      <Route path="/viewCompanyPage/*" element={<ViewCompanyPage/>}/>
+      <Route path="/viewJobPost/*" element={<ViewJobPost/>}/>
+      <Route path="/viewCompanyReviews" element={<ViewCompanyReviews/>}/>
+      <Route path="/viewCompanyVacancies" element={<ViewCompanyVacancies/>}/>
+      <Route path="/viewShortlistedJobs" element={<ViewShortListedJobs/>}/>
       <Route path="*" element={<NotFound/>}/>
     </Routes>
     //</BrowserRouter>
