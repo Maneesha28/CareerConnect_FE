@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import PublicationInfoTable from './PublicationInfoTable';
 import {
   Box,
   Paper,
@@ -18,20 +21,16 @@ import ButtonBase from '@mui/material/ButtonBase';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import Header from '../../components/Header';
-import Sidebar from '../../components/Sidebar';
-
-const publicationInfoData = [
-  { id: 1, title: 'Machine Learning Techniques', authors: 'John Doe, Jane Smith', journal: 'International Journal of AI', pdfLink: 'https://example.com/ml_paper.pdf', publicationDate: '2022-08-15' },
-  { id: 2, title: 'Deep Learning Advances', authors: 'Alice Johnson, Bob Williams', journal: 'Neural Networks', pdfLink: 'https://example.com/dl_paper.pdf', publicationDate: '2021-11-30' },
-  // Add more publication info as needed
-];
 
 function PublicationInfo() {
-  const [publicationInfo, setPublicationInfo] = useState(publicationInfoData);
+  const id = useParams().jobseeker_id;
+  const [publicationInfo, setPublicationInfo] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editedPublicationInfo, setEditedPublicationInfo] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [isLoadingPublication, setIsLoadingPublication] = useState(true);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
   const [newPublicationInfo, setNewPublicationInfo] = useState({
     title: '',
     authors: '',
@@ -40,8 +39,56 @@ function PublicationInfo() {
     publicationDate: '',
   });
 
-  const handleDeletePublicationInfo = (infoId) => {
-    setPublicationInfo(publicationInfo.filter((info) => info.id !== infoId));
+  const fetchPublicationData = async () => {
+    const endpoint = `http://localhost:3000/api/publication/all/${id}`;
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      // Modify data (e.g., remove columns containing "_id")
+      if(response.data.status === 'Access Denied') {
+        setError(response.data.status);
+        setIsLoadingPublication(false);
+        return;
+      }
+      setPublicationInfo(response.data);
+      setIsLoadingPublication(false);
+    } catch (error) {
+      setError(`Error fetching information.`);
+      setIsLoadingPublication(false);
+    }
+  };
+
+  useEffect(() => {
+  fetchPublicationData();
+  }, [id]);
+
+  if (isLoadingPublication) {
+    return <div>Loading...</div>;
+  };
+
+  const handleDeletePublicationInfo = async (infoId) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/api/publication/${infoId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log('response status: ', response.data.status);
+      fetchPublicationData();
+    } catch (error) {
+      console.error('Error deleting publicationInfo:', error);
+    }
+    setIsDeleteConfirmationOpen(false);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteConfirmationOpen(false); // Close the confirmation dialog
   };
 
   const handleAddPublicationInfo = () => {
@@ -54,8 +101,8 @@ function PublicationInfo() {
       title: info.title,
       authors: info.authors,
       journal: info.journal,
-      pdfLink: info.pdfLink,
-      publicationDate: info.publicationDate,
+      pdfLink: info.pdf_link,
+      publicationDate: info.publication_date,
     });
     setIsEditDialogOpen(true);
   };
@@ -71,18 +118,59 @@ function PublicationInfo() {
     });
   };
 
-  const handleSavePublicationInfo = () => {
-    setPublicationInfo([...publicationInfo, { ...newPublicationInfo, id: publicationInfo.length + 1 }]);
-    handleCloseDialog();
+  // Transform the data order to match the backend order
+  const transformedData = {
+    title: newPublicationInfo.title,
+    authors: newPublicationInfo.authors,
+    journal: newPublicationInfo.journal,
+    pdf_link: newPublicationInfo.pdfLink,
+    publication_date: newPublicationInfo.publicationDate,
   };
 
-  const handleSaveEdit = () => {
-    if (editedPublicationInfo) {
-      const updatedPublicationInfo = publicationInfo.map((info) =>
-        info.id === editedPublicationInfo.id ? { ...info, ...newPublicationInfo } : info
-      );
-      setPublicationInfo(updatedPublicationInfo);
+  const handleSavePublicationInfo = async () => {
+    try {
+      console.log('newPublicationInfo: ', newPublicationInfo);
+      const response = await axios.post("http://localhost:3000/api/publication", transformedData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log('response:', response);
+      fetchPublicationData();
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Error saving publicationInfo:', error);
     }
+  };
+
+  const handleSaveEdit = async () => {
+    if (editedPublicationInfo) {
+      console.log('editedPublicationInfo: ', editedPublicationInfo);
+      try {
+        const response = await axios.put(`http://localhost:3000/api/publication/${editedPublicationInfo.publication_id}`, transformedData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+        console.log('response: ', response);
+        fetchPublicationData();
+        setEditedPublicationInfo(null);
+        setIsEditDialogOpen(false);
+        setNewPublicationInfo({
+          degree: '',
+          subject: '',
+          institution: '',
+          result: '',
+          startDate: '',
+          endDate: '',
+        });
+      } catch (error) {
+        console.error('Error updating publicationInfo:', error);
+      }
+    }
+
     setEditedPublicationInfo(null);
     setIsEditDialogOpen(false);
     setNewPublicationInfo({
@@ -108,68 +196,30 @@ function PublicationInfo() {
 
   return (
     <>
-      <Header />
-      <Box display="flex">
-        <Sidebar />
-        <Box p={3}>
-          <Paper elevation={3}>
-            <Box p={3}>
-              <Typography variant="h6" gutterBottom>
-                Publication Information
-              </Typography>
-              <ButtonBase
-                component="div"
-                onClick={handleAddPublicationInfo}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <Typography variant="body1" sx={{ marginRight: '8px' }}>
-                  Add
-                </Typography>
-                <IconButton color="primary">
-                  <AddIcon />
-                </IconButton>
-              </ButtonBase>
-              {publicationInfo.length === 0 ? (
-                <Typography>No publication information available.</Typography>
-              ) : (
-                <List>
-                  {publicationInfo.map((info) => (
-                    <ListItem key={info.id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Box>
-                        <ListItemText
-                          primary={info.title}
-                          secondary={
-                            <>
-                              <div>Authors: {info.authors}</div>
-                              <div>Journal: {info.journal}</div>
-                              <div>
-                                PDF Link: <a href={info.pdfLink} target="_blank" rel="noopener noreferrer">{info.pdfLink}</a>
-                              </div>
-                              <div>Publication Date: {info.publicationDate}</div>
-                            </>
-                          }
-                        />
-                      </Box>
-                      <Box>
-                        <IconButton color="error" onClick={() => handleDeletePublicationInfo(info.id)}>
-                          <DeleteIcon />
-                        </IconButton>
-                        <IconButton color="primary" onClick={() => handleEditPublicationInfo(info)}>
-                          <EditIcon />
-                        </IconButton>
-                      </Box>
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </Box>
-          </Paper>
-        </Box>
+      <Box p={0}>
+        <ButtonBase
+          component="div"
+          onClick={handleAddPublicationInfo}
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            cursor: 'pointer',
+            marginRight: '20px'
+          }}
+        >
+          <Typography variant="body1" sx={{ marginRight: '8px' }}>
+            Add
+          </Typography>
+          <IconButton color="primary">
+            <AddIcon />
+          </IconButton>
+        </ButtonBase>
+        {publicationInfo.length === 0 ? (
+          <Typography>No publication information available.</Typography>
+        ) : (
+          <PublicationInfoTable publicationInfo={publicationInfo} handleDeletePublicationInfo={handleDeletePublicationInfo} handleEditPublicationInfo={handleEditPublicationInfo} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
+        )}
       </Box>
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Add New Publication Information</DialogTitle>

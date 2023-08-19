@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -20,37 +20,77 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import Header from '../../components/Header';
-import Sidebar from '../../components/Sidebar';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { StyledTableCell, StyledTableRow, commonStyles } from './ComponentStyles';
+import DateComponent from '../../components/DateComponent';
 
 function PersonalInfo() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isImageEditMode, setIsImageEditMode] = useState(false);
   const [editedInfo, setEditedInfo] = useState({});
-  const [personalInfo, setPersonalInfo] = useState({
-    name: 'John Doe',
-    gender: 'Male',
-    dateOfBirth: '1990-01-01',
-    nationality: 'United States',
-    nid: '123456789',
-    address: '123 Main St, City, Country',
-    phoneNo: '123-456-7890',
-    githubLink: 'https://github.com/johndoe',
-    image: '',
-  });
+
+  const [jobseekerData, setJobseekerData] = useState(null);
+  const [error, setError] = useState(null);
+
+  const id = useParams().jobseeker_id;
+
+  useEffect(() => {
+    const fetchJobseekerData = async () => {
+      try {
+          const response = await axios.get(`http://localhost:3000/api/jobseeker/${id}`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        });
+        setJobseekerData(response.data);
+      } catch (error) {
+        setError('Error fetching jobseeker information.');
+
+      }
+    };
+    fetchJobseekerData();
+
+  }, [id]);
+
+  if(!jobseekerData) 
+    return (
+      <div>Loading...</div>    
+      );
+
 
   const handleEdit = () => {
     setIsDialogOpen(true);
-    setEditedInfo({ ...personalInfo });
+    setEditedInfo({ ...jobseekerData });
   };
 
-  const handleSave = () => {
-    setIsDialogOpen(false);
-    setIsEditMode(false);
-    setIsImageEditMode(false); // Disable image edit mode when saving
-    setPersonalInfo(editedInfo);
+  const handleSave = async () => {
+    try {
+      setIsDialogOpen(false);
+      setIsEditMode(false);
+      setIsImageEditMode(false);
+  
+      // Send editedInfo to the backend
+      const response = await axios.put('http://localhost:3000/api/jobseeker', editedInfo, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      if (response.status === 200) {
+        // Update jobseekerData with the editedInfo
+        setJobseekerData(editedInfo);
+      } else {
+        console.error('Failed to update jobseeker info.');
+      }
+    } catch (error) {
+      console.error('Error updating jobseeker info:', error);
+    }
   };
+  
 
   const handleCancel = () => {
     setIsDialogOpen(false);
@@ -69,7 +109,7 @@ function PersonalInfo() {
       const reader = new FileReader();
       reader.onload = (e) => {
         setEditedInfo({ ...editedInfo, image: e.target.result });
-        setPersonalInfo({ ...editedInfo, image: e.target.result }); // Save the image as well
+        setJobseekerData({ ...editedInfo, image: e.target.result }); // Save the image as well
         setIsImageEditMode(false); // Disable image edit mode
       };
       reader.readAsDataURL(file);
@@ -78,15 +118,10 @@ function PersonalInfo() {
 
   return (
     <>
-      <Header />
       <Box display="flex">
-        <Sidebar />
-        <Box p={3} width="80%">
+        <Box p={0} width="100%">
           <Paper elevation={3}>
-            <Box p={3} display="flex" alignItems="center">
-              <Box flex="1">
-                <Typography variant="h6">Personal Information</Typography>
-              </Box>
+            <Box p={0} display="flex" alignItems="center" justifyContent="flex-end">
               {isEditMode ? (
                 <>
                   <IconButton color="primary" onClick={handleSave}>
@@ -97,163 +132,13 @@ function PersonalInfo() {
                   </IconButton>
                 </>
               ) : (
-                <IconButton color="primary" onClick={handleEdit}>
-                  <EditIcon />
+                <IconButton color="primary" onClick={handleEdit} sx={{mt: 4, mr: 4}}>
+                 <Typography sx={{mr: 2}}>Edit Info</Typography> <EditIcon />
                 </IconButton>
               )}
             </Box>
             <Box p={3} display="flex">
-              <Box flex="1">
-                <Box display="flex" alignItems="center">
-                  <Typography>Name:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      label="Name"
-                      value={editedInfo.name || ''}
-                      onChange={(e) => setEditedInfo({ ...editedInfo, name: e.target.value })}
-                    />
-                  ) : (
-                    <Typography>{personalInfo.name}</Typography>
-                  )}
-                </Box>
-
-                <Box display="flex" alignItems="center">
-                  <Typography>Gender:</Typography>
-                  {isEditMode ? (
-                    <FormControl fullWidth variant="outlined" margin="dense">
-                      <InputLabel>Gender</InputLabel>
-                      <Select
-                        value={editedInfo.gender || ''}
-                        onChange={(e) => setEditedInfo({ ...editedInfo, gender: e.target.value })}
-                        label="Gender"
-                      >
-                        <MenuItem value="Male">Male</MenuItem>
-                        <MenuItem value="Female">Female</MenuItem>
-                        <MenuItem value="Other">Other</MenuItem>
-                      </Select>
-                    </FormControl>
-                  ) : (
-                    <Typography>{personalInfo.gender}</Typography>
-                  )}
-                </Box>
-
-                <Box display="flex" alignItems="center">
-                  <Typography>Date of Birth:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      type="date"
-                      label="Date of Birth"
-                      value={editedInfo.dateOfBirth || ''}
-                      onChange={(e) =>
-                        setEditedInfo({ ...editedInfo, dateOfBirth: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <Typography>{personalInfo.dateOfBirth}</Typography>
-                  )}
-                </Box>
-
-                <Box display="flex" alignItems="center">
-                  <Typography>Nationality:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      label="Nationality"
-                      value={editedInfo.nationality || ''}
-                      onChange={(e) =>
-                        setEditedInfo({ ...editedInfo, nationality: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <Typography>{personalInfo.nationality}</Typography>
-                  )}
-                </Box>
-
-                <Box display="flex" alignItems="center">
-                  <Typography>NID:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      label="NID"
-                      value={editedInfo.nid || ''}
-                      onChange={(e) => setEditedInfo({ ...editedInfo, nid: e.target.value })}
-                    />
-                  ) : (
-                    <Typography>{personalInfo.nid}</Typography>
-                  )}
-                </Box>
-
-                <Box display="flex" alignItems="center">
-                  <Typography>Address:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      multiline
-                      rows={4}
-                      label="Address"
-                      value={editedInfo.address || ''}
-                      onChange={(e) =>
-                        setEditedInfo({ ...editedInfo, address: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <Typography>{personalInfo.address}</Typography>
-                  )}
-                </Box>
-
-                <Box display="flex" alignItems="center">
-                  <Typography>Phone No:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      label="Phone No"
-                      value={editedInfo.phoneNo || ''}
-                      onChange={(e) =>
-                        setEditedInfo({ ...editedInfo, phoneNo: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <Typography>{personalInfo.phoneNo}</Typography>
-                  )}
-                </Box>
-
-                <Box display="flex" alignItems="center">
-                  <Typography>GitHub Link:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      label="GitHub Link"
-                      value={editedInfo.githubLink || ''}
-                      onChange={(e) =>
-                        setEditedInfo({ ...editedInfo, githubLink: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <Typography>
-                      <a href={personalInfo.githubLink} target="_blank" rel="noopener noreferrer">
-                        <GitHubIcon /> {personalInfo.githubLink}
-                      </a>
-                    </Typography>
-                  )}
-                </Box>
-              </Box>
-              <Box>
+            <Box flex={1}>
                 {isImageEditMode ? (
                   <Box display="flex" flexDirection="column" alignItems="center">
                     <label htmlFor="image-upload">
@@ -281,9 +166,9 @@ function PersonalInfo() {
                   </Box>
                 ) : (
                   <Box display="flex" justifyContent="center">
-                    {personalInfo.image ? (
+                    {jobseekerData.image ? (
                       <img
-                        src={personalInfo.image}
+                        src={jobseekerData.image}
                         alt="Profile"
                         style={{ maxWidth: '300px', maxHeight: '300px', borderRadius: '50%', cursor: 'pointer' }}
                         onClick={handleImageClick}
@@ -293,6 +178,156 @@ function PersonalInfo() {
                     )}
                   </Box>
                 )}
+              </Box>
+              <Box flex={1}>
+                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
+                  <Typography>Name: </Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      label="Name"
+                      value={editedInfo.name || ''}
+                      onChange={(e) => setEditedInfo({ ...editedInfo, name: e.target.value })}
+                    />
+                  ) : (
+                    <Typography>{jobseekerData.name}</Typography>
+                  )}
+                </Box>
+
+                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
+                  <Typography>Gender:</Typography>
+                  {isEditMode ? (
+                    <FormControl fullWidth variant="outlined" margin="dense">
+                      <InputLabel>Gender</InputLabel>
+                      <Select
+                        value={editedInfo.gender || ''}
+                        onChange={(e) => setEditedInfo({ ...editedInfo, gender: e.target.value })}
+                        label="Gender"
+                      >
+                        <MenuItem value="Male">Male</MenuItem>
+                        <MenuItem value="Female">Female</MenuItem>
+                        <MenuItem value="Other">Other</MenuItem>
+                      </Select>
+                    </FormControl>
+                  ) : (
+                    <Typography>{jobseekerData.gender}</Typography>
+                  )}
+                </Box>
+
+                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
+                  <Typography>Date of Birth:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      type="date"
+                      label="Date of Birth"
+                      value={editedInfo.date_of_birth || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, date_of_birth: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <Typography><DateComponent isoDate={jobseekerData.date_of_birth}/></Typography>
+                  )}
+                </Box>
+
+                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
+                  <Typography>Nationality:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      label="Nationality"
+                      value={editedInfo.nationality || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, nationality: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <Typography>{jobseekerData.nationality}</Typography>
+                  )}
+                </Box>
+
+                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
+                  <Typography>NID:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      label="NID"
+                      value={editedInfo.nid || ''}
+                      onChange={(e) => setEditedInfo({ ...editedInfo, nid: e.target.value })}
+                    />
+                  ) : (
+                    <Typography>{jobseekerData.nid}</Typography>
+                  )}
+                </Box>
+
+                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
+                  <Typography>Address:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      multiline
+                      rows={4}
+                      label="Address"
+                      value={editedInfo.address || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, address: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <Typography>{jobseekerData.address}</Typography>
+                  )}
+                </Box>
+
+                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
+                  <Typography>Phone No:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      label="Phone No"
+                      value={editedInfo.phone_no || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, phone_no: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <Typography>{jobseekerData.phone_no}</Typography>
+                  )}
+                </Box>
+
+                {/* <Box display="flex" alignItems="center">
+                  <Typography>GitHub Link:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      label="GitHub Link"
+                      value={editedInfo.githubLink || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, githubLink: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <Typography>
+                      <a href={jobseekerData.githubLink} target="_blank" rel="noopener noreferrer">
+                        <GitHubIcon /> {jobseekerData.githubLink}
+                      </a>
+                    </Typography>
+                  )}
+                </Box> */}
               </Box>
             </Box>
           </Paper>
@@ -362,8 +397,8 @@ function PersonalInfo() {
               variant="outlined"
               margin="dense"
               label="Phone No"
-              value={editedInfo.phoneNo || ''}
-              onChange={(e) => setEditedInfo({ ...editedInfo, phoneNo: e.target.value })}
+              value={editedInfo.phone_no || ''}
+              onChange={(e) => setEditedInfo({ ...editedInfo, phone_no: e.target.value })}
             />
             <TextField
               fullWidth

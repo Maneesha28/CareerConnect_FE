@@ -8,19 +8,12 @@ import {
 import SignUp from "./pages/Authentication/Signup";
 import SignIn from "./pages/Authentication/SignIn";
 import { useEffect } from "react";
-import JobSeekerProfile from "./pages/JobSeekerProfile";
+import JobSeekerProfile from "./pages/JobSeeker/JobSeekerProfile";
 import CompanyProfile from "./pages/CompanyProfile";
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
-import Profile from './pages/JobSeeker/Profile';
 import AccountInfo from './pages/JobSeeker/AccountInfo';
-import AchievementInfo from './pages/JobSeeker/AchievementInfo';
-import EduInfo from './pages/JobSeeker/EduInfo';
-import ProjectInfo from './pages/JobSeeker/ProjectInfo';
-import WorkInfo from './pages/JobSeeker/WorkInfo';
-import PublicationInfo from './pages/JobSeeker/PublicationInfo';
-import SkillInfo from './pages/JobSeeker/SkillInfo';
-import PersonalInfo from './pages/JobSeeker/PersonalInfo';
+
 // changed by any
 function App() {
   const action = useNavigationType();
@@ -69,15 +62,7 @@ function App() {
       <Route path="/jobseeker/:jobseeker_id" element={<JobSeekerProfile />} />
       <Route path="/company/:company_id" element={<CompanyProfile />} />
       <Route path="/" element={<Home/>}/>
-      <Route path="/profile" element={<Profile/>}/>
-      <Route path="/accountInfo" element={<AccountInfo/>}/>
-      <Route path="/achievementInfo" element={<AchievementInfo/>}/>
-      <Route path="/educationalInfo" element={<EduInfo/>}/>
-      <Route path="/projectInfo" element={<ProjectInfo/>}/>
-      <Route path="/workInfo" element={<WorkInfo/>}/>
-      <Route path="/publicationInfo" element={<PublicationInfo/>}/>
-      <Route path="/skillInfo" element={<SkillInfo/>}/>
-      <Route path="/personalInfo" element={<PersonalInfo/>}/>
+      <Route path="/jobseeker/:jobseeker_id/accountInfo" element={<AccountInfo/>}/>
       <Route path="*" element={<NotFound/>}/>
     </Routes>
     //</BrowserRouter>

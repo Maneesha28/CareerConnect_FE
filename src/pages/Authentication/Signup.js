@@ -159,41 +159,6 @@ function SignUp() {
         </Grid>
       </Grid>
     </ThemeProvider>
-    // <div className="signUpContainer">
-    //     {errorMessage && <div>{errorMessage}</div>}
-    //   <form onSubmit={handleSubmit} className="signUpForm">
-    //     <div>
-    //       <label>Email:</label>
-    //       <input
-    //         type="email"
-    //         name="email"
-    //         value={formData.email}
-    //         onChange={handleChange}
-    //         placeholder="Enter your email"
-    //       />
-    //     </div>
-    //     <div>
-    //       <label>Password:</label>
-    //       <input
-    //         type="password"
-    //         name="password"
-    //         value={formData.password}
-    //         onChange={handleChange}
-    //         placeholder="Enter your password"
-    //       />
-    //     </div>
-    //     <div>
-    //       <label>Role:</label>
-    //       <select name="role" value={formData.role} onChange={handleChange}>
-    //         <option value="jobseeker">Job Seeker</option>
-    //         <option value="company">Company</option>
-    //       </select>
-    //     </div>
-    //     <button type="submit" className="signUpButton">
-    //       Sign Up
-    //     </button>
-    //   </form>
-    // </div>
   );
 }
 

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Paper, Grid, Typography, IconButton, InputAdornment, TextField } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import Header from '../../components/Header';
-import Sidebar from '../../components/Sidebar';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 function AccountInfo() {
-  const [email, setEmail] = useState('user@example.com');
+  const [email, setEmail] = useState('email pathash nai -.-');
   const [password, setPassword] = useState('password123');
   const [showPassword, setShowPassword] = useState(false);
 

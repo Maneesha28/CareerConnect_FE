@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import AchievementInfoTable from './AchievementInfoTable';
 import {
   Box,
   Paper,
@@ -18,20 +21,16 @@ import ButtonBase from '@mui/material/ButtonBase';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import Header from '../../components/Header';
-import Sidebar from '../../components/Sidebar';
-
-const achievementsData = [
-  { id: 1, name: 'Coding Competition Winner', date: '2021-06-15', position: '1st Place', organizedBy: 'CodeFest' },
-  { id: 2, name: 'Outstanding Performance Award', date: '2020-12-01', position: 'Top Performer', organizedBy: 'TechAchieve' },
-  // Add more achievements as needed
-];
 
 function AchievementInfo() {
-  const [achievements, setAchievements] = useState(achievementsData);
+  const id = useParams().jobseeker_id;
+  const [achievements, setAchievements] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editedAchievement, setEditedAchievement] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [isLoadingAchievement, setIsLoadingAchievement] = useState(true);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
   const [newAchievement, setNewAchievement] = useState({
     name: '',
     date: '',
@@ -39,8 +38,56 @@ function AchievementInfo() {
     organizedBy: '',
   });
 
-  const handleDeleteAchievement = (achievementId) => {
-    setAchievements(achievements.filter((achievement) => achievement.id !== achievementId));
+  const fetchAchievementData = async () => {
+    const endpoint = `http://localhost:3000/api/achievement/all/${id}`;
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      // Modify data (e.g., remove columns containing "_id")
+      if(response.data.status === 'Access Denied') {
+        setError(response.data.status);
+        setIsLoadingAchievement(false);
+        return;
+      }
+      setAchievements(response.data);
+      setIsLoadingAchievement(false);
+    } catch (error) {
+      setError(`Error fetching information.`);
+      setIsLoadingAchievement(false);
+    }
+  };
+
+  useEffect(() => {
+  fetchAchievementData();
+  }, [id]);
+
+  if (isLoadingAchievement) {
+    return <div>Loading...</div>;
+  }
+
+  const handleDeleteAchievement = async (achievementId) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/api/achievement/${achievementId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log('response status: ', response.data.status);
+      fetchAchievementData();
+    } catch (error) {
+      console.error('Error deleting achievementInfo:', error);
+    }
+    setIsDeleteConfirmationOpen(false);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteConfirmationOpen(false); // Close the confirmation dialog
   };
 
   const handleAddAchievement = () => {
@@ -50,10 +97,10 @@ function AchievementInfo() {
   const handleEditAchievement = (achievement) => {
     setEditedAchievement(achievement);
     setNewAchievement({
-      name: achievement.name,
-      date: achievement.date,
+      name: achievement.achievement_name,
+      date: achievement.achievement_date,
       position: achievement.position,
-      organizedBy: achievement.organizedBy,
+      organizedBy: achievement.organized_by,
     });
     setIsEditDialogOpen(true);
   };
@@ -68,25 +115,55 @@ function AchievementInfo() {
     });
   };
 
-  const handleSaveAchievement = () => {
-    setAchievements([...achievements, { ...newAchievement, id: achievements.length + 1 }]);
-    handleCloseDialog();
+  const transformedData = {
+      achievement_name: newAchievement.name,
+      achievement_date: newAchievement.date,
+      position: newAchievement.position,
+      organized_by: newAchievement.organizedBy,
   };
-  const handleSaveEdit = () => {
-    if (editedAchievement) {
-      const updatedAchievements = achievements.map((achievement) =>
-        achievement.id === editedAchievement.id ? { ...achievement, ...newAchievement } : achievement
-      );
-      setAchievements(updatedAchievements);
-    }
-    setEditedAchievement(null);
-    setIsEditDialogOpen(false);
-    setNewAchievement({
-        name: '',
-        date: '',
-        position: '',
-        organizedBy: '',
+
+  const handleSaveAchievement = async () => {
+    try {
+      console.log('newAchievement: ', newAchievement);
+      const response = await axios.post("http://localhost:3000/api/achievement", transformedData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
       });
+      console.log('response:', response);
+      fetchAchievementData();
+      // const updatedAchievements = [...achievements, { ...transformedData, id: achievements.length + 1 }];
+      // setAchievements(updatedAchievements);
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Error saving achievements:', error);
+    }
+  };
+  const handleSaveEdit = async () => {
+    if (editedAchievement) {
+      console.log('editedAchievement: ', editedAchievement);
+      try {
+        const response = await axios.put(`http://localhost:3000/api/achievement/${editedAchievement.achievement_id}`, transformedData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+        console.log('response: ', response);
+        fetchAchievementData();
+        setEditedAchievement(null);
+        setIsEditDialogOpen(false);
+        setNewAchievement({
+            name: '',
+            date: '',
+            position: '',
+            organizedBy: '',
+          });
+      } catch (error) {
+        console.error('Error updating achievement:', error);
+      }
+    }
   };
 
 
@@ -103,59 +180,30 @@ function AchievementInfo() {
 
   return (
     <>
-      <Header />
-      <Box display="flex">
-        <Sidebar />
-        <Box p={3}>
-          <Paper elevation={3}>
-            <Box p={3}>
-              <Typography variant="h6" gutterBottom>
-                Achievements
+      <Box p={0}>
+        <ButtonBase
+              component="div"
+              onClick={handleAddAchievement}
+              style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              cursor: 'pointer',
+              marginRight: '20px'
+              }}
+              >
+              <Typography variant="body1" sx={{ marginRight: '8px' }}>
+                  Add
               </Typography>
-              <ButtonBase
-                    component="div"
-                    onClick={handleAddAchievement}
-                    style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    }}
-                    >
-                    <Typography variant="body1" sx={{ marginRight: '8px' }}>
-                        Add
-                    </Typography>
-                    <IconButton color="primary">
-                        <AddIcon />
-                    </IconButton>
-                </ButtonBase>
-              {achievements.length === 0 ? (
-                <Typography>No achievements available.</Typography>
-              ) : (
-                <List>
-                  {achievements.map((achievement) => (
-                    <ListItem key={achievement.id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Box>
-                        <ListItemText
-                          primary={achievement.name}
-                          secondary={`${achievement.date} | ${achievement.position} | Organized by: ${achievement.organizedBy}`}
-                        />
-                      </Box>
-                      <Box>
-                        <IconButton color="error" onClick={() => handleDeleteAchievement(achievement.id)}>
-                          <DeleteIcon />
-                        </IconButton>
-                        <IconButton color="primary" onClick={() => handleEditAchievement(achievement)}>
-                          <EditIcon />
-                        </IconButton>
-                      </Box>
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </Box>
-          </Paper>
-        </Box>
+              <IconButton color="primary">
+                  <AddIcon />
+              </IconButton>
+          </ButtonBase>
+        {achievements.length === 0 ? (
+          <Typography>No achievements available.</Typography>
+        ) : (
+          <AchievementInfoTable achievementInfo={achievements} handleDeleteAchievementInfo={handleDeleteAchievement} handleEditAchievementInfo={handleEditAchievement} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
+        )}
       </Box>
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Add New Achievement</DialogTitle>

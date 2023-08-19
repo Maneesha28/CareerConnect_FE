@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import EduInfoTable from './EduInfoTable';
 import {
   Box,
   Paper,
@@ -18,20 +21,17 @@ import ButtonBase from '@mui/material/ButtonBase';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import Header from '../../components/Header';
-import Sidebar from '../../components/Sidebar';
 
-const eduInfoData = [
-  { id: 1, degree: 'Bachelor of Science', subject: 'Computer Science', institution: 'ABC University', result: 'GPA: 3.8', startDate: '2017-09-01', endDate: '2021-05-15' },
-  { id: 2, degree: 'Master of Business Administration', subject: 'Business Management', institution: 'XYZ University', result: 'GPA: 3.9', startDate: '2021-09-01', endDate: '2023-05-15' },
-  // Add more education info as needed
-];
 
 function EduInfo() {
-  const [eduInfo, setEduInfo] = useState(eduInfoData);
+  const id = useParams().jobseeker_id;
+  const [eduInfo, setEduInfo] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editedEduInfo, setEditedEduInfo] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [isLoadingEducation, setIsLoadingEducation] = useState(true);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
   const [newEduInfo, setNewEduInfo] = useState({
     degree: '',
     subject: '',
@@ -41,10 +41,58 @@ function EduInfo() {
     endDate: '',
   });
 
-  const handleDeleteEduInfo = (infoId) => {
-    setEduInfo(eduInfo.filter((info) => info.id !== infoId));
+  const fetchEducationData = async () => {
+    const endpoint = `http://localhost:3000/api/education/all/${id}`;
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      // Modify data (e.g., remove columns containing "_id")
+      if(response.data.status === 'Access Denied') {
+        setError(response.data.status);
+        setIsLoadingEducation(false);
+        return;
+      }
+      setEduInfo(response.data);
+      setIsLoadingEducation(false);
+    } catch (error) {
+      setError(`Error fetching information.`);
+      setIsLoadingEducation(false);
+    }
   };
 
+  useEffect(() => {
+  fetchEducationData();
+  }, [id]);
+
+  if (isLoadingEducation) {
+    return <div>Loading...</div>;
+  };
+
+  const handleDeleteEduInfo = async (infoId) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/api/education/${infoId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log('response status: ', response.data.status);
+      fetchEducationData();
+    } catch (error) {
+      console.error('Error deleting eduInfo:', error);
+    }
+    setIsDeleteConfirmationOpen(false);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteConfirmationOpen(false); // Close the confirmation dialog
+  };
+  
   const handleAddEduInfo = () => {
     setIsDialogOpen(true);
   };
@@ -56,8 +104,8 @@ function EduInfo() {
       subject: info.subject,
       institution: info.institution,
       result: info.result,
-      startDate: info.startDate,
-      endDate: info.endDate,
+      startDate: info.start_date,
+      endDate: info.end_date,
     });
     setIsEditDialogOpen(true);
   };
@@ -74,29 +122,60 @@ function EduInfo() {
     });
   };
 
-  const handleSaveEduInfo = () => {
-    setEduInfo([...eduInfo, { ...newEduInfo, id: eduInfo.length + 1 }]);
-    handleCloseDialog();
+  // Transform the data order to match the backend order
+  const transformedData = {
+    degree: newEduInfo.degree,
+    subject: newEduInfo.subject,
+    institution: newEduInfo.institution,
+    result: newEduInfo.result,
+    start_date: newEduInfo.startDate,
+    end_date: newEduInfo.endDate,
   };
 
-  const handleSaveEdit = () => {
-    if (editedEduInfo) {
-      const updatedEduInfo = eduInfo.map((info) =>
-        info.id === editedEduInfo.id ? { ...info, ...newEduInfo } : info
-      );
-      setEduInfo(updatedEduInfo);
+  const handleSaveEduInfo = async () => {
+    try {
+      console.log('newEduInfo: ', newEduInfo);
+      const response = await axios.post("http://localhost:3000/api/education", transformedData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log('response:', response);
+      fetchEducationData();
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Error saving eduInfo:', error);
     }
-    setEditedEduInfo(null);
-    setIsEditDialogOpen(false);
-    setNewEduInfo({
-      degree: '',
-      subject: '',
-      institution: '',
-      result: '',
-      startDate: '',
-      endDate: '',
-    });
   };
+
+  const handleSaveEdit = async () => {
+    if (editedEduInfo) {
+      console.log('editedEduInfo: ', editedEduInfo);
+      try {
+        const response = await axios.put(`http://localhost:3000/api/education/${editedEduInfo.degree_id}`, transformedData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+        console.log('response: ', response);
+        fetchEducationData();
+        setEditedEduInfo(null);
+        setIsEditDialogOpen(false);
+        setNewEduInfo({
+          degree: '',
+          subject: '',
+          institution: '',
+          result: '',
+          startDate: '',
+          endDate: '',
+        });
+      } catch (error) {
+        console.error('Error updating eduInfo:', error);
+      }
+    }
+  };  
 
   const handleCancelEdit = () => {
     setEditedEduInfo(null);
@@ -113,59 +192,30 @@ function EduInfo() {
 
   return (
     <>
-      <Header />
-      <Box display="flex">
-        <Sidebar />
-        <Box p={3}>
-          <Paper elevation={3}>
-            <Box p={3}>
-              <Typography variant="h6" gutterBottom>
-                Education Information
-              </Typography>
-              <ButtonBase
-                component="div"
-                onClick={handleAddEduInfo}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <Typography variant="body1" sx={{ marginRight: '8px' }}>
-                  Add
-                </Typography>
-                <IconButton color="primary">
-                  <AddIcon />
-                </IconButton>
-              </ButtonBase>
-              {eduInfo.length === 0 ? (
-                <Typography>No education information available.</Typography>
-              ) : (
-                <List>
-                  {eduInfo.map((info) => (
-                    <ListItem key={info.id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Box>
-                        <ListItemText
-                          primary={`${info.degree} in ${info.subject}`}
-                          secondary={`${info.institution} | ${info.result} | ${info.startDate} - ${info.endDate}`}
-                        />
-                      </Box>
-                      <Box>
-                        <IconButton color="error" onClick={() => handleDeleteEduInfo(info.id)}>
-                          <DeleteIcon />
-                        </IconButton>
-                        <IconButton color="primary" onClick={() => handleEditEduInfo(info)}>
-                          <EditIcon />
-                        </IconButton>
-                      </Box>
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </Box>
-          </Paper>
-        </Box>
+      <Box p={0}>
+        <ButtonBase
+          component="div"
+          onClick={handleAddEduInfo}
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            cursor: 'pointer',
+            marginRight: '20px'
+          }}
+        >
+          <Typography variant="body1">
+            Add
+          </Typography>
+          <IconButton color="primary">
+            <AddIcon />
+          </IconButton>
+        </ButtonBase>
+        {eduInfo.length === 0 ? (
+          <Typography>No education information available.</Typography>
+        ) : (
+          <EduInfoTable eduInfo={eduInfo} handleDeleteEduInfo={handleDeleteEduInfo} handleEditEduInfo={handleEditEduInfo} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
+        )}
       </Box>
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Add New Education Information</DialogTitle>

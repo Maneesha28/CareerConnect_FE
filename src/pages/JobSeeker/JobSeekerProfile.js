@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './JobSeekerProfile.css';
 import { useParams } from 'react-router-dom';
-import Header from '../components/Header';
-import { Box, Paper, Grid, Typography, Avatar, Button, IconButton, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
+import Header from '../../components/Header';
+import { Box, Paper, Grid, Typography, Avatar, Button, IconButton, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, CssBaseline } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import EduInfo from './Education/EduInfo';
+import WorkInfo from './Work-Experience/WorkInfo';
+import SkillInfo from './Skill/SkillInfo';
+import AchievementInfo from './Achievement/AchievementInfo';
+import PublicationInfo from './Publication/PublicationInfo';
+import ProjectInfo from './Project/ProjectInfo';
+import PersonalInfo from './PersonalInfo';
 
 const JobSeekerProfile = () => {
     const [jobseekerData, setJobseekerData] = useState(null);
@@ -86,6 +93,11 @@ const JobSeekerProfile = () => {
           });
       
           // Modify data (e.g., remove columns containing "_id")
+          if(response.data.status === 'Access Denied') {
+            setErrorFunction(response.data.status);
+            setIsLoadingFunction(false);
+            return;
+          }
           const modifiedData = response.data.map(item => {
             const filteredItem = {};
             for (const key in item) {
@@ -153,100 +165,62 @@ const JobSeekerProfile = () => {
     if (error) {
       return <div>{error}</div>;
     }
+
+    const renderActiveSection = () => {
+        const activeSectionData = sections.find(section => section.id === activeSection);
+        
+        if (activeSection === 'skills') {
+          return <SkillInfo />;
+        }
+        if (activeSection === 'education') {
+            return <EduInfo />;
+        }
+        if (activeSection === 'work-experience') {
+            return <WorkInfo />;
+        }
+        if (activeSection === 'achievements') {
+            return <AchievementInfo />;
+        }
+        if (activeSection === 'publications') {
+            return <PublicationInfo />;
+        }
+        if (activeSection === 'projects') {
+            return <ProjectInfo />;
+        }
+        // Render other components based on the active section
+        
+        return null;
+      };
   
-    const handleTabChange = (tabName) => {
-      setActiveTab(tabName);
-    };
   
     if (!jobseekerData) {
       return <div>Jobseeker not found.</div>;
     }
 
-    const handleLogout = () => {
-        axios.post('http://localhost:3000/api/auth/logout', {}, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            withCredentials: true,
-        })
-        .then((response) => {
-            if (response.status === 200) {
-                window.location.href = '/auth/login';
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-      };
+    const defaultTheme = createTheme(
+      {
+        typography: {
+          fontSize: 24,
+        },
+        palette: {
+          background: {
+            default: 'rgba(150, 129, 235, 0.8)',
+          },
+        },
+      }
+    );
   
     return (
-      <>
+      <ThemeProvider theme={defaultTheme}>
+        <CssBaseline/>
         <Header />
-        <Box p={0}>
-          <Paper elevation={3}>
-            <Box p={3}>
-              <Grid container spacing={3}>
-                {/* Left side - Image */}
-                <Grid item xs={12} md={4}>
-                  <Box display="flex" justifyContent="center">
-                    <Avatar
-                      alt="Profile Image"
-                      src={jobseekerData.image}
-                      sx={{ width: 200, height: 200, boxShadow: 3 }}
-                    />
-                  </Box>
-                  {/* <Typography align="center" variant="subtitle1">
-                    Following: {jobseekerData.following}
-                  </Typography> */}
-                </Grid>
-
-                {/* Right side - Profile Info */}
-                <Grid item xs={12} md={8}>
-                <Box display="flex" justifyContent="flex-end">
-                      <IconButton
-                          color="inherit"
-                          component="a" // Use the component prop to turn the IconButton into a link
-                          href="/accountInfo" // Specify the link URL
-                          sx={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }} // Style for the link appearance
-                      >
-                      <EditIcon />
-                      <Typography variant="subtitle1" sx={{ marginLeft: 1 }}>
-                          Edit Info
-                      </Typography>
-                      </IconButton>
-                  </Box>
-                  <Typography variant="h6" gutterBottom>
-                    Profile Information
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Name:</strong> {jobseekerData.name}
-                    <br />
-                    <strong>Gender:</strong> {jobseekerData.gender}
-                    <br />
-                    <strong>Date of Birth:</strong> {jobseekerData.dateOfBirth}
-                    <br />
-                    <strong>Nationality:</strong> {jobseekerData.nationality}
-                    <br />
-                    <strong>NID:</strong> {jobseekerData.nid}
-                    <br />
-                    <strong>Address:</strong> {jobseekerData.address}
-                    <br />
-                    <strong>Phone No:</strong> {jobseekerData.phoneNo}
-                    <br />
-                    {/* <strong>Github Link:</strong>{' '}
-                    <a href={jobseekerData.githubLink} target="_blank" rel="noopener noreferrer">
-                      {jobseekerData.githubLink}
-                    </a> */}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Box>
-          </Paper>
+        <Box p={6}>
+            <PersonalInfo />
         </Box>
-        <Box p={0}>
+        <Box p={6}>
         <Paper elevation={3}>
-          <Box p={3}>
-            <Grid container spacing={3}>
+          <Box p={0}>
+            <Grid container spacing={4}>
               {/* Left side - Dashboard Sections */}
               <Grid item xs={12} md={4}>
                 {sections.map((section) => (
@@ -267,7 +241,9 @@ const JobSeekerProfile = () => {
 
               {/* Right side - Section Info */}
               <Grid item xs={12} md={8}>
-                {sections.map((section) => (
+                {/* Render the active section component */}
+                {renderActiveSection()}
+                {/* {sections.map((section) => (
                   section.id === activeSection && section.data[0] && (
                     <Box key={section.id}>
                       <Box display="flex" justifyContent="flex-end">
@@ -278,19 +254,19 @@ const JobSeekerProfile = () => {
                       <TableContainer component={Paper}>
                         <Table>
                           <TableHead>
-                            <TableRow>
+                            <StyledTableRow>
                               {Object.keys(section.data[0]).map((key) => (
-                                <TableCell key={key} style={{ fontWeight: 'bold', textDecoration: 'underline' }}>
+                                <StyledTableCell key={key} style={{ fontWeight: 'bold', textDecoration: 'underline' }}>
                                     {key.replace('_', ' ')}
-                                </TableCell>
+                                </StyledTableCell>
                               ))}
-                            </TableRow>
+                            </StyledTableRow>
                           </TableHead>
                           <TableBody>
                             {section.data.map((item, index) => (
-                              <TableRow key={index}>
+                              <StyledTableRow key={index}>
                                 {Object.entries(item).map(([key, value], index) => (
-                                    <TableCell key={index}>
+                                    <StyledTableCell key={index}>
                                         {key.includes('link') ? (
                                             <a href={value} target="_blank" rel="noopener noreferrer">
                                                 {value}
@@ -298,22 +274,22 @@ const JobSeekerProfile = () => {
                                         ) : (
                                             value
                                         )}
-                                    </TableCell>
+                                    </StyledTableCell>
                                 ))}
-                              </TableRow>
+                              </StyledTableRow>
                             ))}
                           </TableBody>
                         </Table>
                       </TableContainer>
                     </Box>
                   )
-                ))}
+                ))} */}
               </Grid>
             </Grid>
           </Box>
         </Paper>
       </Box>
-      </>
+      </ThemeProvider>
     );
   };
   

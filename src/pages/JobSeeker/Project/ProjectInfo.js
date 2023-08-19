@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import ProjectInfoTable from './ProjectInfoTable';
+import DeleteConfirmationDialogue from '../../../components/DeleteConfirmationDialogue';
+import DateComponent from '../../../components/DateComponent';
 import {
   Box,
   Paper,
@@ -18,20 +23,16 @@ import ButtonBase from '@mui/material/ButtonBase';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import Header from '../../components/Header';
-import Sidebar from '../../components/Sidebar';
-
-const projectInfoData = [
-  { id: 1, title: 'E-commerce Website', description: 'Developed a fully functional e-commerce website using MERN stack.', projectLink: 'https://example.com', technologies: 'React, Node.js, MongoDB', startDate: '2022-03-15', endDate: '2022-06-30' },
-  { id: 2, title: 'Portfolio Website', description: 'Designed and built a personal portfolio website to showcase projects and skills.', projectLink: 'https://example.com/portfolio', technologies: 'HTML, CSS, JavaScript', startDate: '2021-08-01', endDate: '2021-09-15' },
-  // Add more project info as needed
-];
 
 function ProjectInfo() {
-  const [projectInfo, setProjectInfo] = useState(projectInfoData);
+  const id = useParams().jobseeker_id;
+  const [projectInfo, setProjectInfo] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editedProjectInfo, setEditedProjectInfo] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [isLoadingProjectInfo, setIsLoadingProjectInfo] = useState(true);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
   const [newProjectInfo, setNewProjectInfo] = useState({
     title: '',
     description: '',
@@ -41,9 +42,58 @@ function ProjectInfo() {
     endDate: '',
   });
 
-  const handleDeleteProjectInfo = (infoId) => {
-    setProjectInfo(projectInfo.filter((info) => info.id !== infoId));
+  const fetchProjectData = async () => {
+    const endpoint = `http://localhost:3000/api/project/all/${id}`;
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      // Modify data (e.g., remove columns containing "_id")
+      if(response.data.status === 'Access Denied') {
+        setError(response.data.status);
+        setIsLoadingProjectInfo(false);
+        return;
+      }
+      setProjectInfo(response.data);
+      setIsLoadingProjectInfo(false);
+    } catch (error) {
+      setError(`Error fetching information.`);
+      setIsLoadingProjectInfo(false);
+    }
   };
+
+  useEffect(() => {
+  fetchProjectData();
+  }, [id]);
+
+  if (isLoadingProjectInfo) {
+    return <div>Loading...</div>;
+  };
+
+  const handleDeleteProjectInfo = async (infoId) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/api/project/${infoId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log('response status: ', response.data.status);
+      fetchProjectData();
+    } catch (error) {
+      console.error('Error deleting projectInfo:', error);
+    }
+    setIsDeleteConfirmationOpen(false);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteConfirmationOpen(false); // Close the confirmation dialog
+  };
+  
 
   const handleAddProjectInfo = () => {
     setIsDialogOpen(true);
@@ -54,10 +104,10 @@ function ProjectInfo() {
     setNewProjectInfo({
       title: info.title,
       description: info.description,
-      projectLink: info.projectLink,
+      projectLink: info.project_link,
       technologies: info.technologies,
-      startDate: info.startDate,
-      endDate: info.endDate,
+      startDate: info.start_date,
+      endDate: info.end_date,
     });
     setIsEditDialogOpen(true);
   };
@@ -74,28 +124,59 @@ function ProjectInfo() {
     });
   };
 
-  const handleSaveProjectInfo = () => {
-    setProjectInfo([...projectInfo, { ...newProjectInfo, id: projectInfo.length + 1 }]);
-    handleCloseDialog();
+  // Transform the data order to match the backend order
+  const transformedData = {
+    title: newProjectInfo.title,
+    description: newProjectInfo.description,
+    project_link: newProjectInfo.projectLink,
+    technologies: newProjectInfo.technologies,
+    start_date: newProjectInfo.startDate,
+    end_date: newProjectInfo.endDate,
   };
 
-  const handleSaveEdit = () => {
-    if (editedProjectInfo) {
-      const updatedProjectInfo = projectInfo.map((info) =>
-        info.id === editedProjectInfo.id ? { ...info, ...newProjectInfo } : info
-      );
-      setProjectInfo(updatedProjectInfo);
+  const handleSaveProjectInfo = async () => {
+    try {
+      console.log('newProjectInfo: ', newProjectInfo);
+      const response = await axios.post("http://localhost:3000/api/project", transformedData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log('response:', response);
+      fetchProjectData();
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Error saving projectInfo:', error);
     }
-    setEditedProjectInfo(null);
-    setIsEditDialogOpen(false);
-    setNewProjectInfo({
-      title: '',
-      description: '',
-      projectLink: '',
-      technologies: '',
-      startDate: '',
-      endDate: '',
-    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (editedProjectInfo) {
+      console.log('editedProjectInfo: ', editedProjectInfo);
+      try {
+        const response = await axios.put(`http://localhost:3000/api/project/${editedProjectInfo.project_id}`, transformedData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+        console.log('response: ', response);
+        fetchProjectData();
+        setEditedProjectInfo(null);
+        setIsEditDialogOpen(false);
+        setNewProjectInfo({
+          title: '',
+          description: '',
+          projectLink: '',
+          technologies: '',
+          startDate: '',
+          endDate: '',
+        });
+      } catch (error) {
+        console.error('Error updating projectInfo:', error);
+      }
+    }
   };
 
   const handleCancelEdit = () => {
@@ -113,68 +194,63 @@ function ProjectInfo() {
 
   return (
     <>
-      <Header />
-      <Box display="flex">
-        <Sidebar />
-        <Box p={3}>
-          <Paper elevation={3}>
-            <Box p={3}>
-              <Typography variant="h6" gutterBottom>
-                Project Information
-              </Typography>
-              <ButtonBase
-                component="div"
-                onClick={handleAddProjectInfo}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <Typography variant="body1" sx={{ marginRight: '8px' }}>
-                  Add
-                </Typography>
-                <IconButton color="primary">
-                  <AddIcon />
-                </IconButton>
-              </ButtonBase>
-              {projectInfo.length === 0 ? (
-                <Typography>No project information available.</Typography>
-              ) : (
-                <List>
-                  {projectInfo.map((info) => (
-                    <ListItem key={info.id} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Box>
-                        <ListItemText
-                          primary={info.title}
-                          secondary={
-                            <>
-                              <div>{info.description}</div>
-                              <div>Project Link: <a href={info.projectLink} target="_blank" rel="noopener noreferrer">{info.projectLink}</a></div>
-                              <div>Technologies: {info.technologies}</div>
-                              <div>
-                                Dates: {info.startDate} - {info.endDate}
-                              </div>
-                            </>
-                          }
-                        />
-                      </Box>
-                      <Box>
-                        <IconButton color="error" onClick={() => handleDeleteProjectInfo(info.id)}>
-                          <DeleteIcon />
-                        </IconButton>
-                        <IconButton color="primary" onClick={() => handleEditProjectInfo(info)}>
-                          <EditIcon />
-                        </IconButton>
-                      </Box>
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </Box>
-          </Paper>
-        </Box>
+      <Box p={0}>
+        <ButtonBase
+          component="div"
+          onClick={handleAddProjectInfo}
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            cursor: 'pointer',
+            marginRight: '20px',
+          }}
+        >
+          <Typography variant="body1" sx={{ marginRight: '8px' }}>
+            Add
+          </Typography>
+          <IconButton color="primary">
+            <AddIcon />
+          </IconButton>
+        </ButtonBase>
+        {projectInfo.length === 0 ? (
+          <Typography>No project information available.</Typography>
+        ) : (
+          <List>
+            {projectInfo.map((info) => (
+              <ListItem key={info.project_id} sx={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #ccc'}}>
+                <Box>
+                  <ListItemText
+                    primary={info.title}
+                    secondary={
+                      <>
+                        <div>{info.description}</div>
+                        <div>Project Link: <a href={`http://${info.project_link}`} target="_blank" rel="noopener noreferrer">{info.projectLink}</a></div>
+                        <div>Technologies: {info.technologies}</div>
+                        <div>
+                          Dates: <DateComponent isoDate={info.start_date} /> - <DateComponent isoDate={info.end_date} />
+                        </div>
+                      </>
+                    }
+                  />
+                </Box>
+                <Box>
+                  <IconButton color="primary" onClick={() => handleEditProjectInfo(info)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => setIsDeleteConfirmationOpen(true)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+                <DeleteConfirmationDialogue
+                  isOpen={isDeleteConfirmationOpen}
+                  onClose={handleCancelDelete}
+                  onDelete={() => handleDeleteProjectInfo(info.project_id)}
+                />
+              </ListItem>
+            ))}
+          </List>
+        )}
       </Box>
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Add New Project Information</DialogTitle>
