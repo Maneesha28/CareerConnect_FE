@@ -25,55 +25,87 @@ import axios from 'axios';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-// Sample job data (replace with actual data from API)
-const jobData = [
-  {
-    id: 1,
-    title: 'Software Engineer',
-    type: 'Full-time',
-    salary: 80000,
-    vacancies: 3,
-    applicants: 20,
-  },
-  {
-    id: 2,
-    title: 'Data Analyst',
-    type: 'Part-time',
-    salary: 60000,
-    vacancies: 2,
-    applicants: 15,
-  },
-  {
-    id: 3,
-    title: 'Marketing Intern',
-    type: 'Internship',
-    salary: 15000,
-    vacancies: 1,
-    applicants: 5,
-  },
-  // Add more job objects here...
-];
-
-const archivedJobs = [
-  {
-    id: 1,
-    title: 'Software Engineer',
-    type: 'Part-time',
-    salary: 80000,
-    vacancies: 3,
-    applicants: 20,
-  },
-  // ... archived job objects ...
-];
 
 const CompanyVacancy = () => {
   const [selectedTab, setSelectedTab] = useState(0); // 0 for Job List, 1 for Archived Job List
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [jobPostData,setJobPostData] = useState(null);
+  const [archivedJobPostData,setArchivedJobPostData] = useState(null);
+  const [filteredJobs, setFilteredJobs] = useState([]);
+  const [minSalary, setMinSalary] = useState(0);
+  const [maxSalary, setMaxSalary] = useState(Infinity);
+  const [salaryRange, setSalaryRange] = useState([minSalary, maxSalary]);
   const [jobTypeFilters, setJobTypeFilters] = useState({
     fullTime: false,
     partTime: false,
     internship: false,
   });
+  const [isLoadingJobPost, setIsLoadingJobPost] = useState(true);
+  const [isLoadingArchivedJobPost, setIsLoadingArchivedJobPost] = useState(true);
+  const [error, setError] = useState('');
+  const id = useParams().company_id;
+  let jobsToShow = [];
+  useEffect(() => {
+    
+    const fetchJobPostData = async () => {
+      console.log(id);
+      try {
+        const response = await axios.get(`http://localhost:3001/api/jobpost/all/${id}`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        });
+
+        const jobData = response.data;
+        const min = Math.min(...jobData.map(job => job.salary));
+        const max = Math.max(...jobData.map(job => job.salary));
+
+        setJobPostData(jobData);
+        setMinSalary(min);
+        setMaxSalary(max);
+        setSalaryRange([min, max]);
+        setIsLoadingJobPost(false);
+      } catch (error) {
+        setError('Error fetching jobpost information.');
+        setIsLoadingJobPost(false);
+      }
+    };
+    const fetchArchivedJobPostData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3001/api/jobpost/archived/${id}`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        });
+        setArchivedJobPostData(response.data);
+        setIsLoadingArchivedJobPost(false);
+      } catch (error) {
+        setError('Error fetching archived jobpost information.');
+        setIsLoadingArchivedJobPost(false);
+      }
+    };
+    
+    fetchJobPostData();
+    fetchArchivedJobPostData();
+    //setFilteredJobs(jobsToShow.jobsToShow.filter(filterJobs));
+
+  }, [id]);
+  if (isLoadingJobPost||isLoadingArchivedJobPost) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+  if (!jobPostData) {
+    return <div>Job Post not found.</div>;
+  }
+  if (!archivedJobPostData) {
+    return <div>Archived Job Posts not found.</div>;
+  }
+
 
   const filterJobs = (job) => {
     if (searchKeyword && !job.title.toLowerCase().includes(searchKeyword.toLowerCase())) {
@@ -92,31 +124,23 @@ const CompanyVacancy = () => {
     return true;
   };
 
-  let jobsToShow = [];
-  if (selectedTab === 0) {
-    jobsToShow = jobData;
-  } else if (selectedTab === 1) {
-    jobsToShow = archivedJobs;
-  }
-
-  const minSalary = Math.min(...jobsToShow.map(job => job.salary));
-  const maxSalary = Math.max(...jobsToShow.map(job => job.salary));
-
-  // Initialize salaryRange state with the calculated values
-  const [salaryRange, setSalaryRange] = useState([minSalary, maxSalary]);
-  const filteredJobs = jobsToShow.filter(filterJobs);
-  useEffect(() => {
-    setSalaryRange([minSalary, maxSalary]);
-  }, [minSalary, maxSalary]);
   const handleSalaryRangeChange = (event, newValue) => {
     setSalaryRange(newValue);
   };
+
   const handleJobTypeChange = (event) => {
-    setJobTypeFilters({
-      ...jobTypeFilters,
-      [event.target.name]: event.target.checked,
-    });
+    const { name, checked } = event.target;
+    setJobTypeFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: checked,
+    }));
+    console.log(event.target.name,event.target.checked);
+    
+    // Update the filtered jobs based on the new filters
+    const updatedFilteredJobs = jobsToShow.filter(filterJobs);
+    setFilteredJobs(updatedFilteredJobs);
   };
+  
   const handleEditJob = (jobId) => {
     // Implement logic to navigate to the edit job page with the given jobId
   };
@@ -124,6 +148,15 @@ const CompanyVacancy = () => {
   const handleDeleteJob = (jobId) => {
     // Implement logic to delete the job post with the given jobId
   };
+
+  if (selectedTab === 0) {
+    jobsToShow = jobPostData;
+  } else if (selectedTab === 1) {
+    jobsToShow = archivedJobPostData;
+  }
+
+  //const filteredJobs = jobsToShow.filter(filterJobs);
+
 
   return (
     <>
@@ -257,7 +290,7 @@ const CompanyVacancy = () => {
                     </div>
                   </Box>
                     <Typography variant="subtitle1" gutterBottom>
-                      Vacancy: {job.vacancies}
+                      Vacancy: {job.vacancy}
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
                       Applicants: {job.applicants}
