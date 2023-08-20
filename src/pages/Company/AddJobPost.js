@@ -60,6 +60,8 @@ const AddJobPost = () => {
   const handlePostJob = async () => {
     const requirementText = jobRequirements.map((req, index) => `${index + 1}. ${req}`).join('\n');
     setRequirementText(requirementText);
+    console.log('requirementText: ', requirementText);
+    console.log('description: ', jobDescription);
     // Here you can save the job post data and navigate to "/companyVacancy"
     try {
       console.log('newJobPost: ', transformedData);
@@ -138,9 +140,9 @@ const AddJobPost = () => {
                   onChange={(e) => setEmploymentType(e.target.value)}
                   label="Employment Type"
                 >
-                  <MenuItem value="Full-time">Full-time</MenuItem>
-                  <MenuItem value="Part-time">Part-time</MenuItem>
-                  <MenuItem value="Internship">Internship</MenuItem>
+                  <MenuItem value="full-time">Full-time</MenuItem>
+                  <MenuItem value="part-time">Part-time</MenuItem>
+                  <MenuItem value="internship">Internship</MenuItem>
                 </Select>
               </FormControl>
               <Typography variant="subtitle1">Job Description:</Typography>

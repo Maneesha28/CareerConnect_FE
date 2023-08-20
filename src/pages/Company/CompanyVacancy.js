@@ -16,6 +16,11 @@ import {
   FormControlLabel,
   Tabs,
   Tab,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogActions,
+  MenuItem
 } from '@mui/material';
 import Header from '../../components/Header';
 import SearchIcon from '@mui/icons-material/Search';
@@ -24,6 +29,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteConfirmationDialogue from '../../components/DeleteConfirmationDialogue';
 
 
 const CompanyVacancy = () => {
@@ -45,48 +51,60 @@ const CompanyVacancy = () => {
   const [error, setError] = useState('');
   const id = useParams().company_id;
   let jobsToShow = [];
+
+  const [editedJobPost, setEditedJobPost] = useState(null);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
+  const [newJobPost, setNewJobPost] = useState({
+    title: '',
+    description: '',
+    requirements: '',
+    vacancy: 0,
+    salary: 0,
+    employment_type: '',
+    deadline: '',
+  });
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const fetchJobPostData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3001/api/jobpost/all/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+
+      const jobData = response.data;
+      const min = Math.min(...jobData.map(job => job.salary));
+      const max = Math.max(...jobData.map(job => job.salary));
+
+      setJobPostData(jobData);
+      setMinSalary(min);
+      setMaxSalary(max);
+      setSalaryRange([min, max]);
+      setIsLoadingJobPost(false);
+    } catch (error) {
+      setError('Error fetching jobpost information.');
+      setIsLoadingJobPost(false);
+    }
+  };
+  const fetchArchivedJobPostData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3001/api/jobpost/archived/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      setArchivedJobPostData(response.data);
+      setIsLoadingArchivedJobPost(false);
+    } catch (error) {
+      setError('Error fetching archived jobpost information.');
+      setIsLoadingArchivedJobPost(false);
+    }
+  };
+
   useEffect(() => {
-    
-    const fetchJobPostData = async () => {
-      console.log(id);
-      try {
-        const response = await axios.get(`http://localhost:3001/api/jobpost/all/${id}`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        });
-
-        const jobData = response.data;
-        const min = Math.min(...jobData.map(job => job.salary));
-        const max = Math.max(...jobData.map(job => job.salary));
-
-        setJobPostData(jobData);
-        setMinSalary(min);
-        setMaxSalary(max);
-        setSalaryRange([min, max]);
-        setIsLoadingJobPost(false);
-      } catch (error) {
-        setError('Error fetching jobpost information.');
-        setIsLoadingJobPost(false);
-      }
-    };
-    const fetchArchivedJobPostData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/api/jobpost/archived/${id}`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        });
-        setArchivedJobPostData(response.data);
-        setIsLoadingArchivedJobPost(false);
-      } catch (error) {
-        setError('Error fetching archived jobpost information.');
-        setIsLoadingArchivedJobPost(false);
-      }
-    };
-    
     fetchJobPostData();
     fetchArchivedJobPostData();
     //setFilteredJobs(jobsToShow.jobsToShow.filter(filterJobs));
@@ -140,13 +158,84 @@ const CompanyVacancy = () => {
     const updatedFilteredJobs = jobsToShow.filter(filterJobs);
     setFilteredJobs(updatedFilteredJobs);
   };
-  
-  const handleEditJob = (jobId) => {
-    // Implement logic to navigate to the edit job page with the given jobId
+
+  const handleEditJobPost = (job) => {
+    setEditedJobPost(job);
+    setNewJobPost({
+      title: job.title,
+      description: job.description,
+      requirements: job.requirements,
+      vacancy: job.vacancy,
+      salary: job.salary,
+      employment_type: job.employment_type,
+      deadline: job.deadline,
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditDialogOpen(false);
+    setEditedJobPost(null);
+    setNewJobPost({
+      title: '',
+      description: '',
+      requirements: '',
+      vacancy: 0,
+      salary: 0,
+      employment_type: 'full-time',
+      deadline: '',
+    });
   };
   
-  const handleDeleteJob = (jobId) => {
-    // Implement logic to delete the job post with the given jobId
+  const handleSaveEdit = async () => {
+    // Implement logic to navigate to the edit job page with the given jobId
+    if (editedJobPost) {
+      console.log('editedJobPost: ', newJobPost);
+      console.log('jobId: ', editedJobPost.jobpost_id);
+      try {
+        const response = await axios.put(`http://localhost:3001/api/jobpost/${editedJobPost.jobpost_id}`, newJobPost, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+        console.log('response: ', response);
+        fetchJobPostData();
+        setEditedJobPost(null);
+        setIsEditDialogOpen(false);
+        setNewJobPost({
+          title: '',
+          description: '',
+          requirements: '',
+          vacancy: 0,
+          salary: 0,
+          employment_type: 'full-time',
+          deadline: '',
+        });
+      } catch (error) {
+        console.error('Error updating Jobpost:', error);
+      }
+    }
+  };
+  
+  const handleDeleteJobPost = async (jobpostId) => {
+    try {
+      const response = await axios.delete(`http://localhost:3001/api/jobpost/${jobpostId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log('response status: ', response.data.status);
+      fetchJobPostData();
+    } catch (error) {
+      console.error('Error deleting Jobpost:', error);
+    }
+    setIsDeleteConfirmationOpen(false);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteConfirmationOpen(false); // Close the confirmation dialog
   };
 
   if (selectedTab === 0) {
@@ -183,7 +272,7 @@ const CompanyVacancy = () => {
           <Box sx={{ flexGrow: 1 }} />
           <Button
             component={Link}
-            to="/addJobPost"
+            to={`/addJobPost/${id}`}
             variant="contained"
             color="success"
             startIcon={<AddIcon />}
@@ -272,22 +361,27 @@ const CompanyVacancy = () => {
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2}>
               {filteredJobs.map((job) => (
-                <Grid item xs={5} key={job.id}>
+                <Grid item xs={5} key={job.jobpost_id}>
                   <Paper elevation={3} sx={{ padding: '16px' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Link to={`/companyViewJobPost/${job.id}`} style={{ textDecoration: 'none' }}>
+                    <Link to={`/companyViewJobPost/${job.jobpost_id}`} style={{ textDecoration: 'none' }}>
                       <Typography variant="h6" gutterBottom>
                         {job.title}
                       </Typography>
                     </Link>
                     <div>
-                      <IconButton>
+                      <IconButton color="primary" onClick={() => handleEditJobPost(job)}>
                         <EditIcon />
                       </IconButton>
-                      <IconButton>
+                      <IconButton color="error" onClick={() => setIsDeleteConfirmationOpen(true)}>
                         <DeleteIcon />
                       </IconButton>
                     </div>
+                    <DeleteConfirmationDialogue
+                    isOpen={isDeleteConfirmationOpen}
+                    onClose={handleCancelDelete}
+                    onDelete={() => handleDeleteJobPost(job.jobpost_id)}
+                  />
                   </Box>
                     <Typography variant="subtitle1" gutterBottom>
                       Vacancy: {job.vacancy}
@@ -302,6 +396,88 @@ const CompanyVacancy = () => {
           </Box>
         </Box>
       </Container>
+
+      {/* Edit Job Dialog */}
+      <Dialog open={isEditDialogOpen} onClose={handleCancelEdit}>
+        <DialogTitle>Edit Job Post</DialogTitle>
+        <DialogContent>
+          {/* Display existing project info */}
+          {editedJobPost && (
+            <Box>
+              <Typography>{newJobPost.jobpost_id}</Typography>
+              <TextField
+                label="Title"
+                fullWidth
+                margin="dense"
+                value={newJobPost.title}
+                onChange={(e) => setNewJobPost({ ...newJobPost, title: e.target.value })}
+              />
+              <TextField
+                label="Description"
+                fullWidth
+                margin="dense"
+                multiline
+                rows={4}
+                value={newJobPost.description}
+                onChange={(e) => setNewJobPost({ ...newJobPost, description: e.target.value })}
+              />
+              <TextField
+                label="Requirements"
+                fullWidth
+                margin="dense"
+                multiline
+                rows={4}
+                value={newJobPost.requirements}
+                onChange={(e) => setNewJobPost({ ...newJobPost, requirements: e.target.value })}
+              />
+              <TextField
+                select
+                label="Employment Type"
+                fullWidth
+                margin="dense"
+                value={newJobPost.employment_type}
+                onChange={(e) => setNewJobPost({ ...newJobPost, employment_type: e.target.value })}
+              >
+                <MenuItem value="full-time">Full-Time</MenuItem>
+                <MenuItem value="part-time">Part-Time</MenuItem>
+                <MenuItem value="internship">Internship</MenuItem>
+              </TextField>
+              <TextField
+                label="Vacancy"
+                fullWidth
+                margin="dense"
+                type="number"
+                value={newJobPost.vacancy}
+                onChange={(e) => setNewJobPost({ ...newJobPost, vacancy: e.target.value })}
+              />
+              <TextField
+                label="Salary"
+                fullWidth
+                margin="dense"
+                type="number"
+                value={newJobPost.salary}
+                onChange={(e) => setNewJobPost({ ...newJobPost, salary: e.target.value })}
+              />
+              <TextField
+                label="Aplication Deadline"
+                fullWidth
+                margin="dense"
+                type="date"
+                value={newJobPost.deadline}
+                onChange={(e) => setNewJobPost({ ...newJobPost, deadline: e.target.value })}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelEdit} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleSaveEdit} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

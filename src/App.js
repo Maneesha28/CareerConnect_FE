@@ -90,10 +90,10 @@ function App() {
       <Route path="/companySidebar" element={<SidebarOptionsCompany/>}/>
 
       <Route path="/addJobPost/:company_id" element={<AddJobPost/>}/>
-      <Route path="/companyViewJobPost/*" element={<CompanyViewJobPost/>}/>
+      <Route path="/companyViewJobPost/:jobpost_id" element={<CompanyViewJobPost/>}/>
 
       <Route path="/viewCompanyPage/*" element={<ViewCompanyPage/>}/>
-      <Route path="/viewJobPost/*" element={<ViewJobPost/>}/>
+      <Route path="/viewJobPost/:jobpost_id" element={<ViewJobPost/>}/>
       <Route path="/viewCompanyReviews" element={<ViewCompanyReviews/>}/>
       <Route path="/viewCompanyVacancies" element={<ViewCompanyVacancies/>}/>
       <Route path="/viewShortlistedJobs" element={<ViewShortListedJobs/>}/>
