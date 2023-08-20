@@ -75,15 +75,15 @@ function App() {
       <Route path="/auth/login" element={<SignIn />} />
       <Route path="/auth/register" element={<SignUp />} />
       <Route path="/jobseeker/:jobseeker_id" element={<JobSeekerProfile />} />
-      <Route path="/company/:company_id" element={<CompanyProfile />} />
+      <Route path="/company/:company_id" element={<CompanyPage />} />
       <Route path="/" element={<Home/>}/>
       <Route path="/jobseeker/:jobseeker_id/accountInfo" element={<AccountInfo/>}/>
       
       <Route path="/companyPage" element={<CompanyPage/>}/>
       <Route path="/companyInfo" element={<CompanyInfo/>}/>
       <Route path="/companyAccountInfo" element={<CompanyAccountInfo/>}/>
-      <Route path="/companyReviews" element={<CompanyReviews/>}/>
-      <Route path="/companyVacancy" element={<CompanyVacancy/>}/>
+      <Route path="/companyReviews/:company_id" element={<CompanyReviews/>}/>
+      <Route path="/companyVacancy/:company_id" element={<CompanyVacancy/>}/>
 
       <Route path="/addJobPost" element={<AddJobPost/>}/>
       <Route path="/companyViewJobPost/*" element={<CompanyViewJobPost/>}/>

@@ -196,7 +196,7 @@ const CompanyProfile = () => {
 const handleFormSubmit = async (editedData) => {
   try {
     // Perform the PUT request to save the edits in the backend
-    const response = await axios.put(`http://localhost:3000/api/company/${id}`, editedData, {
+    const response = await axios.put(`http://localhost:3001/api/company/${id}`, editedData, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -226,7 +226,7 @@ const handleFormSubmit = async (editedData) => {
     useEffect(() => {
       const fetchCompanyData = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/api/company/${id}`, {
+          const response = await axios.get(`http://localhost:3001/api/company/${id}`, {
             headers: {
               'Content-Type': 'application/json',
             },
@@ -262,7 +262,7 @@ const handleFormSubmit = async (editedData) => {
     }
 
     const handleLogout = () => {
-        axios.post('http://localhost:3000/api/auth/logout', {}, {
+        axios.post('http://localhost:3001/api/auth/logout', {}, {
             headers: {
                 'Content-Type': 'application/json',
             },

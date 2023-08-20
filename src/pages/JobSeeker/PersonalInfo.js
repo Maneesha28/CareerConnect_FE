@@ -39,7 +39,7 @@ function PersonalInfo() {
   useEffect(() => {
     const fetchJobseekerData = async () => {
       try {
-          const response = await axios.get(`http://localhost:3000/api/jobseeker/${id}`, {
+          const response = await axios.get(`http://localhost:3001/api/jobseeker/${id}`, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -73,7 +73,7 @@ function PersonalInfo() {
       setIsImageEditMode(false);
   
       // Send editedInfo to the backend
-      const response = await axios.put('http://localhost:3000/api/jobseeker', editedInfo, {
+      const response = await axios.put('http://localhost:3001/api/jobseeker', editedInfo, {
         headers: {
           'Content-Type': 'application/json',
         },

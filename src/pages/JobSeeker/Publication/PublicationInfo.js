@@ -40,7 +40,7 @@ function PublicationInfo() {
   });
 
   const fetchPublicationData = async () => {
-    const endpoint = `http://localhost:3000/api/publication/all/${id}`;
+    const endpoint = `http://localhost:3001/api/publication/all/${id}`;
     try {
       const response = await axios.get(endpoint, {
         headers: {
@@ -73,7 +73,7 @@ function PublicationInfo() {
 
   const handleDeletePublicationInfo = async (infoId) => {
     try {
-      const response = await axios.delete(`http://localhost:3000/api/publication/${infoId}`, {
+      const response = await axios.delete(`http://localhost:3001/api/publication/${infoId}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -130,7 +130,7 @@ function PublicationInfo() {
   const handleSavePublicationInfo = async () => {
     try {
       console.log('newPublicationInfo: ', newPublicationInfo);
-      const response = await axios.post("http://localhost:3000/api/publication", transformedData, {
+      const response = await axios.post("http://localhost:3001/api/publication", transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -148,7 +148,7 @@ function PublicationInfo() {
     if (editedPublicationInfo) {
       console.log('editedPublicationInfo: ', editedPublicationInfo);
       try {
-        const response = await axios.put(`http://localhost:3000/api/publication/${editedPublicationInfo.publication_id}`, transformedData, {
+        const response = await axios.put(`http://localhost:3001/api/publication/${editedPublicationInfo.publication_id}`, transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },

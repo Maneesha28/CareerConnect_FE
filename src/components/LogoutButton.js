@@ -4,7 +4,7 @@ import { Button } from '@mui/material';
 
 const LogoutButton = () => {
   const handleLogout = () => {
-    axios.post('http://localhost:3000/api/auth/logout', {}, {
+    axios.post('http://localhost:3001/api/auth/logout', {}, {
       headers: {
         'Content-Type': 'application/json',
       },

@@ -1,24 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Typography, Paper, Grid, Container, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import Header from '../../components/Header';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
-// Sample company data (replace with actual data from API)
-const companyData = {
-  company_name: 'ABC Corp',
-  description: 'A leading technology company',
-  address: '123 Main St, City, Country',
-  trade_license: '123456789',
-  website_address: 'https://www.example.com',
-  phone_no: '123-456-7890',
-  company_logo: '', // Replace with actual logo image path
-};
-
-const defaultCompanyLogo = 'images/defaultCompanyLogo.jpg'; // Replace with default logo image path
+const defaultCompanyLogo = '../images/defaultCompanyLogo.jpg'; // Replace with default logo image path
 
 
 const CompanyPage = () => {
+  const [companyData, setCompanyData] = useState(null);
+  const [isLoadingCompany, setIsLoadingCompany] = useState(true);
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
+  const [error, setError] = useState('');
+  const id = useParams().company_id;
+  useEffect(() => {
+    const fetchCompanyData = async () => {
+      console.log(id);
+      try {
+        const response = await axios.get(`http://localhost:3001/api/company/${id}`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        });
+        setCompanyData(response.data);
+        setIsLoadingCompany(false);
+      } catch (error) {
+        setError('Error fetching company information.');
+        setIsLoadingCompany(false);
+      }
+    };
+    fetchCompanyData();
+
+  }, [id]);
+  if (isLoadingCompany) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+  if (!companyData) {
+    return <div>Company not found.</div>;
+  }
 
   const handleContactDialogOpen = () => {
     setIsContactDialogOpen(true);
@@ -29,9 +54,9 @@ const CompanyPage = () => {
   };
 
   const exploreItems = [
-    { path: '/companyVacancy', label: 'Vacancies', image: '/images/vacancy.jpg' },
+    { path: `/companyVacancy/${id}`, label: 'Vacancies', image: '/images/vacancy.jpg' },
     { path: companyData.website_address, label: 'Website', image: '/images/website.jpg' },
-    { path: '/companyReviews', label: 'Reviews', image: '/images/review.jpg' },
+    { path: `/companyReviews/${id}`, label: 'Reviews', image: '/images/review.jpg' },
     { action: handleContactDialogOpen, label: 'Contact Company', image: '/images/contact.png' },
   ];
 
@@ -49,7 +74,7 @@ const CompanyPage = () => {
             maxHeight: '200px', // Adjust the maxHeight to make the banner smaller
           }}
         />
-        <Link to="/companyPage" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+        <Link to={`/company/${id}`} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
           <Typography variant="h2" color="black" sx={{ fontWeight: 'bold', textDecoration: 'underline', border: '2px solid black', padding: '4px 8px' }}>
             {companyData.company_name}
           </Typography>
@@ -68,14 +93,22 @@ const CompanyPage = () => {
         <Box display="flex" justifyContent="space-between" mt={2}>
           {exploreItems.map((item, index) => (
             <Grid item xs={3} key={index}>
-              {item.path ? (
+            {item.path ? (
+                item.label === 'Website' ? (
+                <Box textAlign="center">
+                  <a href={`http://${item.path}`} target="_blank" rel="noopener noreferrer">
+                    <img src={item.image} alt={item.label} style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+                    <Typography variant="subtitle1" fontWeight="bold">{item.label}</Typography>
+                  </a>
+                </Box>
+                ) : (
                 <Link to={item.path} style={{ textDecoration: 'none' }}>
                   <Box textAlign="center">
                     <img src={item.image} alt={item.label} style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
                     <Typography variant="subtitle1" fontWeight="bold">{item.label}</Typography>
                   </Box>
                 </Link>
-              ) : (
+              )) : (
                 <button onClick={item.action} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}>
                   <img src={item.image} alt={item.label} style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
                 </button>
@@ -90,7 +123,8 @@ const CompanyPage = () => {
           <DialogContentText>
             Address: {companyData.address}
             <br />
-            Email: company@example.com
+            {}
+            Email: {companyData.email}
             <br />
             Phone No: {companyData.phone_no}
           </DialogContentText>

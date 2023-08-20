@@ -39,7 +39,7 @@ function AchievementInfo() {
   });
 
   const fetchAchievementData = async () => {
-    const endpoint = `http://localhost:3000/api/achievement/all/${id}`;
+    const endpoint = `http://localhost:3001/api/achievement/all/${id}`;
     try {
       const response = await axios.get(endpoint, {
         headers: {
@@ -72,7 +72,7 @@ function AchievementInfo() {
 
   const handleDeleteAchievement = async (achievementId) => {
     try {
-      const response = await axios.delete(`http://localhost:3000/api/achievement/${achievementId}`, {
+      const response = await axios.delete(`http://localhost:3001/api/achievement/${achievementId}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -125,7 +125,7 @@ function AchievementInfo() {
   const handleSaveAchievement = async () => {
     try {
       console.log('newAchievement: ', newAchievement);
-      const response = await axios.post("http://localhost:3000/api/achievement", transformedData, {
+      const response = await axios.post("http://localhost:3001/api/achievement", transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -144,7 +144,7 @@ function AchievementInfo() {
     if (editedAchievement) {
       console.log('editedAchievement: ', editedAchievement);
       try {
-        const response = await axios.put(`http://localhost:3000/api/achievement/${editedAchievement.achievement_id}`, transformedData, {
+        const response = await axios.put(`http://localhost:3001/api/achievement/${editedAchievement.achievement_id}`, transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },
