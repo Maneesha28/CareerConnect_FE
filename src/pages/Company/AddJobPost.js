@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import {
   Box,
   Container,
@@ -13,6 +15,7 @@ import {
   Button,
 } from '@mui/material';
 import Header from '../../components/Header';
+import ClippedDrawer from '../../components/SidebarOptionsCompany';
 
 const AddJobPost = () => {
   const [jobTitle, setJobTitle] = useState('');
@@ -25,6 +28,28 @@ const AddJobPost = () => {
   const [newRequirement, setNewRequirement] = useState('');
   const [requirementText, setRequirementText] = useState('');
 
+  const id = useParams().company_id;
+
+  const [newJobPost, setNewJobPost] = useState({
+    title: '',
+    description: '',
+    requirements: '',
+    employment_type: '',
+    salary: '',
+    vacancy: '',
+    deadline: ''
+  });
+
+  const transformedData = {
+    title: jobTitle,
+    description: jobDescription,
+    requirements: requirementText,
+    employment_type: employmentType,
+    salary: salary,
+    vacancy: vacancy,
+    deadline: applicationDeadline
+  };
+
   const handleAddRequirement = () => {
     if (newRequirement) {
       setJobRequirements([...jobRequirements, newRequirement]);
@@ -32,15 +57,28 @@ const AddJobPost = () => {
     }
   };
 
-  const handlePostJob = () => {
+  const handlePostJob = async () => {
     const requirementText = jobRequirements.map((req, index) => `${index + 1}. ${req}`).join('\n');
     setRequirementText(requirementText);
     // Here you can save the job post data and navigate to "/companyVacancy"
+    try {
+      console.log('newJobPost: ', transformedData);
+      const response = await axios.post("http://localhost:3001/api/jobpost", transformedData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log('response:', response);
+    } catch (error) {
+      console.error('Error saving newJobPost:', error);
+    }
   };
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
+      <ClippedDrawer />
       <Container sx={{ marginTop: '36px' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
           <Typography variant="h6">Job Title:</Typography>
@@ -62,6 +100,10 @@ const AddJobPost = () => {
                 variant="outlined"
                 size="small"
                 fullWidth
+                inputProps={{
+                  type: 'number',
+                  pattern: '[0-9]*', // Allow only numeric characters
+                }}
                 sx={{ marginBottom: '16px' }}
               />
               <Typography variant="subtitle1">Salary:</Typography>
@@ -71,6 +113,10 @@ const AddJobPost = () => {
                 variant="outlined"
                 size="small"
                 fullWidth
+                inputProps={{
+                  type: 'number',
+                  pattern: '[0-9]*', // Allow only numeric characters
+                }}
                 sx={{ marginBottom: '16px' }}
               />
               <Typography variant="subtitle1">Application Deadline:</Typography>
@@ -130,7 +176,7 @@ const AddJobPost = () => {
         </Paper>
         <Button
           component={Link}
-          to="/companyVacancy"
+          to={`/companyVacancy/${id}`}
           variant="contained"
           color="success"
           sx={{ float: 'right' }}

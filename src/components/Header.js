@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Cookies from 'js-cookie';
 import {
   AppBar,
   Toolbar,
@@ -76,7 +75,7 @@ const Header = () => {
   return (
     <ThemeProvider theme={defaultTheme}>
       <CssBaseline />
-      <AppBar position="static" sx={{height: 80, backgroundColor: 'rgb(101, 39, 190)' }}>
+      <AppBar position="static" sx={{height: 80, backgroundColor: 'rgb(101, 39, 190)', zIndex: (theme) => theme.zIndex.drawer + 1}} >
         <Toolbar>
         <Box flexGrow={1} display="flex" alignItems="center" sx={{pt: 1}}>
               <IconButton color="inherit" component={Link} to="/">
@@ -87,9 +86,9 @@ const Header = () => {
               </Link>
           </Box>
           <Box>
-            <IconButton color="inherit" onClick={handleOpenContactMenu}>
+            {/* <IconButton color="inherit" onClick={handleOpenContactMenu}>
               <ContactMail fontSize="large" />
-            </IconButton>
+            </IconButton> */}
             <IconButton color="inherit" onClick={handleOpenNotificationMenu}>
               <Badge badgeContent={3} color="error">
                 <Notifications fontSize="large" />
@@ -99,7 +98,7 @@ const Header = () => {
               <Settings fontSize="large" />
             </IconButton>
           </Box>
-          <Menu
+          {/* <Menu
             anchorEl={contactMenuAnchor}
             open={Boolean(contactMenuAnchor)}
             onClose={handleCloseContactMenu}
@@ -110,7 +109,7 @@ const Header = () => {
             <MenuItem>
               <Phone /> 082378874
             </MenuItem>
-          </Menu>
+          </Menu> */}
           <Menu
             anchorEl={notificationAnchor}
             open={Boolean(notificationAnchor)}

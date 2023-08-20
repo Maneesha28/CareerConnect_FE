@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Typography, Paper, Container, Grid, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import Header from '../../components/Header';
+import PermanentDrawerLeft from '../../components/SidebarOptionsCompany';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
@@ -111,16 +112,17 @@ const CompanyReviews = () => {
   return (
     <>
       <Header />
-      <Box sx={{ position: 'relative', marginTop: '36px' }}>
+      <PermanentDrawerLeft/>
+      <Box sx={{ position: 'relative'}}>
         {/* Company Banner */}
-        <Link to={`/company/${id}`} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+        <Link to={`/company/${id}`} style={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)' }}>
           <Typography variant="h3" color="black" sx={{ fontWeight: 'bold', textDecoration: 'underline', border: '2px solid black', padding: '4px 8px' }}>
             {companyData.company_name}
           </Typography>
         </Link>
       </Box>
       <Box>
-        <Typography variant="h5" gutterBottom style={{ textAlign: 'right', marginTop: 80, marginRight: 600, fontWeight: 700 }}>
+        <Typography variant="h5" gutterBottom style={{ textAlign: 'right', marginTop: 20, marginRight: 600, fontWeight: 700 }}>
           Average Rating: {avgStars}
         </Typography>
       </Box>

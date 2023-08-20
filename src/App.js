@@ -29,6 +29,8 @@ import ViewCompanyReviews from './pages/JobSeeker/ViewCompanyReviews';
 import ViewCompanyVacancies from './pages/JobSeeker/ViewCompanyVacancies';
 import ViewShortListedJobs from './pages/JobSeeker/ViewShortListedJobs';
 
+import SidebarOptionsCompany from './components/SidebarOptionsCompany';
+
 // changed by any
 function App() {
   const action = useNavigationType();
@@ -85,7 +87,9 @@ function App() {
       <Route path="/companyReviews/:company_id" element={<CompanyReviews/>}/>
       <Route path="/companyVacancy/:company_id" element={<CompanyVacancy/>}/>
 
-      <Route path="/addJobPost" element={<AddJobPost/>}/>
+      <Route path="/companySidebar" element={<SidebarOptionsCompany/>}/>
+
+      <Route path="/addJobPost/:company_id" element={<AddJobPost/>}/>
       <Route path="/companyViewJobPost/*" element={<CompanyViewJobPost/>}/>
 
       <Route path="/viewCompanyPage/*" element={<ViewCompanyPage/>}/>
