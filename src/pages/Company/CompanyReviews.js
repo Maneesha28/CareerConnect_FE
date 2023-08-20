@@ -25,15 +25,16 @@ const CompanyReviews = () => {
   const [selectedReview, setSelectedReview] = useState(null);
   const [reviewData,setReviewData] = useState(null);
   const [companyData,setCompanyData] = useState(null);
+  const [avgStars,setAvgStars] = useState(0.0);
   const [jobseekerData,setJobseekerData] = useState(null);
   const [isLoadingReview, setIsLoadingReview] = useState(true);
+  const [isLoadingStars, setIsLoadingStars] = useState(true);
   const [isLoadingCompany, setIsLoadingCompany] = useState(true);
   const [isLoadingJobSeeker, setIsLoadingJobSeeker] = useState(true);
   const [error, setError] = useState('');
   const id = useParams().company_id;
   useEffect(() => {
     const fetchReviewData = async () => {
-      console.log(id);
       try {
         const response = await axios.get(`http://localhost:3001/api/review/all/${id}`, {
           headers: {
@@ -63,7 +64,23 @@ const CompanyReviews = () => {
         setIsLoadingCompany(false);
       }
     };
+    const fetchAvgStars = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3001/api/review/avg_stars/${id}`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        });
+        setAvgStars(response.data.avg_stars);
+        setIsLoadingStars(false);
+      } catch (error) {
+        setError('Error fetching review information.');
+        setIsLoadingStars(false);
+      }
+    };
     fetchReviewData();
+    fetchAvgStars();
     fetchCompanyData();
 
   }, [id]);
@@ -102,37 +119,43 @@ const CompanyReviews = () => {
           </Typography>
         </Link>
       </Box>
-      <Container sx={{ marginTop: '68px' }}>
-        <Paper elevation={3} sx={{ padding: '20px' }}>
-          <Typography variant="h6" gutterBottom>
+      <Box>
+        <Typography variant="h5" gutterBottom style={{ textAlign: 'right', marginTop: 80, marginRight: 600, fontWeight: 700 }}>
+          Average Rating: {avgStars}
+        </Typography>
+      </Box>
+      <Container sx={{ marginTop: '10px'}}>
+        <Paper elevation={3} sx={{ padding: '20px', backgroundColor: '#f5f5f5' }}>
+          <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', fontWeight: 700}}>
             Company Reviews
           </Typography>
           {/* Display Reviews */}
           {reviewData.map((review, index) => (
             <Paper key={index} sx={{ padding: '15px', marginBottom: '15px', display: 'flex', flexDirection: 'column' }}>
-              <Typography variant="body1" gutterBottom>
+              <Typography variant="body1" gutterBottom sx={{ fontSize: 28 }}>
                 {review.comment}
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="subtitle2" sx={{ alignSelf: 'flex-end' }}>
+                <Typography variant="subtitle2" sx={{ alignSelf: 'flex-end', fontSize: 22 }}>
                   {/*need jobseeker name here*/}
                   Posted by: {review.name}
                 </Typography>
-                <Typography variant="subtitle2">
+                <Typography variant="subtitle2" sx={{ fontSize: 20 }}>
                   {new Date(review.time).toLocaleString()}
                 </Typography>
               </Box>
-              <Button onClick={() => handleReviewDialogOpen(review)} color="primary" size="small">
+              <Button onClick={() => handleReviewDialogOpen(review)} color="primary" size="large">
                 View Details
               </Button>
             </Paper>
           ))}
         </Paper>
       </Container>
+
       {/* Review Details Dialog */}
       <Dialog open={isReviewDialogOpen} onClose={handleReviewDialogClose}>
         <DialogTitle>Review Details</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ padding: '20px' }}>
           {selectedReview && (
             <>
               <DialogContentText>{selectedReview.comment}</DialogContentText>

@@ -6,6 +6,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 function SignUp() {
   const [formData, setFormData] = useState({
     email: '',
+    name: '',
     password: '',
     role: ''
   });
@@ -19,7 +20,7 @@ function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // check if valid email and password (length > 8)
-    if(!formData.email || !formData.password || !formData.role) {
+    if(!formData.email || !formData.name || !formData.password || !formData.role) {
       setErrorMessage('Please fill in all fields.');
       return;
     }
@@ -105,6 +106,18 @@ function SignUp() {
                 autoComplete="email"
                 autoFocus
                 value={formData.email}
+                onChange={handleChange}
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="name"
+                label="Name"
+                name="name"
+                autoComplete="name"
+                autoFocus
+                value={formData.name}
                 onChange={handleChange}
               />
               <TextField
