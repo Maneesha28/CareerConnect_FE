@@ -65,7 +65,7 @@ const AddJobPost = () => {
     // Here you can save the job post data and navigate to "/companyVacancy"
     try {
       console.log('newJobPost: ', transformedData);
-      const response = await axios.post("http://localhost:3001/api/jobpost", transformedData, {
+      const response = await axios.post("/api/jobpost", transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },

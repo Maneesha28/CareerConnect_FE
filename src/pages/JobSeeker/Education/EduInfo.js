@@ -42,7 +42,7 @@ function EduInfo() {
   });
 
   const fetchEducationData = async () => {
-    const endpoint = `http://localhost:3001/api/education/all/${id}`;
+    const endpoint = `/api/education/all/${id}`;
     try {
       const response = await axios.get(endpoint, {
         headers: {
@@ -75,7 +75,7 @@ function EduInfo() {
 
   const handleDeleteEduInfo = async (infoId) => {
     try {
-      const response = await axios.delete(`http://localhost:3001/api/education/${infoId}`, {
+      const response = await axios.delete(`/api/education/${infoId}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -135,7 +135,7 @@ function EduInfo() {
   const handleSaveEduInfo = async () => {
     try {
       console.log('newEduInfo: ', newEduInfo);
-      const response = await axios.post("http://localhost:3001/api/education", transformedData, {
+      const response = await axios.post("/api/education", transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -153,7 +153,7 @@ function EduInfo() {
     if (editedEduInfo) {
       console.log('editedEduInfo: ', editedEduInfo);
       try {
-        const response = await axios.put(`http://localhost:3001/api/education/${editedEduInfo.degree_id}`, transformedData, {
+        const response = await axios.put(`/api/education/${editedEduInfo.degree_id}`, transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },

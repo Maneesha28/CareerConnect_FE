@@ -41,7 +41,7 @@ function SkillInfo() {
   });
 
   const fetchSkillData = async () => {
-    const endpoint = `http://localhost:3001/api/skill/all/${id}`;
+    const endpoint = `/api/skill/all/${id}`;
     try {
       const response = await axios.get(endpoint, {
         headers: {
@@ -74,7 +74,7 @@ function SkillInfo() {
 
   const handleDeleteSkillInfo = async (infoId) => {
     try {
-      const response = await axios.delete(`http://localhost:3001/api/skill/${infoId}`, {
+      const response = await axios.delete(`/api/skill/${infoId}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -121,7 +121,7 @@ function SkillInfo() {
   const handleSaveSkillInfo = async () => {
     try {
       console.log('newSkillInfo: ', newSkillInfo);
-      const response = await axios.post("http://localhost:3001/api/skill", transformedData, {
+      const response = await axios.post("/api/skill", transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -139,7 +139,7 @@ function SkillInfo() {
     if (editedSkillInfo) {
       console.log('editedSkillInfo: ', editedSkillInfo);
       try {
-        const response = await axios.put(`http://localhost:3001/api/skill/${editedSkillInfo.skill_id}`, transformedData, {
+        const response = await axios.put(`/api/skill/${editedSkillInfo.skill_id}`, transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },

@@ -37,7 +37,7 @@ const CompanyReviews = () => {
   useEffect(() => {
     const fetchReviewData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/api/review/all/${id}`, {
+        const response = await axios.get(`/api/review/all/${id}`, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -52,7 +52,7 @@ const CompanyReviews = () => {
     };
     const fetchCompanyData = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/api/company/${id}`, {
+        const response = await axios.get(`/api/company/${id}`, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -67,7 +67,7 @@ const CompanyReviews = () => {
     };
     const fetchAvgStars = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/api/review/avg_stars/${id}`, {
+        const response = await axios.get(`/api/review/avg_stars/${id}`, {
           headers: {
             'Content-Type': 'application/json',
           },

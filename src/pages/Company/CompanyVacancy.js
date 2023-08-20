@@ -67,7 +67,7 @@ const CompanyVacancy = () => {
 
   const fetchJobPostData = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/jobpost/all/${id}`, {
+      const response = await axios.get(`/api/jobpost/all/${id}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -90,7 +90,7 @@ const CompanyVacancy = () => {
   };
   const fetchArchivedJobPostData = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/jobpost/archived/${id}`, {
+      const response = await axios.get(`/api/jobpost/archived/${id}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -193,7 +193,7 @@ const CompanyVacancy = () => {
       console.log('editedJobPost: ', newJobPost);
       console.log('jobId: ', editedJobPost.jobpost_id);
       try {
-        const response = await axios.put(`http://localhost:3001/api/jobpost/${editedJobPost.jobpost_id}`, newJobPost, {
+        const response = await axios.put(`/api/jobpost/${editedJobPost.jobpost_id}`, newJobPost, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -220,7 +220,7 @@ const CompanyVacancy = () => {
   
   const handleDeleteJobPost = async (jobpostId) => {
     try {
-      const response = await axios.delete(`http://localhost:3001/api/jobpost/${jobpostId}`, {
+      const response = await axios.delete(`/api/jobpost/${jobpostId}`, {
         headers: {
           'Content-Type': 'application/json',
         },

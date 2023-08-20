@@ -33,7 +33,7 @@ function SignUp() {
       return;
     }
     try {
-      const response = await axios.post('http://localhost:3001/api/auth/register', formData, {
+      const response = await axios.post('/api/auth/register', formData, {
         headers: {
           'Content-Type': 'application/json',
         },

@@ -49,7 +49,7 @@ const CompanyViewJobPost = () => {
   const [isLoadingJobPost, setIsLoadingJobPost] = useState(true);
 
   const fetchJobData = async () => {
-    const endpoint = `http://localhost:3001/api/jobpost/${id}`;
+    const endpoint = `/api/jobpost/${id}`;
     try {
       const response = await axios.get(endpoint, {
         headers: {

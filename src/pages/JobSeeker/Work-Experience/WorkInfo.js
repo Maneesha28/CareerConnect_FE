@@ -41,7 +41,7 @@ function WorkInfo() {
   });
 
   const fetchWorkExperienceData = async () => {
-    const endpoint = `http://localhost:3001/api/workexperience/all/${id}`;
+    const endpoint = `/api/workexperience/all/${id}`;
     try {
       const response = await axios.get(endpoint, {
         headers: {
@@ -74,7 +74,7 @@ function WorkInfo() {
 
   const handleDeleteWorkInfo = async (infoId) => {
     try {
-      const response = await axios.delete(`http://localhost:3001/api/workexperience/${infoId}`, {
+      const response = await axios.delete(`/api/workexperience/${infoId}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -131,7 +131,7 @@ function WorkInfo() {
   const handleSaveWorkInfo = async () => {
     try {
       console.log('newWorkInfo: ', newWorkInfo);
-      const response = await axios.post("http://localhost:3001/api/workexperience", transformedData, {
+      const response = await axios.post("/api/workexperience", transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -149,7 +149,7 @@ function WorkInfo() {
     if (editedWorkInfo) {
       console.log('editedWorkInfo: ', editedWorkInfo);
       try {
-        const response = await axios.put(`http://localhost:3001/api/workexperience/${editedWorkInfo.exp_id}`, transformedData, {
+        const response = await axios.put(`/api/workexperience/${editedWorkInfo.exp_id}`, transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },

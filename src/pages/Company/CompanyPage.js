@@ -18,7 +18,7 @@ const CompanyPage = () => {
     const fetchCompanyData = async () => {
       console.log(id);
       try {
-        const response = await axios.get(`http://localhost:3001/api/company/${id}`, {
+        const response = await axios.get(`/api/company/${id}`, {
           headers: {
             'Content-Type': 'application/json',
           },

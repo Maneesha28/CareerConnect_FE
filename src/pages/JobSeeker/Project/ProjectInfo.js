@@ -43,7 +43,7 @@ function ProjectInfo() {
   });
 
   const fetchProjectData = async () => {
-    const endpoint = `http://localhost:3001/api/project/all/${id}`;
+    const endpoint = `/api/project/all/${id}`;
     try {
       const response = await axios.get(endpoint, {
         headers: {
@@ -76,7 +76,7 @@ function ProjectInfo() {
 
   const handleDeleteProjectInfo = async (infoId) => {
     try {
-      const response = await axios.delete(`http://localhost:3001/api/project/${infoId}`, {
+      const response = await axios.delete(`/api/project/${infoId}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -137,7 +137,7 @@ function ProjectInfo() {
   const handleSaveProjectInfo = async () => {
     try {
       console.log('newProjectInfo: ', newProjectInfo);
-      const response = await axios.post("http://localhost:3001/api/project", transformedData, {
+      const response = await axios.post("/api/project", transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -155,7 +155,7 @@ function ProjectInfo() {
     if (editedProjectInfo) {
       console.log('editedProjectInfo: ', editedProjectInfo);
       try {
-        const response = await axios.put(`http://localhost:3001/api/project/${editedProjectInfo.project_id}`, transformedData, {
+        const response = await axios.put(`/api/project/${editedProjectInfo.project_id}`, transformedData, {
         headers: {
           'Content-Type': 'application/json',
         },

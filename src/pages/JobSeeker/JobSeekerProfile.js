@@ -69,7 +69,7 @@ const JobSeekerProfile = () => {
     useEffect(() => {
       const fetchJobseekerData = async () => {
         try {
-          const response = await axios.get(`http://localhost:3001/api/jobseeker/${id}`, {
+          const response = await axios.get(`/api/jobseeker/${id}`, {
             headers: {
               'Content-Type': 'application/json',
             },
@@ -118,32 +118,32 @@ const JobSeekerProfile = () => {
       };
       
       const fetchWorkExperienceData = async () => {
-        const endpoint = `http://localhost:3001/api/workexperience/all/${id}`;
+        const endpoint = `/api/workexperience/all/${id}`;
         fetchAndModifySectionData(endpoint, setWorkExperienceData, setIsLoadingWorkExperience, setError);
       };
 
     const fetchEducationData = async () => {
-      const endpoint = `http://localhost:3001/api/education/all/${id}`;
+      const endpoint = `/api/education/all/${id}`;
       fetchAndModifySectionData(endpoint, setEducationData, setIsLoadingEducation, setError);
     };
 
     const fetchSkillsData = async () => {
-        const endpoint = `http://localhost:3001/api/skill/all/${id}`;
+        const endpoint = `/api/skill/all/${id}`;
         fetchAndModifySectionData(endpoint, setSkillsData, setIsLoadingSkills, setError);
     };
 
     const fetchAchievementsData = async () => {
-        const endpoint = `http://localhost:3001/api/achievement/all/${id}`;
+        const endpoint = `/api/achievement/all/${id}`;
         fetchAndModifySectionData(endpoint, setAchievementsData, setIsLoadingAchievements, setError);
     };
 
     const fetchPublicationsData = async () => {
-        const endpoint = `http://localhost:3001/api/publication/all/${id}`;
+        const endpoint = `/api/publication/all/${id}`;
         fetchAndModifySectionData(endpoint, setPublicationsData, setIsLoadingPublications, setError);
     };
 
     const fetchProjectData = async () => {
-        const endpoint = `http://localhost:3001/api/project/all/${id}`;
+        const endpoint = `/api/project/all/${id}`;
         fetchAndModifySectionData(endpoint, setProjectData, setIsLoadingProject, setError);
     };
   
