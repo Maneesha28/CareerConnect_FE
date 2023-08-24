@@ -35,25 +35,28 @@ import DeleteConfirmationDialogue from '../../components/DeleteConfirmationDialo
 const CompanyVacancy = () => {
   const [selectedTab, setSelectedTab] = useState(0); // 0 for Job List, 1 for Archived Job List
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [jobPostData,setJobPostData] = useState(null);
-  const [archivedJobPostData,setArchivedJobPostData] = useState(null);
-  const [filteredJobs, setFilteredJobs] = useState([]);
+  const [jobPostData,setJobPostData] = useState([]);
+  const [archivedJobPostData,setArchivedJobPostData] = useState([]);
+  const [jobsToShow, setJobsToShow] = useState([]);
   const [minSalary, setMinSalary] = useState(0);
   const [maxSalary, setMaxSalary] = useState(Infinity);
   const [salaryRange, setSalaryRange] = useState([minSalary, maxSalary]);
   const [jobTypeFilters, setJobTypeFilters] = useState({
-    fullTime: false,
-    partTime: false,
-    internship: false,
+    fullTime: true,
+    partTime: true,
+    internship: true,
   });
   const [isLoadingJobPost, setIsLoadingJobPost] = useState(true);
   const [isLoadingArchivedJobPost, setIsLoadingArchivedJobPost] = useState(true);
   const [error, setError] = useState('');
   const id = useParams().company_id;
-  let jobsToShow = [];
 
   const [editedJobPost, setEditedJobPost] = useState(null);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
+  // useEffect conditions
+  const [fetch,setFetch] = useState(true);
+  const [applyFilter,setApplyFilter] = useState(true);
+
   const [newJobPost, setNewJobPost] = useState({
     title: '',
     description: '',
@@ -79,6 +82,8 @@ const CompanyVacancy = () => {
       const max = Math.max(...jobData.map(job => job.salary));
 
       setJobPostData(jobData);
+      console.log(jobData);
+      console.log('fetched jobpostdata',jobPostData);
       setMinSalary(min);
       setMaxSalary(max);
       setSalaryRange([min, max]);
@@ -98,18 +103,94 @@ const CompanyVacancy = () => {
       });
       setArchivedJobPostData(response.data);
       setIsLoadingArchivedJobPost(false);
+      console.log('hello2');
     } catch (error) {
       setError('Error fetching archived jobpost information.');
       setIsLoadingArchivedJobPost(false);
     }
   };
 
-  useEffect(() => {
-    fetchJobPostData();
-    fetchArchivedJobPostData();
-    //setFilteredJobs(jobsToShow.jobsToShow.filter(filterJobs));
+  const filterJobs = (job) => {
+    if (!job) {
+      return false;
+    }
+  
+    //console.log("jobTypeFilters:", jobTypeFilters," - job.type:", job.employment_type);
+  
+    if (searchKeyword && !job.title.toLowerCase().includes(searchKeyword.toLowerCase())) {
+      return false;
+    }
+  
+    const jobType = job.employment_type ? job.employment_type.toLowerCase() : ''; // Convert to lower case
+  
+    if (
+      (!jobTypeFilters.fullTime && jobType === 'full-time') ||
+      (!jobTypeFilters.partTime && jobType === 'part-time') ||
+      (!jobTypeFilters.internship && jobType === 'internship')
+    ) {
+      return false;
+    }
+  
+    if (job.salary < salaryRange[0] || job.salary > salaryRange[1]) {
+      return false;
+    }
+  
+    return true;
+  };
+  
+  
+  const handleSearch = (e) => {
+    setSearchKeyword(e.target.value);
+    setApplyFilter(!applyFilter);
+  };
 
-  }, [id]);
+  const handleSalaryRangeChange = (event, newValue) => {
+    setSalaryRange(newValue);
+    setApplyFilter(!applyFilter);
+  };
+
+  const handleJobTypeChange = (event) => {
+    const { name, checked } = event.target;
+    setJobTypeFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: checked,
+    }));
+    console.log(event.target.name,event.target.checked);
+    setApplyFilter(!applyFilter);
+  };
+
+  const switchTabs = () => {
+    console.log(selectedTab);
+    if (selectedTab === 0) {
+      const filteredJobs = jobPostData ? jobPostData.filter(filterJobs) : [];
+      setJobsToShow(filteredJobs);
+    } else if (selectedTab === 1) {
+      const filteredArchivedJobs = archivedJobPostData ? archivedJobPostData.filter(filterJobs) : [];
+      setJobsToShow(filteredArchivedJobs);
+    }
+    console.log("JobPostData: ",jobPostData,"Archived:",archivedJobPostData);
+  };
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await fetchJobPostData();
+        await fetchArchivedJobPostData();
+      } catch (error) {
+        // Handle errors here
+      }
+    };
+  
+    fetchData();
+  }, [id, fetch]);
+  
+  useEffect(() => {
+    switchTabs(); // Call switchTabs whenever jobPostData or archivedJobPostData changes
+  }, [jobPostData, archivedJobPostData, selectedTab, applyFilter]);
+  
+  // useEffect(()=>{
+  //   switchTabs();
+  // },[selectedTab]);
   if (isLoadingJobPost||isLoadingArchivedJobPost) {
     return <div>Loading...</div>;
   }
@@ -124,40 +205,6 @@ const CompanyVacancy = () => {
     return <div>Archived Job Posts not found.</div>;
   }
 
-
-  const filterJobs = (job) => {
-    if (searchKeyword && !job.title.toLowerCase().includes(searchKeyword.toLowerCase())) {
-      return false;
-    }
-    if (
-      (!jobTypeFilters.fullTime && job.type === 'Full-time') ||
-      (!jobTypeFilters.partTime && job.type === 'Part-time') ||
-      (!jobTypeFilters.internship && job.type === 'Internship')
-    ) {
-      return false;
-    }
-    if (job.salary < salaryRange[0] || job.salary > salaryRange[1]) {
-      return false;
-    }
-    return true;
-  };
-
-  const handleSalaryRangeChange = (event, newValue) => {
-    setSalaryRange(newValue);
-  };
-
-  const handleJobTypeChange = (event) => {
-    const { name, checked } = event.target;
-    setJobTypeFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: checked,
-    }));
-    console.log(event.target.name,event.target.checked);
-    
-    // Update the filtered jobs based on the new filters
-    const updatedFilteredJobs = jobsToShow.filter(filterJobs);
-    setFilteredJobs(updatedFilteredJobs);
-  };
 
   const handleEditJobPost = (job) => {
     setEditedJobPost(job);
@@ -198,9 +245,10 @@ const CompanyVacancy = () => {
           'Content-Type': 'application/json',
         },
         withCredentials: true,
-      });
+        });
         console.log('response: ', response);
-        fetchJobPostData();
+        //fetchJobPostData();
+        setFetch(!fetch);
         setEditedJobPost(null);
         setIsEditDialogOpen(false);
         setNewJobPost({
@@ -227,7 +275,8 @@ const CompanyVacancy = () => {
         withCredentials: true,
       });
       console.log('response status: ', response.data.status);
-      fetchJobPostData();
+      //fetchJobPostData();
+      setFetch(!fetch);
     } catch (error) {
       console.error('Error deleting Jobpost:', error);
     }
@@ -237,12 +286,6 @@ const CompanyVacancy = () => {
   const handleCancelDelete = () => {
     setIsDeleteConfirmationOpen(false); // Close the confirmation dialog
   };
-
-  if (selectedTab === 0) {
-    jobsToShow = jobPostData;
-  } else if (selectedTab === 1) {
-    jobsToShow = archivedJobPostData;
-  }
 
   //const filteredJobs = jobsToShow.filter(filterJobs);
 
@@ -258,7 +301,7 @@ const CompanyVacancy = () => {
           <TextField
             label="Search by title"
             value={searchKeyword}
-            onChange={(e) => setSearchKeyword(e.target.value)}
+            onChange={handleSearch}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -353,14 +396,14 @@ const CompanyVacancy = () => {
               min={minSalary}
               max={maxSalary}
             />
-            <Button variant="contained" color="primary" sx={{ marginTop: '16px' }}>
+            {/* <Button variant="contained" color="primary" sx={{ marginTop: '16px' }}>
               Apply Filter
-            </Button>
+            </Button> */}
           </Paper>
           {/* Job Lists */}
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2}>
-              {filteredJobs.map((job) => (
+              {jobsToShow.map((job) => (
                 <Grid item xs={5} key={job.jobpost_id}>
                   <Paper elevation={3} sx={{ padding: '16px' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -385,6 +428,9 @@ const CompanyVacancy = () => {
                   </Box>
                     <Typography variant="subtitle1" gutterBottom>
                       Vacancy: {job.vacancy}
+                    </Typography>
+                    <Typography variant="subtitle1" gutterBottom>
+                      Salary: {job.salary}
                     </Typography>
                     <Typography variant="subtitle1" gutterBottom>
                       Applicants: {job.applicants}
