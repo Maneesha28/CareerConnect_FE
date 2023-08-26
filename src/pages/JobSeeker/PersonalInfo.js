@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { storage } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { v4 } from 'uuid';
 import {
   Box,
   Paper,
@@ -25,7 +28,7 @@ import axios from 'axios';
 import { StyledTableCell, StyledTableRow, commonStyles } from './ComponentStyles';
 import DateComponent from '../../components/DateComponent';
 
-function PersonalInfo() {
+function PersonalInfo({isLoggedInUser}) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isImageEditMode, setIsImageEditMode] = useState(false);
@@ -36,24 +39,50 @@ function PersonalInfo() {
 
   const id = useParams().jobseeker_id;
 
+  const fetchJobseekerData = async () => {
+    try {
+        const response = await axios.get(`/api/jobseeker/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      setJobseekerData(response.data);
+      setEditedInfo(response.data);
+    } catch (error) {
+      setError('Error fetching jobseeker information.');
+
+    }
+  };
+
+  const sendEditedInfoToBackend = async () => {
+    try {
+        console.log(editedInfo.profile_pic);
+        const response = await axios.put('/api/jobseeker', editedInfo, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    const fetchJobseekerData = async () => {
-      try {
-          const response = await axios.get(`/api/jobseeker/${id}`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        });
-        setJobseekerData(response.data);
-      } catch (error) {
-        setError('Error fetching jobseeker information.');
-
-      }
-    };
     fetchJobseekerData();
-
   }, [id]);
+
+  //useEffect hook to listen for changes in profile_pic
+  useEffect(() => {
+    if(editedInfo.profile_pic)
+    {
+      console.log("Sending edited info to backend");
+      sendEditedInfoToBackend();
+    }
+    fetchJobseekerData();
+  }, [editedInfo.profile_pic]);
 
   if(!jobseekerData) 
     return (
@@ -102,15 +131,18 @@ function PersonalInfo() {
     setIsImageEditMode(true);
   };
 
-
-  const handleImageUpload = (event) => {
+  const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setEditedInfo({ ...editedInfo, image: e.target.result });
-        setJobseekerData({ ...editedInfo, image: e.target.result }); // Save the image as well
-        setIsImageEditMode(false); // Disable image edit mode
+      reader.onload = async (e) => {
+        const imageRef = ref(storage, `profile_pictures/${file.name + v4()}`);
+        await uploadBytes(imageRef, file);
+        const imageUrl = await getDownloadURL(imageRef);
+  
+        const updatedEditedInfo = { ...editedInfo, profile_pic: imageUrl };
+        setEditedInfo(updatedEditedInfo);
+        setIsImageEditMode(false);
       };
       reader.readAsDataURL(file);
     }
@@ -122,29 +154,30 @@ function PersonalInfo() {
         <Box p={0} width="100%">
           <Paper elevation={3}>
             <Box p={0} display="flex" alignItems="center" justifyContent="flex-end">
-              {isEditMode ? (
+              
+            {isLoggedInUser && isEditMode && 
                 <>
-                  <IconButton color="primary" onClick={handleSave}>
-                    <SaveIcon />
-                  </IconButton>
-                  <IconButton color="error" onClick={handleCancel}>
-                    <CancelIcon />
-                  </IconButton>
-                </>
-              ) : (
-                <IconButton color="primary" onClick={handleEdit} sx={{mt: 4, mr: 4}}>
-                 <Typography sx={{mr: 2}}>Edit Info</Typography> <EditIcon />
+                <IconButton color="primary" onClick={handleSave}>
+                  <SaveIcon />
                 </IconButton>
-              )}
+                <IconButton color="error" onClick={handleCancel}>
+                  <CancelIcon />
+                </IconButton>
+              </>}
+              {isLoggedInUser && !isEditMode &&
+                <IconButton color="primary" onClick={handleEdit} sx={{mt: 4, mr: 4}}>
+                  <Typography sx={{mr: 2}}>Edit Info</Typography> <EditIcon />
+                </IconButton>
+              }
             </Box>
             <Box p={3} display="flex">
             <Box flex={1}>
                 {isImageEditMode ? (
                   <Box display="flex" flexDirection="column" alignItems="center">
                     <label htmlFor="image-upload">
-                      {editedInfo.image ? (
+                      {editedInfo.profile_pic ? (
                         <img
-                          src={editedInfo.image}
+                          src={editedInfo.profile_pic}
                           alt="Profile"
                           style={{ maxWidth: '250px', maxHeight: '250px', borderRadius: '50%', cursor: 'pointer' }}
                         />
@@ -166,9 +199,9 @@ function PersonalInfo() {
                   </Box>
                 ) : (
                   <Box display="flex" justifyContent="center">
-                    {jobseekerData.image ? (
+                    {jobseekerData.profile_pic ? (
                       <img
-                        src={jobseekerData.image}
+                        src={jobseekerData.profile_pic}
                         alt="Profile"
                         style={{ maxWidth: '300px', maxHeight: '300px', borderRadius: '50%', cursor: 'pointer' }}
                         onClick={handleImageClick}
@@ -400,14 +433,14 @@ function PersonalInfo() {
               value={editedInfo.phone_no || ''}
               onChange={(e) => setEditedInfo({ ...editedInfo, phone_no: e.target.value })}
             />
-            <TextField
+            {/* <TextField
               fullWidth
               variant="outlined"
               margin="dense"
               label="GitHub Link"
               value={editedInfo.githubLink || ''}
               onChange={(e) => setEditedInfo({ ...editedInfo, githubLink: e.target.value })}
-            />
+            /> */}
           </Box>
         </DialogContent>
         <DialogActions>

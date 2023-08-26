@@ -7,7 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteConfirmationDialogue from '../../../components/DeleteConfirmationDialogue';
 
 
-function PublicationInfoTable({ publicationInfo, handleDeletePublicationInfo, handleEditPublicationInfo, setIsDeleteConfirmationOpen, handleCancelDelete, isDeleteConfirmationOpen }) {
+function PublicationInfoTable({ isLoggedInUser, publicationInfo, handleDeletePublicationInfo, handleEditPublicationInfo, setIsDeleteConfirmationOpen, handleCancelDelete, isDeleteConfirmationOpen }) {
   return (
     <TableContainer>
       <Table>
@@ -18,7 +18,7 @@ function PublicationInfoTable({ publicationInfo, handleDeletePublicationInfo, ha
             <TableCell>Journal</TableCell>
             <TableCell>Paper Link</TableCell>
             <TableCell>Date</TableCell>
-            <TableCell>Actions</TableCell>
+            {isLoggedInUser && <TableCell>Actions</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -33,14 +33,14 @@ function PublicationInfoTable({ publicationInfo, handleDeletePublicationInfo, ha
               <TableCell>
                 <DateComponent isoDate={info.publication_date} />
               </TableCell>
-              <TableCell>
+              {isLoggedInUser && <TableCell>
                 <IconButton color="primary" onClick={() => handleEditPublicationInfo(info)}>
                   <EditIcon />
                 </IconButton>
                 <IconButton color="error" onClick={() => setIsDeleteConfirmationOpen(true)}>
                   <DeleteIcon />
                 </IconButton>
-              </TableCell>
+              </TableCell>}
               <DeleteConfirmationDialogue
                 isOpen={isDeleteConfirmationOpen}
                 onClose={handleCancelDelete}

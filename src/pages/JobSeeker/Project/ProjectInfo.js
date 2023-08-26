@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import ProjectInfoTable from './ProjectInfoTable';
 import DeleteConfirmationDialogue from '../../../components/DeleteConfirmationDialogue';
 import DateComponent from '../../../components/DateComponent';
 import {
@@ -24,7 +23,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 
-function ProjectInfo() {
+function ProjectInfo({isLoggedInUser}) {
   const id = useParams().jobseeker_id;
   const [projectInfo, setProjectInfo] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -195,7 +194,7 @@ function ProjectInfo() {
   return (
     <>
       <Box p={0}>
-        <ButtonBase
+        {isLoggedInUser && <ButtonBase
           component="div"
           onClick={handleAddProjectInfo}
           style={{
@@ -212,7 +211,7 @@ function ProjectInfo() {
           <IconButton color="primary">
             <AddIcon />
           </IconButton>
-        </ButtonBase>
+        </ButtonBase>}
         {projectInfo.length === 0 ? (
           <Typography>No project information available.</Typography>
         ) : (
@@ -234,14 +233,14 @@ function ProjectInfo() {
                     }
                   />
                 </Box>
-                <Box>
+                {isLoggedInUser && <Box>
                   <IconButton color="primary" onClick={() => handleEditProjectInfo(info)}>
                     <EditIcon />
                   </IconButton>
                   <IconButton color="error" onClick={() => setIsDeleteConfirmationOpen(true)}>
                     <DeleteIcon />
                   </IconButton>
-                </Box>
+                </Box>}
                 <DeleteConfirmationDialogue
                   isOpen={isDeleteConfirmationOpen}
                   onClose={handleCancelDelete}

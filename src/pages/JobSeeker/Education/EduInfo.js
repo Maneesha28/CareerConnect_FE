@@ -23,7 +23,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 
 
-function EduInfo() {
+function EduInfo({isLoggedInUser}) {
   const id = useParams().jobseeker_id;
   const [eduInfo, setEduInfo] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -193,6 +193,7 @@ function EduInfo() {
   return (
     <>
       <Box p={0}>
+        { isLoggedInUser && 
         <ButtonBase
           component="div"
           onClick={handleAddEduInfo}
@@ -210,11 +211,11 @@ function EduInfo() {
           <IconButton color="primary">
             <AddIcon />
           </IconButton>
-        </ButtonBase>
+        </ButtonBase> }
         {eduInfo.length === 0 ? (
           <Typography>No education information available.</Typography>
         ) : (
-          <EduInfoTable eduInfo={eduInfo} handleDeleteEduInfo={handleDeleteEduInfo} handleEditEduInfo={handleEditEduInfo} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
+          <EduInfoTable isLoggedInUser={isLoggedInUser} eduInfo={eduInfo} handleDeleteEduInfo={handleDeleteEduInfo} handleEditEduInfo={handleEditEduInfo} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
         )}
       </Box>
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>

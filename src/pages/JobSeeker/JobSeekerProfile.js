@@ -65,6 +65,23 @@ const JobSeekerProfile = () => {
     const [activeSection, setActiveSection] = useState(sections[0].id);
     const [error, setError] = useState('');
     const id = useParams().jobseeker_id;
+
+    //for current logged in user
+    const [currentUser, setCurrentUser] = useState(null);
+    
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get('/api/auth/user', {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        });
+        setCurrentUser(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }; 
   
     useEffect(() => {
       const fetchJobseekerData = async () => {
@@ -146,7 +163,9 @@ const JobSeekerProfile = () => {
         const endpoint = `/api/project/all/${id}`;
         fetchAndModifySectionData(endpoint, setProjectData, setIsLoadingProject, setError);
     };
-  
+    
+    fetchCurrentUser();
+
     fetchJobseekerData();
     fetchWorkExperienceData();
     fetchEducationData();
@@ -170,22 +189,22 @@ const JobSeekerProfile = () => {
         const activeSectionData = sections.find(section => section.id === activeSection);
         
         if (activeSection === 'skills') {
-          return <SkillInfo />;
+          return <SkillInfo isLoggedInUser={currentUser.user_id == id}/>;
         }
         if (activeSection === 'education') {
-            return <EduInfo />;
+            return <EduInfo isLoggedInUser={currentUser.user_id == id}/>;
         }
         if (activeSection === 'work-experience') {
-            return <WorkInfo />;
+            return <WorkInfo isLoggedInUser={currentUser.user_id == id}/>;
         }
         if (activeSection === 'achievements') {
-            return <AchievementInfo />;
+            return <AchievementInfo isLoggedInUser={currentUser.user_id == id}/>;
         }
         if (activeSection === 'publications') {
-            return <PublicationInfo />;
+            return <PublicationInfo isLoggedInUser={currentUser.user_id == id}/>;
         }
         if (activeSection === 'projects') {
-            return <ProjectInfo />;
+            return <ProjectInfo isLoggedInUser={currentUser.user_id == id}/>;
         }
         // Render other components based on the active section
         
@@ -215,7 +234,7 @@ const JobSeekerProfile = () => {
         <CssBaseline/>
         <Header />
         <Box p={6}>
-            <PersonalInfo />
+            <PersonalInfo isLoggedInUser={currentUser.user_id == id}/>
         </Box>
         <Box p={6}>
         <Paper elevation={3}>
@@ -243,47 +262,6 @@ const JobSeekerProfile = () => {
               <Grid item xs={12} md={8}>
                 {/* Render the active section component */}
                 {renderActiveSection()}
-                {/* {sections.map((section) => (
-                  section.id === activeSection && section.data[0] && (
-                    <Box key={section.id}>
-                      <Box display="flex" justifyContent="flex-end">
-                      </Box>
-                      <Typography variant="h6" gutterBottom>
-                        {section.label}
-                      </Typography>
-                      <TableContainer component={Paper}>
-                        <Table>
-                          <TableHead>
-                            <StyledTableRow>
-                              {Object.keys(section.data[0]).map((key) => (
-                                <StyledTableCell key={key} style={{ fontWeight: 'bold', textDecoration: 'underline' }}>
-                                    {key.replace('_', ' ')}
-                                </StyledTableCell>
-                              ))}
-                            </StyledTableRow>
-                          </TableHead>
-                          <TableBody>
-                            {section.data.map((item, index) => (
-                              <StyledTableRow key={index}>
-                                {Object.entries(item).map(([key, value], index) => (
-                                    <StyledTableCell key={index}>
-                                        {key.includes('link') ? (
-                                            <a href={value} target="_blank" rel="noopener noreferrer">
-                                                {value}
-                                            </a>
-                                        ) : (
-                                            value
-                                        )}
-                                    </StyledTableCell>
-                                ))}
-                              </StyledTableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </Box>
-                  )
-                ))} */}
               </Grid>
             </Grid>
           </Box>

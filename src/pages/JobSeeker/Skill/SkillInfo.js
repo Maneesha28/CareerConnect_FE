@@ -26,7 +26,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 
-function SkillInfo() {
+function SkillInfo({ isLoggedInUser }) {
   const id = useParams().jobseeker_id;
   const [skillInfo, setSkillInfo] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -171,6 +171,7 @@ function SkillInfo() {
   return (
     <>
       <Box p={0}>
+        {isLoggedInUser && 
         <ButtonBase
           component="div"
           onClick={handleAddSkillInfo}
@@ -188,11 +189,11 @@ function SkillInfo() {
           <IconButton color="primary">
             <AddIcon />
           </IconButton>
-        </ButtonBase>
+        </ButtonBase>}
         {skillInfo.length === 0 ? (
           <Typography>No skill information available.</Typography>
         ) : (
-          <SkillInfoTable skillInfo={skillInfo} handleDeleteSkillInfo={handleDeleteSkillInfo} handleEditSkillInfo={handleEditSkillInfo} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
+          <SkillInfoTable isLoggedInUser={isLoggedInUser} skillInfo={skillInfo} handleDeleteSkillInfo={handleDeleteSkillInfo} handleEditSkillInfo={handleEditSkillInfo} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
         )}
       </Box>
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>

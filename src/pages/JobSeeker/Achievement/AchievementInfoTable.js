@@ -7,7 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteConfirmationDialogue from '../../../components/DeleteConfirmationDialogue';
 
 
-function AchievementInfoTable({ achievementInfo, handleDeleteAchievementInfo, handleEditAchievementInfo, setIsDeleteConfirmationOpen, handleCancelDelete, isDeleteConfirmationOpen }) {
+function AchievementInfoTable({ isLoggedInUser, achievementInfo, handleDeleteAchievementInfo, handleEditAchievementInfo, setIsDeleteConfirmationOpen, handleCancelDelete, isDeleteConfirmationOpen }) {
   return (
     <TableContainer>
       <Table>
@@ -17,7 +17,7 @@ function AchievementInfoTable({ achievementInfo, handleDeleteAchievementInfo, ha
             <TableCell>Position</TableCell>
             <TableCell>Organizer</TableCell>
             <TableCell>Date</TableCell>
-            <TableCell>Actions</TableCell>
+            {isLoggedInUser && <TableCell>Actions</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -29,6 +29,7 @@ function AchievementInfoTable({ achievementInfo, handleDeleteAchievementInfo, ha
               <TableCell>
                 <DateComponent isoDate={info.achievement_date} />
               </TableCell>
+              {isLoggedInUser && 
               <TableCell>
                 <IconButton color="primary" onClick={() => handleEditAchievementInfo(info)}>
                   <EditIcon />
@@ -36,7 +37,7 @@ function AchievementInfoTable({ achievementInfo, handleDeleteAchievementInfo, ha
                 <IconButton color="error" onClick={() => setIsDeleteConfirmationOpen(true)}>
                   <DeleteIcon />
                 </IconButton>
-              </TableCell>
+              </TableCell>}
               <DeleteConfirmationDialogue
                 isOpen={isDeleteConfirmationOpen}
                 onClose={handleCancelDelete}

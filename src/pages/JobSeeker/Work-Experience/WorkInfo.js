@@ -23,7 +23,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 
 
-function WorkInfo() {
+function WorkInfo({isLoggedInUser}) {
   const id = useParams().jobseeker_id;
   const [workInfo, setWorkInfo] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -187,7 +187,7 @@ function WorkInfo() {
   return (
     <>
       <Box p={0}>
-        <ButtonBase
+        {isLoggedInUser && <ButtonBase
           component="div"
           onClick={handleAddWorkInfo}
           style={{
@@ -204,11 +204,11 @@ function WorkInfo() {
           <IconButton color="primary">
             <AddIcon />
           </IconButton>
-        </ButtonBase>
+        </ButtonBase>}
         {workInfo.length === 0 ? (
           <Typography>No work information available.</Typography>
         ) : (
-          <WorkInfoTable workInfo={workInfo} handleDeleteWorkInfo={handleDeleteWorkInfo} handleEditWorkInfo={handleEditWorkInfo} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
+          <WorkInfoTable isLoggedInUser={isLoggedInUser} workInfo={workInfo} handleDeleteWorkInfo={handleDeleteWorkInfo} handleEditWorkInfo={handleEditWorkInfo} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
         )}
       </Box>
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>

@@ -22,7 +22,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 
-function PublicationInfo() {
+function PublicationInfo({isLoggedInUser}) {
   const id = useParams().jobseeker_id;
   const [publicationInfo, setPublicationInfo] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -197,7 +197,7 @@ function PublicationInfo() {
   return (
     <>
       <Box p={0}>
-        <ButtonBase
+        {isLoggedInUser && <ButtonBase
           component="div"
           onClick={handleAddPublicationInfo}
           style={{
@@ -214,11 +214,11 @@ function PublicationInfo() {
           <IconButton color="primary">
             <AddIcon />
           </IconButton>
-        </ButtonBase>
+        </ButtonBase>}
         {publicationInfo.length === 0 ? (
           <Typography>No publication information available.</Typography>
         ) : (
-          <PublicationInfoTable publicationInfo={publicationInfo} handleDeletePublicationInfo={handleDeletePublicationInfo} handleEditPublicationInfo={handleEditPublicationInfo} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
+          <PublicationInfoTable isLoggedInUser={isLoggedInUser} publicationInfo={publicationInfo} handleDeletePublicationInfo={handleDeletePublicationInfo} handleEditPublicationInfo={handleEditPublicationInfo} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
         )}
       </Box>
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>

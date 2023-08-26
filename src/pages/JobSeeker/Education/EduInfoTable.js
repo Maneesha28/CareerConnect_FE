@@ -11,7 +11,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DeleteConfirmationDialogue from '../../../components/DeleteConfirmationDialogue';
 
 
-function EduInfoTable({ eduInfo, handleDeleteEduInfo, handleEditEduInfo, setIsDeleteConfirmationOpen, handleCancelDelete, isDeleteConfirmationOpen }) {
+function EduInfoTable({ isLoggedInUser, eduInfo, handleDeleteEduInfo, handleEditEduInfo, setIsDeleteConfirmationOpen, handleCancelDelete, isDeleteConfirmationOpen }) {
   return (
     <TableContainer>
       <Table>
@@ -23,7 +23,7 @@ function EduInfoTable({ eduInfo, handleDeleteEduInfo, handleEditEduInfo, setIsDe
             <TableCell>Result</TableCell>
             <TableCell>Start Date</TableCell>
             <TableCell>End Date</TableCell>
-            <TableCell>Actions</TableCell>
+            { isLoggedInUser && <TableCell>Actions</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -39,14 +39,14 @@ function EduInfoTable({ eduInfo, handleDeleteEduInfo, handleEditEduInfo, setIsDe
               <TableCell>
                 <DateComponent isoDate={info.end_date} />
               </TableCell>
-              <TableCell>
+              {isLoggedInUser && <TableCell>
                 <IconButton color="primary" onClick={() => handleEditEduInfo(info)}>
                   <EditIcon />
                 </IconButton>
                 <IconButton color="error" onClick={() => setIsDeleteConfirmationOpen(true)}>
                   <DeleteIcon />
                 </IconButton>
-              </TableCell>
+              </TableCell>}
               <DeleteConfirmationDialogue
                 isOpen={isDeleteConfirmationOpen}
                 onClose={handleCancelDelete}

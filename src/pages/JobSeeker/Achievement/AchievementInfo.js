@@ -22,7 +22,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 
-function AchievementInfo() {
+function AchievementInfo({isLoggedInUser}) {
   const id = useParams().jobseeker_id;
   const [achievements, setAchievements] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -181,7 +181,7 @@ function AchievementInfo() {
   return (
     <>
       <Box p={0}>
-        <ButtonBase
+        {isLoggedInUser && <ButtonBase
               component="div"
               onClick={handleAddAchievement}
               style={{
@@ -198,11 +198,11 @@ function AchievementInfo() {
               <IconButton color="primary">
                   <AddIcon />
               </IconButton>
-          </ButtonBase>
+          </ButtonBase>}
         {achievements.length === 0 ? (
           <Typography>No achievements available.</Typography>
         ) : (
-          <AchievementInfoTable achievementInfo={achievements} handleDeleteAchievementInfo={handleDeleteAchievement} handleEditAchievementInfo={handleEditAchievement} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
+          <AchievementInfoTable isLoggedInUser={isLoggedInUser} achievementInfo={achievements} handleDeleteAchievementInfo={handleDeleteAchievement} handleEditAchievementInfo={handleEditAchievement} setIsDeleteConfirmationOpen={setIsDeleteConfirmationOpen} handleCancelDelete={handleCancelDelete} isDeleteConfirmationOpen={isDeleteConfirmationOpen} />
         )}
       </Box>
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>

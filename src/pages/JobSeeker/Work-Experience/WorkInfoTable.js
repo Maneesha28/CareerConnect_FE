@@ -7,7 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteConfirmationDialogue from '../../../components/DeleteConfirmationDialogue';
 
 
-function WorkInfoTable({ workInfo, handleDeleteWorkInfo, handleEditWorkInfo, setIsDeleteConfirmationOpen, handleCancelDelete, isDeleteConfirmationOpen }) {
+function WorkInfoTable({ isLoggedInUser, workInfo, handleDeleteWorkInfo, handleEditWorkInfo, setIsDeleteConfirmationOpen, handleCancelDelete, isDeleteConfirmationOpen }) {
   return (
     <>
       <TableContainer>
@@ -19,7 +19,7 @@ function WorkInfoTable({ workInfo, handleDeleteWorkInfo, handleEditWorkInfo, set
               <TableCell>Employment Type</TableCell>
               <TableCell>Start Date</TableCell>
               <TableCell>End Date</TableCell>
-              <TableCell>Actions</TableCell>
+              { isLoggedInUser && <TableCell>Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -34,14 +34,14 @@ function WorkInfoTable({ workInfo, handleDeleteWorkInfo, handleEditWorkInfo, set
                 <TableCell>
                   <DateComponent isoDate={info.end_date} />
                 </TableCell>
-                <TableCell>
+                {isLoggedInUser && <TableCell>
                   <IconButton color="primary" onClick={() => handleEditWorkInfo(info)}>
                     <EditIcon />
                   </IconButton>
                   <IconButton color="error" onClick={() => setIsDeleteConfirmationOpen(true)}>
                     <DeleteIcon />
                   </IconButton>
-                </TableCell>
+                </TableCell>}
                 <DeleteConfirmationDialogue
                   isOpen={isDeleteConfirmationOpen}
                   onClose={handleCancelDelete}
