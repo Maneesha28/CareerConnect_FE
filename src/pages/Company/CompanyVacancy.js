@@ -30,7 +30,7 @@ import axios from 'axios';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteConfirmationDialogue from '../../components/DeleteConfirmationDialogue';
-
+import CompanyReviews from './CompanyReviews';
 
 const CompanyVacancy = () => {
   const [selectedTab, setSelectedTab] = useState(0); // 0 for Job List, 1 for Archived Job List
@@ -292,12 +292,8 @@ const CompanyVacancy = () => {
 
   return (
     <>
-      <Header />
-      <Container sx={{ marginTop: '36px' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-          <Typography variant="h4">Job Lists</Typography>
-        </Box>
-        <Box sx={{ display: 'flex', marginBottom: '16px', alignItems: 'center' }}>
+      <Container sx={{ marginTop: '0px'  }}>
+        <Box sx={{ display: 'flex', marginBottom: '16px', alignItems: 'center' ,width:'100%' }}>
           <TextField
             label="Search by title"
             value={searchKeyword}
@@ -311,6 +307,7 @@ const CompanyVacancy = () => {
                 </InputAdornment>
               ),
             }}
+            sx={{ width: '40%' }}
           />
           <Box sx={{ flexGrow: 1 }} />
           <Button
@@ -323,7 +320,7 @@ const CompanyVacancy = () => {
             New Job Post
           </Button>
           </Box>
-          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Box sx={{ flexGrow: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Tabs
               value={selectedTab}
               onChange={(event, newValue) => setSelectedTab(newValue)}
@@ -401,11 +398,11 @@ const CompanyVacancy = () => {
             </Button> */}
           </Paper>
           {/* Job Lists */}
-          <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2}>
-              {jobsToShow.map((job) => (
-                <Grid item xs={5} key={job.jobpost_id}>
-                  <Paper elevation={3} sx={{ padding: '16px' }}>
+          <Box sx={{ width: '100%' }}>
+          <Grid container spacing={2}>
+            {jobsToShow.map((job) => (
+              <Grid item xs={12} sm={6} md={6} key={job.jobpost_id}>
+                <Paper elevation={3} sx={{ padding: '16px' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Link to={`/companyViewJobPost/${job.jobpost_id}`} style={{ textDecoration: 'none' }}>
                       <Typography variant="h6" gutterBottom>
@@ -421,25 +418,25 @@ const CompanyVacancy = () => {
                       </IconButton>
                     </div>
                     <DeleteConfirmationDialogue
-                    isOpen={isDeleteConfirmationOpen}
-                    onClose={handleCancelDelete}
-                    onDelete={() => handleDeleteJobPost(job.jobpost_id)}
-                  />
+                      isOpen={isDeleteConfirmationOpen}
+                      onClose={handleCancelDelete}
+                      onDelete={() => handleDeleteJobPost(job.jobpost_id)}
+                    />
                   </Box>
-                    <Typography variant="subtitle1" gutterBottom>
-                      Vacancy: {job.vacancy}
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
-                      Salary: {job.salary}
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
-                      Applicants: {job.applicants}
-                    </Typography>
-                  </Paper>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Vacancy: {job.vacancy}
+                  </Typography>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Salary: {job.salary}
+                  </Typography>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Applicants: {job.applicants}
+                  </Typography>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
         </Box>
       </Container>
 

@@ -82,7 +82,7 @@ function App() {
       <Route path="/jobseeker/:jobseeker_id/accountInfo" element={<AccountInfo/>}/>
       
       <Route path="/companyPage" element={<CompanyPage/>}/>
-      <Route path="/companyInfo" element={<CompanyInfo/>}/>
+      <Route path="/companyInfo/:company_id" element={<CompanyInfo/>}/>
       <Route path="/companyAccountInfo" element={<CompanyAccountInfo/>}/>
       <Route path="/companyReviews/:company_id" element={<CompanyReviews/>}/>
       <Route path="/companyVacancy/:company_id" element={<CompanyVacancy/>}/>

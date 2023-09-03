@@ -26,10 +26,8 @@ const CompanyReviews = () => {
   const [selectedReview, setSelectedReview] = useState(null);
   const [reviewData,setReviewData] = useState(null);
   const [companyData,setCompanyData] = useState(null);
-  const [avgStars,setAvgStars] = useState(0.0);
   const [jobseekerData,setJobseekerData] = useState(null);
   const [isLoadingReview, setIsLoadingReview] = useState(true);
-  const [isLoadingStars, setIsLoadingStars] = useState(true);
   const [isLoadingCompany, setIsLoadingCompany] = useState(true);
   const [isLoadingJobSeeker, setIsLoadingJobSeeker] = useState(true);
   const [error, setError] = useState('');
@@ -65,23 +63,7 @@ const CompanyReviews = () => {
         setIsLoadingCompany(false);
       }
     };
-    const fetchAvgStars = async () => {
-      try {
-        const response = await axios.get(`/api/review/avg_stars/${id}`, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        });
-        setAvgStars(response.data.avg_stars);
-        setIsLoadingStars(false);
-      } catch (error) {
-        setError('Error fetching review information.');
-        setIsLoadingStars(false);
-      }
-    };
     fetchReviewData();
-    fetchAvgStars();
     fetchCompanyData();
 
   }, [id]);
@@ -111,22 +93,7 @@ const CompanyReviews = () => {
 
   return (
     <>
-      <Header />
-      <PermanentDrawerLeft/>
-      <Box sx={{ position: 'relative'}}>
-        {/* Company Banner */}
-        <Link to={`/company/${id}`} style={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-          <Typography variant="h3" color="black" sx={{ fontWeight: 'bold', textDecoration: 'underline', border: '2px solid black', padding: '4px 8px' }}>
-            {companyData.company_name}
-          </Typography>
-        </Link>
-      </Box>
-      <Box>
-        <Typography variant="h5" gutterBottom style={{ textAlign: 'right', marginTop: 20, marginRight: 600, fontWeight: 700 }}>
-          Average Rating: {avgStars}
-        </Typography>
-      </Box>
-      <Container sx={{ marginTop: '10px'}}>
+      <Container sx={{ marginTop: '0px', width: '100%' }}>
         <Paper elevation={3} sx={{ padding: '20px', backgroundColor: '#f5f5f5' }}>
           <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', fontWeight: 700}}>
             Company Reviews

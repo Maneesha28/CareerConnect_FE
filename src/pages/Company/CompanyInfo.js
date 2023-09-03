@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import { storage } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { v4 } from 'uuid';
 import {
   Box,
   Paper,
@@ -15,74 +18,239 @@ import {
   DialogContent,
   DialogActions,
   Avatar,
+  Grid,
 } from '@mui/material';
+import { useParams } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Header from '../../components/Header';
-import Sidebar_Company from '../../components/Sidebar_Company';
+import axios from 'axios';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 function CompanyInfo() {
+  const [companyData,setCompanyData] = useState({});
+  const [editedInfo, setEditedInfo] = useState({});
+
   const [isEditMode, setIsEditMode] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isImageEditMode, setIsImageEditMode] = useState(false);
-  const [editedInfo, setEditedInfo] = useState({});
-  const [companyInfo, setCompanyInfo] = useState({
-    companyName: 'ABC Corp',
-    description: 'A leading technology company',
-    address: '123 Main St, City, Country',
-    website: 'https://www.example.com',
-    phoneNo: '123-456-7890',
-    tradeLicense: '123456789',
-    companyLogo: '',
-  });
+  const [followersCount, setFollowersCount] = useState(0);
+  const [error, setError] = useState('');
+  const [avgStars,setAvgStars] = useState(0.0);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  const handleEdit = () => {
-    setIsDialogOpen(true);
-    setEditedInfo({ ...companyInfo });
+  const [isLoadingCompany, setIsLoadingCompany] = useState(true);
+  const [isLoadingStars, setIsLoadingStars] = useState(true);
+
+  const id = useParams().company_id;
+  // Calculate the number of full stars
+  const fullStars = Math.floor(avgStars);
+  
+  // Calculate the number of empty stars
+  const emptyStars = 5 - fullStars;
+
+  // Style for the full star icons
+  const fullStarStyle = { color: 'gold' };
+  
+  // Create an array of full star icons with the golden color style
+  const fullStarIcons = Array.from({ length: fullStars }, (_, index) => (
+    <StarIcon key={index} style={fullStarStyle} />
+  ));
+
+  // Create an array of empty star icons
+  const emptyStarIcons = Array.from({ length: emptyStars }, (_, index) => (
+    <StarBorderIcon key={index} />
+  ));
+
+
+  const fetchAvgStars = async () => {
+    try {
+      const response = await axios.get(`/api/review/avg_stars/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      setAvgStars(response.data.avg_stars);
+      setIsLoadingStars(false);
+    } catch (error) {
+      setError('Error fetching review information.');
+      setIsLoadingStars(false);
+    }
+  };
+  const fetchCurrentUser = async() => {
+    try{
+      const response = await axios.get('/api/auth/user', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+        setCurrentUser(response.data);
+        console.log(currentUser);
+      } catch (error) {
+        setError('Error fetching current user information.');
+
+      }
+    };
+
+  const fetchCompanyData = async () => {
+    try {
+      const response = await axios.get(`/api/company/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      setCompanyData(response.data);
+      setIsLoadingCompany(false);
+    } catch (error) {
+      setError('Error fetching company information.');
+      setIsLoadingCompany(false);
+    }
+  };
+  const fetchFollowersCount = async () => {
+    try {
+      const response = await axios.get(`/api/follow/follower_count/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      setFollowersCount(response.data.follower_count);
+    } catch (error) {
+      console.log(id);
+      setError('Error fetching Followers Count.');
+    }
+  };
+  const sendEditedInfoToBackend = async() => {
+    try {
+      console.log(editedInfo.company_logo);
+      const response = await axios.put('/api/company', editedInfo, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true,
+    });
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleSave = () => {
-    setIsDialogOpen(false);
-    setIsEditMode(false);
-    setIsImageEditMode(false); // Disable image edit mode when saving
-    setCompanyInfo(editedInfo);
+  useEffect(() => {
+
+      fetchCompanyData();
+      fetchFollowersCount();
+      fetchAvgStars();
+  }, [id]);
+  //useEffect hook to listen for changes in profile_pic
+  useEffect(() => {
+      if(editedInfo.company_logo)
+      {
+        console.log("Sending edited info to backend");
+        sendEditedInfoToBackend();
+      }
+      fetchCompanyData();
+    }, [editedInfo.company_logo]);
+
+  if(isLoadingCompany){
+    return <div>Loading Company</div>;
+  }
+  if (error) {
+    return <div>{error}</div>;
+  }
+  if (!companyData) {
+    return <div>Company Data not found.</div>;
+  }
+  const handleEdit = () => {
+    setEditedInfo({ ...companyData });
+    setIsDialogOpen(true);
+  };
+
+  const handleSave = async() => {
+    try {
+      setIsDialogOpen(false);
+      setIsEditMode(false);
+      setIsImageEditMode(false);
+  
+      // Send editedInfo to the backend
+      const response = await axios.put('/api/company', editedInfo, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      if (response.status === 200) {
+        // Update jobseekerData with the editedInfo
+        setCompanyData(editedInfo);
+      } else {
+        console.error('Failed to update Company info.');
+      }
+    } catch (error) {
+      console.error('Error updating Company info:', error);
+    }
   };
 
   const handleCancel = () => {
-    setIsDialogOpen(false);
     setIsEditMode(false);
-    setIsImageEditMode(false); // Disable image edit mode when canceling
+    setIsImageEditMode(false); // Disable image edit mode when saving
+    setIsDialogOpen(false);
   };
 
   const handleImageClick = () => {
     setIsImageEditMode(true);
   };
 
-  const handleImageUpload = (event) => {
+  const handleImageUpload = async(event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setEditedInfo({ ...editedInfo, companyLogo: e.target.result });
-        setCompanyInfo({ ...editedInfo, companyLogo: e.target.result }); // Save the image as well
-        setIsImageEditMode(false); // Disable image edit mode
+      reader.onload = async (e) => {
+        const imageRef = ref(storage, `profile_pictures/${file.name + v4()}`);
+        await uploadBytes(imageRef, file);
+        const imageUrl = await getDownloadURL(imageRef);
+  
+        const updatedEditedInfo = { ...editedInfo, company_logo: imageUrl };
+        setEditedInfo(updatedEditedInfo);
+        setIsImageEditMode(false);
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const buttonStyle = {
+    backgroundColor: 'blue', // Set the background color to blue
+    color: 'white', // Set the text color to white
+  };
+
   return (
     <>
-      <Header />
       <Box display="flex">
-        <Sidebar_Company />
-        <Box p={3} width="80%">
+        <Box p={3} width="100%">
           <Paper elevation={3} sx={{ p: 3 }}>
-            <Box display="flex" alignItems="center">
-              <Box flex="1">
-                <Typography variant="h6">Company Information</Typography>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Box sx={{ mb: 0 }}>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      label="Company Name"
+                      value={editedInfo.company_name || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, company_name: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <Typography variant="body1" style={{ fontSize: '22px', fontWeight: 'bolder' }}>
+                      {companyData.company_name}
+                    </Typography>
+                  )}
               </Box>
               {isEditMode ? (
                 <Box>
@@ -94,134 +262,15 @@ function CompanyInfo() {
                   </IconButton>
                 </Box>
               ) : (
-                <IconButton color="primary" onClick={handleEdit}>
-                  <EditIcon />
-                </IconButton>
+                <IconButton color="primary" onClick={handleEdit} style={buttonStyle}>
+                <Typography variant="body1" style={{ fontWeight: 'bold', color: 'white' }}>
+                  Edit <EditIcon />
+                </Typography>
+              </IconButton>
               )}
             </Box>
-            <Box display="flex">
-              <Box flex="1">
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle1">Company Name:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      label="Company Name"
-                      value={editedInfo.companyName || ''}
-                      onChange={(e) =>
-                        setEditedInfo({ ...editedInfo, companyName: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <Typography variant="body1">{companyInfo.companyName}</Typography>
-                  )}
-                </Box>
-
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle1">Description:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      label="Description"
-                      value={editedInfo.description || ''}
-                      onChange={(e) =>
-                        setEditedInfo({ ...editedInfo, description: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <Typography variant="body1">{companyInfo.description}</Typography>
-                  )}
-                </Box>
-
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle1">Address:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      multiline
-                      rows={4}
-                      label="Address"
-                      value={editedInfo.address || ''}
-                      onChange={(e) =>
-                        setEditedInfo({ ...editedInfo, address: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <Typography variant="body1">{companyInfo.address}</Typography>
-                  )}
-                </Box>
-
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle1">Website:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      label="Website"
-                      value={editedInfo.website || ''}
-                      onChange={(e) =>
-                        setEditedInfo({ ...editedInfo, website: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <Typography variant="body1">
-                      <a
-                        href={companyInfo.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {companyInfo.website}
-                      </a>
-                    </Typography>
-                  )}
-                </Box>
-
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle1">Phone No:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      label="Phone No"
-                      value={editedInfo.phoneNo || ''}
-                      onChange={(e) =>
-                        setEditedInfo({ ...editedInfo, phoneNo: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <Typography variant="body1">{companyInfo.phoneNo}</Typography>
-                  )}
-                </Box>
-
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle1">Trade License:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      label="Trade License"
-                      value={editedInfo.tradeLicense || ''}
-                      onChange={(e) =>
-                        setEditedInfo({ ...editedInfo, tradeLicense: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <Typography variant="body1">
-                      {companyInfo.tradeLicense}
-                    </Typography>
-                  )}
-                </Box>
-              </Box>
-              <Box>
+            <Box display="flex" alignItems="center">
+            <Box>
                 {isImageEditMode ? (
                   <Box
                     display="flex"
@@ -230,9 +279,9 @@ function CompanyInfo() {
                     sx={{ mb: 2 }}
                   >
                     <label htmlFor="image-upload">
-                      {editedInfo.companyLogo ? (
+                      {editedInfo.company_logo ? (
                         <Avatar
-                          src={editedInfo.companyLogo}
+                          src={editedInfo.company_logo}
                           alt="Company Logo"
                           sx={{
                             width: 200,
@@ -270,16 +319,11 @@ function CompanyInfo() {
                   </Box>
                 ) : (
                   <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
-                    {companyInfo.companyLogo ? (
-                      <Avatar
-                        src={companyInfo.companyLogo}
-                        alt="Company Logo"
-                        sx={{
-                          width: 200,
-                          height: 200,
-                          borderRadius: '50%',
-                          cursor: 'pointer',
-                        }}
+                    {companyData.company_logo ? (
+                      <img
+                        src={companyData.company_logo}
+                        alt="Profile"
+                        style={{ maxWidth: '300px', maxHeight: '300px', borderRadius: '50%', cursor: 'pointer' }}
                         onClick={handleImageClick}
                       />
                     ) : (
@@ -294,6 +338,139 @@ function CompanyInfo() {
                     )}
                   </Box>
                 )}
+              <Box alignItems="center">
+              <button
+                  style={{ backgroundColor: 'green', color: 'white', padding: '10px 20px', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  Followers ({followersCount})
+              </button>
+              <Box>
+                <Typography variant="h5" gutterBottom style={{ textAlign: 'right', fontWeight: 700 }}>
+                  Average Rating: 
+                  {fullStarIcons}
+                  {emptyStarIcons}
+                </Typography>
+              </Box>
+              </Box>
+              </Box>
+              <Box flex="1">
+              <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ mb: 5 , paddingLeft: '20px'}}>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      label="Description"
+                      value={editedInfo.about || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, about: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <Typography variant="body1">{companyData.about}</Typography>
+                  )}
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="subtitle1">Address:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      multiline
+                      rows={4}
+                      label="Address"
+                      value={editedInfo.address || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, address: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <Typography variant="body1">{companyData.address}</Typography>
+                  )}
+                </Box>
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="subtitle1">Email:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      multiline
+                      rows={4}
+                      label="Email"
+                      value={editedInfo.email || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, email: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <Typography variant="body1">{companyData.email}</Typography>
+                  )}
+                </Box>
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="subtitle1">Website:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      label="Website"
+                      value={editedInfo.website_address || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, website_address: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <Typography variant="body1">
+                      <a href={companyData.website_address} target="_blank" rel="noopener noreferrer">
+                        {companyData.website_address}
+                      </a>
+                    </Typography>
+                  )}
+                </Box>
+
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="subtitle1">Phone No:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      label="Phone No"
+                      value={editedInfo.phone_no || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, phone_no: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <Typography variant="body1">{companyData.phone_no}</Typography>
+                  )}
+                </Box>
+
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="subtitle1">Trade License:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      label="Trade License"
+                      value={editedInfo.trade_license || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, trade_license: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <Typography variant="body1">{companyData.trade_license}</Typography>
+                  )}
+                </Box>
+              </Grid>
+            </Grid>
               </Box>
             </Box>
           </Paper>
@@ -308,9 +485,9 @@ function CompanyInfo() {
               variant="outlined"
               margin="dense"
               label="Company Name"
-              value={editedInfo.companyName || ''}
+              value={editedInfo.company_name || ''}
               onChange={(e) =>
-                setEditedInfo({ ...editedInfo, companyName: e.target.value })
+                setEditedInfo({ ...editedInfo, company_name: e.target.value })
               }
             />
             <TextField
@@ -318,9 +495,9 @@ function CompanyInfo() {
               variant="outlined"
               margin="dense"
               label="Description"
-              value={editedInfo.description || ''}
+              value={editedInfo.about || ''}
               onChange={(e) =>
-                setEditedInfo({ ...editedInfo, description: e.target.value })
+                setEditedInfo({ ...editedInfo, about: e.target.value })
               }
             />
             <TextField
@@ -338,9 +515,9 @@ function CompanyInfo() {
               variant="outlined"
               margin="dense"
               label="Website"
-              value={editedInfo.website || ''}
+              value={editedInfo.website_address || ''}
               onChange={(e) =>
-                setEditedInfo({ ...editedInfo, website: e.target.value })
+                setEditedInfo({ ...editedInfo, website_address: e.target.value })
               }
             />
             <TextField
@@ -348,9 +525,9 @@ function CompanyInfo() {
               variant="outlined"
               margin="dense"
               label="Phone No"
-              value={editedInfo.phoneNo || ''}
+              value={editedInfo.phone_no || ''}
               onChange={(e) =>
-                setEditedInfo({ ...editedInfo, phoneNo: e.target.value })
+                setEditedInfo({ ...editedInfo, phone_no: e.target.value })
               }
             />
             <TextField
@@ -358,9 +535,9 @@ function CompanyInfo() {
               variant="outlined"
               margin="dense"
               label="Trade License"
-              value={editedInfo.tradeLicense || ''}
+              value={editedInfo.trade_license || ''}
               onChange={(e) =>
-                setEditedInfo({ ...editedInfo, tradeLicense: e.target.value })
+                setEditedInfo({ ...editedInfo, trade_license: e.target.value })
               }
             />
           </Box>

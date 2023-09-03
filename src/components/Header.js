@@ -82,7 +82,7 @@ const Header = () => {
                   <Home fontSize="large" />
               </IconButton>
               <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <Typography variant="h6">Career Connect</Typography>
+              <Typography variant="h6" style={{ fontWeight: 'bold' }}>Career Connect</Typography>
               </Link>
           </Box>
           <Box>
@@ -94,9 +94,9 @@ const Header = () => {
                 <Notifications fontSize="large" />
               </Badge>
             </IconButton>
-            <IconButton color="inherit" onClick={handleOpenSettingsMenu}>
+            {/* <IconButton color="inherit" onClick={handleOpenSettingsMenu}>
               <Settings fontSize="large" />
-            </IconButton>
+            </IconButton> */}
           </Box>
           {/* <Menu
             anchorEl={contactMenuAnchor}
@@ -119,16 +119,26 @@ const Header = () => {
             <MenuItem>Notification 2</MenuItem>
             <MenuItem>Notification 3</MenuItem>
           </Menu>
-          <Menu
-            anchorEl={settingsAnchor}
-            open={Boolean(settingsAnchor)}
-            onClose={handleCloseSettingsMenu}
+          <Box>
+          <Typography
+            color="inherit"
+            onClick={handleCloseUserMenu}
+            // component={Link}
+            to={`/jobseeker/${id}`}
+            style={{ cursor: 'pointer', marginRight: '20px', fontWeight: 'bold' }}
           >
-            <MenuItem onClick={handleCloseUserMenu} component={Link} to={`/jobseeker/${id}`}>
-              <Typography textAlign="center">Profile</Typography>
-            </MenuItem>
-            <MenuItem><LogoutButton/></MenuItem>
-          </Menu>
+            My Profile
+          </Typography>
+          </Box>
+          <Box>
+          <Typography
+            color="inherit"
+            onClick={LogoutButton}
+            style={{ cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            Log Out
+          </Typography>
+        </Box>
         </Toolbar>
       </AppBar>
     </ThemeProvider>
