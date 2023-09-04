@@ -12,6 +12,7 @@ const CompanyPage = () => {
 
   //for current logged in user
   const [currentUser, setCurrentUser] = useState(null);
+  const [error, setError] = useState(null);
 
   const fetchCurrentUser = async() => {
     try{
@@ -22,32 +23,41 @@ const CompanyPage = () => {
         withCredentials: true,
       });
         setCurrentUser(response.data);
-        console.log('current user fetched');
-        console.log(currentUser);
+        console.log(response.data);
+        console.log('current user fetched',currentUser);
+        console.log(currentUser.user_id,' ',id);
+        console.log(currentUser.user_id === id);
+        console.log(parseInt(currentUser.user_id) === parseInt(id));
       } catch (error) {
         setError('Error fetching current user information.');
-
+        console.log(error);
       }
     };
 
   useEffect(() => {
-      fetchCurrentUser();
-
+    console.log("Fetching current user...");
+    fetchCurrentUser();
   }, [id]);
-  
+
   return (
-  <>
-    <Header />
-    <CompanyInfo isLoggedInUser={currentUser.user_id == id}/>
-    <div style={{ display: 'flex' }}>
-      <div style={{ flex: '3' }}>
-        <CompanyVacancy isLoggedInUser={currentUser.user_id == id}/>
-      </div>
-      <div style={{ flex: '2' }}>
-        <CompanyReviews isLoggedInUser={currentUser.user_id == id}/>
-      </div>
-    </div>
-  </>
+    <>
+      <Header />
+      {currentUser !== null ? (
+        <>
+          <CompanyInfo isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} />
+          <div style={{ display: 'flex' }}>
+            <div style={{ flex: '3' }}>
+              <CompanyVacancy isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} />
+            </div>
+            <div style={{ flex: '2' }}>
+              <CompanyReviews isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} />
+            </div>
+          </div>
+        </>
+      ) : (
+        <p>Loading...</p>
+      )}
+    </>
   );
 };
 

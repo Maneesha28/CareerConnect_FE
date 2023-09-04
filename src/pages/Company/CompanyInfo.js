@@ -44,6 +44,9 @@ function CompanyInfo({isLoggedInUser}) {
 
   const [isLoadingCompany, setIsLoadingCompany] = useState(true);
   const [isLoadingStars, setIsLoadingStars] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(null);
+  const [followButtonText, setFollowButtonText] = useState(null);
+  const [isLoadingFollowingInfo,setIsLoadingFollowingInfo] = useState(true);
 
   const id = useParams().company_id;
   // Calculate the number of full stars
@@ -79,6 +82,27 @@ function CompanyInfo({isLoggedInUser}) {
     } catch (error) {
       setError('Error fetching review information.');
       setIsLoadingStars(false);
+    }
+  };
+  const fetchIsFollowing = async () => {
+    try {
+      const response = await axios.get(`/api/follow/is_following/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      setIsFollowing(response.data.is_following);
+      if (response.data.is_following == 1) {
+        setFollowButtonText('Unfollow');
+      } else {
+        setFollowButtonText('Follow+');
+      }
+      console.log(isFollowing);
+      setIsLoadingFollowingInfo(false);
+    } catch (error) {
+      setError('Error fetching review information.');
+      setIsLoadingFollowingInfo(false);
     }
   };
   const fetchCurrentUser = async() => {
@@ -122,7 +146,6 @@ function CompanyInfo({isLoggedInUser}) {
       });
       setFollowersCount(response.data.follower_count);
     } catch (error) {
-      console.log(id);
       setError('Error fetching Followers Count.');
     }
   };
@@ -140,13 +163,53 @@ function CompanyInfo({isLoggedInUser}) {
       console.error(error);
     }
   };
-
+  const requestData = {
+    company_id: parseInt(id),
+  };
+  const handleFollow = async() => {
+    console.log("is following ",isFollowing);
+    if(isFollowing==0){
+      try {
+        console.log(id);
+        const response = await axios.post('/api/follow', requestData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }else if(isFollowing == 1){
+      try {
+        console.log(id);
+        const response = await axios.delete('/api/follow', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+        data: requestData,
+      });
+        console.log(requestData);
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+      fetchIsFollowing();
+    }
+  };
   useEffect(() => {
 
       fetchCompanyData();
       fetchFollowersCount();
       fetchAvgStars();
   }, [id]);
+  useEffect(() => {
+
+    fetchIsFollowing();
+}, [id,isFollowing]);
+
   //useEffect hook to listen for changes in profile_pic
   useEffect(() => {
       if(editedInfo.company_logo)
@@ -157,8 +220,11 @@ function CompanyInfo({isLoggedInUser}) {
       fetchCompanyData();
     }, [editedInfo.company_logo]);
 
-  if(isLoadingCompany){
+  if(isLoadingCompany||isLoadingStars){
     return <div>Loading Company</div>;
+  }
+  if(!isLoadingCompany && isLoadingFollowingInfo){
+    return <div>Loading Following Info</div>
   }
   if (error) {
     return <div>{error}</div>;
@@ -252,22 +318,34 @@ function CompanyInfo({isLoggedInUser}) {
                     </Typography>
                   )}
               </Box>
-              {isEditMode ? (
-                <Box>
-                  <IconButton color="primary" onClick={handleSave} sx={{ mr: 1 }}>
-                    <SaveIcon />
+              {isLoggedInUser && isEditMode && 
+                  <Box>
+                    <IconButton color="primary" onClick={handleSave} sx={{ mr: 1 }}>
+                      <SaveIcon />
+                    </IconButton>
+                    <IconButton color="error" onClick={handleCancel}>
+                      <CancelIcon />
+                    </IconButton>
+                  </Box>
+              }
+              {isLoggedInUser && !isEditMode &&
+                  <IconButton color="primary" onClick={handleEdit} style={buttonStyle}>
+                    <Typography variant="body1" style={{ fontWeight: 'bold', color: 'white' }}>
+                      Edit <EditIcon />
+                    </Typography>
                   </IconButton>
-                  <IconButton color="error" onClick={handleCancel}>
-                    <CancelIcon />
-                  </IconButton>
-                </Box>
-              ) : (
-                <IconButton color="primary" onClick={handleEdit} style={buttonStyle}>
-                <Typography variant="body1" style={{ fontWeight: 'bold', color: 'white' }}>
-                  Edit <EditIcon />
-                </Typography>
-              </IconButton>
-              )}
+                }
+                {!isLoggedInUser &&
+                <IconButton
+                  color="success" // Change to your desired green color
+                  onClick={handleFollow} // Define handleFollow function for the "Follow+" button
+                  style={buttonStyle}
+                >
+                  <Typography variant="body1" style={{ fontWeight: 'bold', color: 'white' }}>
+                  {followButtonText}
+                  </Typography>
+                </IconButton>
+                }
             </Box>
             <Box display="flex" alignItems="center">
             <Box>

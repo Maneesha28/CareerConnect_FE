@@ -310,15 +310,18 @@ const CompanyVacancy = ({isLoggedInUser}) => {
             sx={{ width: '40%' }}
           />
           <Box sx={{ flexGrow: 1 }} />
-          <Button
-            component={Link}
-            to={`/addJobPost/${id}`}
-            variant="contained"
-            color="success"
-            startIcon={<AddIcon />}
-          >
-            New Job Post
-          </Button>
+          {isLoggedInUser && (
+            <Button
+              component={Link}
+              to={`/addJobPost/${id}`}
+              variant="contained"
+              color="success"
+              startIcon={<AddIcon />}
+            >
+              New Job Post
+            </Button>
+          )}
+
           </Box>
           <Box sx={{ flexGrow: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Tabs
@@ -409,14 +412,16 @@ const CompanyVacancy = ({isLoggedInUser}) => {
                         {job.title}
                       </Typography>
                     </Link>
-                    <div>
-                      <IconButton color="primary" onClick={() => handleEditJobPost(job)}>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton color="error" onClick={() => setIsDeleteConfirmationOpen(true)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </div>
+                    {isLoggedInUser && (
+                      <div>
+                        <IconButton color="primary" onClick={() => handleEditJobPost(job)}>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton color="error" onClick={() => setIsDeleteConfirmationOpen(true)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </div>
+                    )}
                     <DeleteConfirmationDialogue
                       isOpen={isDeleteConfirmationOpen}
                       onClose={handleCancelDelete}

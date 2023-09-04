@@ -65,6 +65,7 @@ const JobSeekerProfile = () => {
     const [activeSection, setActiveSection] = useState(sections[0].id);
     const [error, setError] = useState('');
     const id = useParams().jobseeker_id;
+    //const idMatch = parseInt(currentUser.user_id) === parseInt(id);
 
     //for current logged in user
     const [currentUser, setCurrentUser] = useState(null);
@@ -78,6 +79,9 @@ const JobSeekerProfile = () => {
           withCredentials: true,
         });
         setCurrentUser(response.data);
+        console.log('current user fetched');
+        console.log(currentUser.user_id,' ',id);
+        console.log(currentUser.user_id === id);
       } catch (error) {
         console.log(error);
       }
