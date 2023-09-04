@@ -70,7 +70,7 @@ function SignIn() {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
-        backgroundImage: 'url(/background2.jpg)',
+        backgroundImage: 'url(https://firebasestorage.googleapis.com/v0/b/careerconnect-54e58.appspot.com/o/project_images%2Fbackground2.jpg?alt=media&token=5b3e9257-95c6-4e65-b149-6a73c5b997a9)',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
       }}>

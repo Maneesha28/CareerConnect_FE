@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -29,19 +29,10 @@ import LogoutButton from './LogoutButton';
 import { useParams } from 'react-router-dom';
 
 const Header = () => {
-  const id = useParams().jobseeker_id;
   const [contactMenuAnchor, setContactMenuAnchor] = useState(null);
   const [notificationAnchor, setNotificationAnchor] = useState(null);
   const [settingsAnchor, setSettingsAnchor] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-
-  const handleOpenContactMenu = (event) => {
-    setContactMenuAnchor(event.currentTarget);
-  };
-
-  const handleCloseContactMenu = () => {
-    setContactMenuAnchor(null);
-  };
 
   const handleOpenNotificationMenu = (event) => {
     setNotificationAnchor(event.currentTarget);
@@ -51,17 +42,31 @@ const Header = () => {
     setNotificationAnchor(null);
   };
 
-  const handleOpenSettingsMenu = (event) => {
-    setSettingsAnchor(event.currentTarget);
-  };
-
-  const handleCloseSettingsMenu = () => {
-    setSettingsAnchor(null);
-  };
-
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+      //for current logged in user
+    const [currentUser, setCurrentUser] = useState(null);
+  
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get('/api/auth/user', {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        });
+        setCurrentUser(response.data);
+        console.log('current user fetched');
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    useEffect(() => {
+      fetchCurrentUser();
+    }, []);
 
   // TODO remove, this demo shouldn't need to reset the theme.
   const defaultTheme = createTheme(
@@ -113,15 +118,17 @@ const Header = () => {
             <MenuItem>Notification 3</MenuItem>
           </Menu>
           <Box>
-          <Typography
+            {currentUser &&
+            <Typography
             color="inherit"
             onClick={handleCloseUserMenu}
-            // component={Link}
-            to={`/jobseeker/${id}`}
+            component={Link}
+            to={`/jobseeker/${currentUser.user_id}`}
             style={{ cursor: 'pointer', marginRight: '20px', fontWeight: 'bold' }}
           >
-            My Profile
+            Profile
           </Typography>
+            }
           </Box>
           <Box>
             <LogoutButton />

@@ -14,22 +14,6 @@ import ProjectInfo from './Project/ProjectInfo';
 import PersonalInfo from './PersonalInfo';
 
 const JobSeekerProfile = () => {
-    const [jobseekerData, setJobseekerData] = useState(null);
-    const [workExperienceData, setWorkExperienceData] = useState(null);
-    const [educationData, setEducationData] = useState(null);
-    const [skillsData, setSkillsData] = useState(null);
-    const [achievementsData, setAchievementsData] = useState(null);
-    const [publicationsData, setPublicationsData] = useState(null);
-    const [projectData, setProjectData] = useState(null);
-
-    const [isLoadingJobseeker, setIsLoadingJobseeker] = useState(true);
-    const [isLoadingWorkExperience, setIsLoadingWorkExperience] = useState(true);
-    const [isLoadingEducation, setIsLoadingEducation] = useState(true);
-    const [isLoadingSkills, setIsLoadingSkills] = useState(true);
-    const [isLoadingAchievements, setIsLoadingAchievements] = useState(true);
-    const [isLoadingPublications, setIsLoadingPublications] = useState(true);
-    const [isLoadingProject, setIsLoadingProject] = useState(true);
-
     const sections = [
       {
         id: 'education',
@@ -59,7 +43,6 @@ const JobSeekerProfile = () => {
     const [activeSection, setActiveSection] = useState(sections[0].id);
     const [error, setError] = useState('');
     const id = useParams().jobseeker_id;
-    //const idMatch = parseInt(currentUser.user_id) === parseInt(id);
 
     //for current logged in user
     const [currentUser, setCurrentUser] = useState(null);
@@ -74,8 +57,6 @@ const JobSeekerProfile = () => {
         });
         setCurrentUser(response.data);
         console.log('current user fetched');
-        console.log(currentUser.user_id,' ',id);
-        console.log(currentUser.user_id === id);
       } catch (error) {
         console.log(error);
       }
@@ -126,7 +107,7 @@ const JobSeekerProfile = () => {
         },
         palette: {
           background: {
-            default: 'rgba(150, 129, 235, 0.8)',
+            default: 'rgba(150, 129, 235, 1)',
           },
         },
       }

@@ -47,7 +47,6 @@ function PersonalInfo({isLoggedInUser}) {
         },
         withCredentials: true,
       });
-      console.log(response.data);
       if(response.data.status === 'not a jobseeker')
       {
         setError('Not a jobseeker');
@@ -63,7 +62,6 @@ function PersonalInfo({isLoggedInUser}) {
 
   const sendEditedInfoToBackend = async () => {
     try {
-        console.log(editedInfo.profile_pic);
         const response = await axios.put('/api/jobseeker', editedInfo, {
         headers: {
           'Content-Type': 'application/json',
