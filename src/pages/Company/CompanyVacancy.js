@@ -52,7 +52,7 @@ const CompanyVacancy = ({isLoggedInUser}) => {
   const id = useParams().company_id;
 
   const [editedJobPost, setEditedJobPost] = useState(null);
-  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState({});
   // useEffect conditions
   const [fetch,setFetch] = useState(true);
   const [applyFilter,setApplyFilter] = useState(true);
@@ -109,7 +109,7 @@ const CompanyVacancy = ({isLoggedInUser}) => {
       setIsLoadingArchivedJobPost(false);
     }
   };
-
+  
   const filterJobs = (job) => {
     if (!job) {
       return false;
@@ -265,8 +265,12 @@ const CompanyVacancy = ({isLoggedInUser}) => {
       }
     }
   };
-  
+  const handleOpenDeleteConfirmation = (jobpostId) => {
+    setIsDeleteConfirmationOpen({ ...isDeleteConfirmationOpen, [jobpostId]: true });
+  };
   const handleDeleteJobPost = async (jobpostId) => {
+    setIsDeleteConfirmationOpen({ ...isDeleteConfirmationOpen, [jobpostId]: true });
+    console.log("Deleting post with id: ",jobpostId);
     try {
       const response = await axios.delete(`/api/jobpost/${jobpostId}`, {
         headers: {
@@ -280,11 +284,11 @@ const CompanyVacancy = ({isLoggedInUser}) => {
     } catch (error) {
       console.error('Error deleting Jobpost:', error);
     }
-    setIsDeleteConfirmationOpen(false);
+    setIsDeleteConfirmationOpen({ ...isDeleteConfirmationOpen, [jobpostId]: false });
   };
 
-  const handleCancelDelete = () => {
-    setIsDeleteConfirmationOpen(false); // Close the confirmation dialog
+  const handleCloseDeleteConfirmation = (jobpostId) => {
+    setIsDeleteConfirmationOpen({ ...isDeleteConfirmationOpen, [jobpostId]: false });
   };
 
   //const filteredJobs = jobsToShow.filter(filterJobs);
@@ -417,17 +421,17 @@ const CompanyVacancy = ({isLoggedInUser}) => {
                         <IconButton color="primary" onClick={() => handleEditJobPost(job)}>
                           <EditIcon />
                         </IconButton>
-                        <IconButton color="error" onClick={() => setIsDeleteConfirmationOpen(true)}>
+                        <IconButton color="error" onClick={() => handleOpenDeleteConfirmation(job.jobpost_id)}>
                           <DeleteIcon />
                         </IconButton>
                       </div>
                     )}
                     <DeleteConfirmationDialogue
-                      isOpen={isDeleteConfirmationOpen}
-                      onClose={handleCancelDelete}
+                      isOpen={isDeleteConfirmationOpen[job.jobpost_id]}
+                      onClose={() => handleCloseDeleteConfirmation(job.jobpost_id)}
                       onDelete={() => handleDeleteJobPost(job.jobpost_id)}
                     />
-                  </Box>
+                                      </Box>
                   <Typography variant="subtitle1" gutterBottom>
                     Vacancy: {job.vacancy}
                   </Typography>
