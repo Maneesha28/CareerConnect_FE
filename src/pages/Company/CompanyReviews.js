@@ -121,7 +121,7 @@ const CompanyReviews = ({isLoggedInUser}) => {
         setReviewData(response.data);
         setIsLoadingReview(false);
       } catch (error) {
-        setError('Error fetching review information.');
+        setError('Error fetching Review information.');
         setIsLoadingReview(false);
       }
     };

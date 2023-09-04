@@ -80,7 +80,7 @@ function CompanyInfo({isLoggedInUser}) {
       setAvgStars(response.data.avg_stars);
       setIsLoadingStars(false);
     } catch (error) {
-      setError('Error fetching review information.');
+      setError('Error fetching rating information.');
       setIsLoadingStars(false);
     }
   };
@@ -101,7 +101,7 @@ function CompanyInfo({isLoggedInUser}) {
       console.log(isFollowing);
       setIsLoadingFollowingInfo(false);
     } catch (error) {
-      setError('Error fetching review information.');
+      setError('Error fetching is following information.');
       setIsLoadingFollowingInfo(false);
     }
   };
@@ -182,6 +182,7 @@ function CompanyInfo({isLoggedInUser}) {
         console.error(error);
       }
       fetchIsFollowing();
+      fetchFollowersCount();
     }else if(isFollowing == 1){
       try {
         console.log(id);
@@ -198,6 +199,7 @@ function CompanyInfo({isLoggedInUser}) {
         console.error(error);
       }
       fetchIsFollowing();
+      fetchFollowersCount();
     }
   };
   useEffect(() => {
@@ -207,8 +209,7 @@ function CompanyInfo({isLoggedInUser}) {
       fetchAvgStars();
   }, [id]);
   useEffect(() => {
-
-    fetchIsFollowing();
+    if(!isLoggedInUser) fetchIsFollowing();
 }, [id,isFollowing]);
 
   //useEffect hook to listen for changes in profile_pic
@@ -224,7 +225,7 @@ function CompanyInfo({isLoggedInUser}) {
   if(isLoadingCompany||isLoadingStars){
     return <div>Loading Company</div>;
   }
-  if(!isLoadingCompany && isLoadingFollowingInfo){
+  if(!isLoggedInUser && isLoadingFollowingInfo){
     return <div>Loading Following Info</div>
   }
   if (error) {
