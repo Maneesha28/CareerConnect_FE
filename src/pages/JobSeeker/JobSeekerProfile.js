@@ -34,32 +34,26 @@ const JobSeekerProfile = () => {
       {
         id: 'education',
         label: 'Education Background',
-        data: educationData,
       },
       {
         id: 'work-experience',
         label: 'Work Experience',
-        data: workExperienceData,
       },
       {
         id: 'skills',
         label: 'Skills',
-        data: skillsData,
       },
       {
         id: 'achievements',
         label: 'Achievements',
-        data: achievementsData,
       },
       {
         id: 'publications',
         label: 'Publications',
-        data: publicationsData,
       },
       {
         id: 'projects',
         label: 'Projects',
-        data: projectData,
       }
     ];
     const [activeSection, setActiveSection] = useState(sections[0].id);
@@ -85,105 +79,16 @@ const JobSeekerProfile = () => {
       } catch (error) {
         console.log(error);
       }
-    }; 
-  
+    };
+
     useEffect(() => {
-      const fetchJobseekerData = async () => {
-        try {
-          const response = await axios.get(`/api/jobseeker/${id}`, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            withCredentials: true,
-          });
-          setJobseekerData(response.data);
-          setIsLoadingJobseeker(false);
-        } catch (error) {
-          setError('Error fetching jobseeker information.');
-          setIsLoadingJobseeker(false);
-        }
-      };
+      fetchCurrentUser();
+    }, []);
 
-      const fetchAndModifySectionData = async (endpoint, setIdFunction, setIsLoadingFunction, setErrorFunction) => {
-        try {
-          const response = await axios.get(endpoint, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            withCredentials: true,
-          });
-      
-          // Modify data (e.g., remove columns containing "_id")
-          if(response.data.status === 'Access Denied') {
-            setErrorFunction(response.data.status);
-            setIsLoadingFunction(false);
-            return;
-          }
-          const modifiedData = response.data.map(item => {
-            const filteredItem = {};
-            for (const key in item) {
-              if (!key.includes('_id')) {
-                filteredItem[key] = item[key];
-              }
-            }
-            return filteredItem;
-          });
-      
-          // Set state and loading status
-          setIdFunction(modifiedData);
-          setIsLoadingFunction(false);
-        } catch (error) {
-          setErrorFunction(`Error fetching information.`);
-          setIsLoadingFunction(false);
-        }
-      };
-      
-      const fetchWorkExperienceData = async () => {
-        const endpoint = `/api/workexperience/all/${id}`;
-        fetchAndModifySectionData(endpoint, setWorkExperienceData, setIsLoadingWorkExperience, setError);
-      };
-
-    const fetchEducationData = async () => {
-      const endpoint = `/api/education/all/${id}`;
-      fetchAndModifySectionData(endpoint, setEducationData, setIsLoadingEducation, setError);
-    };
-
-    const fetchSkillsData = async () => {
-        const endpoint = `/api/skill/all/${id}`;
-        fetchAndModifySectionData(endpoint, setSkillsData, setIsLoadingSkills, setError);
-    };
-
-    const fetchAchievementsData = async () => {
-        const endpoint = `/api/achievement/all/${id}`;
-        fetchAndModifySectionData(endpoint, setAchievementsData, setIsLoadingAchievements, setError);
-    };
-
-    const fetchPublicationsData = async () => {
-        const endpoint = `/api/publication/all/${id}`;
-        fetchAndModifySectionData(endpoint, setPublicationsData, setIsLoadingPublications, setError);
-    };
-
-    const fetchProjectData = async () => {
-        const endpoint = `/api/project/all/${id}`;
-        fetchAndModifySectionData(endpoint, setProjectData, setIsLoadingProject, setError);
-    };
-    
-    fetchCurrentUser();
-
-    fetchJobseekerData();
-    fetchWorkExperienceData();
-    fetchEducationData();
-    fetchSkillsData();
-    fetchAchievementsData();
-    fetchPublicationsData();
-    fetchProjectData();
-
-    }, [id]);
-  
-    if (isLoadingJobseeker || isLoadingWorkExperience || isLoadingEducation || isLoadingSkills || isLoadingAchievements 
-        || isLoadingPublications || isLoadingProject) {
+    if(!currentUser) {
       return <div>Loading...</div>;
     }
+  
   
     if (error) {
       return <div>{error}</div>;
@@ -210,15 +115,9 @@ const JobSeekerProfile = () => {
         if (activeSection === 'projects') {
             return <ProjectInfo isLoggedInUser={currentUser.user_id == id}/>;
         }
-        // Render other components based on the active section
         
         return null;
       };
-  
-  
-    if (!jobseekerData) {
-      return <div>Jobseeker not found.</div>;
-    }
 
     const defaultTheme = createTheme(
       {
@@ -237,10 +136,10 @@ const JobSeekerProfile = () => {
       <ThemeProvider theme={defaultTheme}>
         <CssBaseline/>
         <Header />
-        <Box p={6}>
+        <Box paddingLeft={24} paddingRight={24} paddingTop={4} paddingBottom={5}>
             <PersonalInfo isLoggedInUser={currentUser.user_id == id}/>
         </Box>
-        <Box p={6}>
+        <Box paddingLeft={24} paddingRight={24} paddingTop={4} paddingBottom={5}>
         <Paper elevation={3}>
           <Box p={0}>
             <Grid container spacing={4}>

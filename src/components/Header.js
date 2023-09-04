@@ -67,7 +67,7 @@ const Header = () => {
   const defaultTheme = createTheme(
       {
           typography: {
-              fontSize: 16,
+              fontSize: 20,
           },
       }
   );
@@ -78,38 +78,31 @@ const Header = () => {
       <AppBar position="static" sx={{height: 80, backgroundColor: 'rgb(101, 39, 190)', zIndex: (theme) => theme.zIndex.drawer + 1}} >
         <Toolbar>
         <Box flexGrow={1} display="flex" alignItems="center" sx={{pt: 1}}>
-              <IconButton color="inherit" component={Link} to="/">
-                  <Home fontSize="large" />
-              </IconButton>
               <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <Typography variant="h6" style={{ fontWeight: 'bold' }}>Career Connect</Typography>
+              <Typography variant="h6" style={{ fontWeight: 'bold' }}>CareerConnect</Typography>
               </Link>
           </Box>
           <Box>
-            {/* <IconButton color="inherit" onClick={handleOpenContactMenu}>
-              <ContactMail fontSize="large" />
+            <Typography
+              color="inherit"
+              onClick={handleCloseUserMenu}
+              // component={Link}
+              to={`#`}
+              style={{ cursor: 'pointer', marginRight: '20px', fontWeight: 'bold' }}
+            >
+              Home
+            </Typography>
+            {/* <IconButton color="inherit" component={Link} to="/">
+                <Home fontSize="medium" />
             </IconButton> */}
-            <IconButton color="inherit" onClick={handleOpenNotificationMenu}>
+          </Box>
+          <Box>
+            <IconButton color="inherit" onClick={handleOpenNotificationMenu} paddingRight='2'>
               <Badge badgeContent={3} color="error">
                 <Notifications fontSize="large" />
               </Badge>
             </IconButton>
-            {/* <IconButton color="inherit" onClick={handleOpenSettingsMenu}>
-              <Settings fontSize="large" />
-            </IconButton> */}
           </Box>
-          {/* <Menu
-            anchorEl={contactMenuAnchor}
-            open={Boolean(contactMenuAnchor)}
-            onClose={handleCloseContactMenu}
-          >
-            <MenuItem>
-              <Email /> abcd@gmail.com
-            </MenuItem>
-            <MenuItem>
-              <Phone /> 082378874
-            </MenuItem>
-          </Menu> */}
           <Menu
             anchorEl={notificationAnchor}
             open={Boolean(notificationAnchor)}
@@ -131,13 +124,7 @@ const Header = () => {
           </Typography>
           </Box>
           <Box>
-          <Typography
-            color="inherit"
-            onClick={LogoutButton}
-            style={{ cursor: 'pointer', fontWeight: 'bold' }}
-          >
-            Log Out
-          </Typography>
+            <LogoutButton />
         </Box>
         </Toolbar>
       </AppBar>
