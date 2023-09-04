@@ -47,6 +47,12 @@ function PersonalInfo({isLoggedInUser}) {
         },
         withCredentials: true,
       });
+      console.log(response.data);
+      if(response.data.status === 'not a jobseeker')
+      {
+        setError('Not a jobseeker');
+        return;
+      }
       setJobseekerData(response.data);
       setEditedInfo(response.data);
     } catch (error) {
@@ -64,7 +70,6 @@ function PersonalInfo({isLoggedInUser}) {
         },
         withCredentials: true,
       });
-      console.log(response.data);
     } catch (error) {
       console.error(error);
     }
@@ -78,11 +83,17 @@ function PersonalInfo({isLoggedInUser}) {
   useEffect(() => {
     if(editedInfo.profile_pic)
     {
-      console.log("Sending edited info to backend");
       sendEditedInfoToBackend();
     }
     fetchJobseekerData();
   }, [editedInfo.profile_pic]);
+
+  if(error)
+      return (
+        <>
+          <Typography variant='h4' align='center'>{error}</Typography>
+        </>
+      );
 
   if(!jobseekerData) 
     return (
@@ -339,28 +350,6 @@ function PersonalInfo({isLoggedInUser}) {
                     <Typography>{jobseekerData.phone_no}</Typography>
                   )}
                 </Box>
-
-                {/* <Box display="flex" alignItems="center">
-                  <Typography>GitHub Link:</Typography>
-                  {isEditMode ? (
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      margin="dense"
-                      label="GitHub Link"
-                      value={editedInfo.githubLink || ''}
-                      onChange={(e) =>
-                        setEditedInfo({ ...editedInfo, githubLink: e.target.value })
-                      }
-                    />
-                  ) : (
-                    <Typography>
-                      <a href={jobseekerData.githubLink} target="_blank" rel="noopener noreferrer">
-                        <GitHubIcon /> {jobseekerData.githubLink}
-                      </a>
-                    </Typography>
-                  )}
-                </Box> */}
               </Box>
             </Box>
           </Paper>

@@ -21,7 +21,8 @@ const LogoutButton = () => {
   };
 
   return (
-    <Button variant='text' onClick={handleLogout}>Logout</Button>
+    <Button variant='text' color='inherit' style={{ cursor: 'pointer', fontWeight: 'bold' }} 
+      onClick={handleLogout}>LogOut</Button>
   );
 };
 
