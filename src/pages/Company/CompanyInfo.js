@@ -181,6 +181,7 @@ function CompanyInfo({isLoggedInUser}) {
       } catch (error) {
         console.error(error);
       }
+      fetchIsFollowing();
     }else if(isFollowing == 1){
       try {
         console.log(id);
