@@ -30,7 +30,7 @@ import axios from 'axios';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 
-function CompanyInfo() {
+function CompanyInfo({isLoggedInUser}) {
   const [companyData,setCompanyData] = useState({});
   const [editedInfo, setEditedInfo] = useState({});
 

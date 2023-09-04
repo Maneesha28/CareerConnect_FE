@@ -6,22 +6,8 @@ import PermanentDrawerLeft from '../../components/SidebarOptionsCompany';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-// Sample reviews data (replace with actual data from API)
-const reviewsData = [
-  {
-    comment: 'Great company to work for. The culture is amazing!',
-    postedBy: 'John Doe',
-    time: '2023-08-15',
-  },
-  {
-    comment: 'I had a wonderful experience interning at this company. Learned a lot!',
-    postedBy: 'Jane Smith',
-    time: '2023-08-14',
-  },
-  // Add more review objects here...
-];
 
-const CompanyReviews = () => {
+const CompanyReviews = ({isLoggedInUser}) => {
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
   const [reviewData,setReviewData] = useState(null);

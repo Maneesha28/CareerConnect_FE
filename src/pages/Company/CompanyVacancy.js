@@ -32,7 +32,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteConfirmationDialogue from '../../components/DeleteConfirmationDialogue';
 import CompanyReviews from './CompanyReviews';
 
-const CompanyVacancy = () => {
+const CompanyVacancy = ({isLoggedInUser}) => {
   const [selectedTab, setSelectedTab] = useState(0); // 0 for Job List, 1 for Archived Job List
   const [searchKeyword, setSearchKeyword] = useState('');
   const [jobPostData,setJobPostData] = useState([]);

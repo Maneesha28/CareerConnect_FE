@@ -22,6 +22,7 @@ const CompanyPage = () => {
         withCredentials: true,
       });
         setCurrentUser(response.data);
+        console.log('current user fetched');
         console.log(currentUser);
       } catch (error) {
         setError('Error fetching current user information.');
@@ -30,20 +31,20 @@ const CompanyPage = () => {
     };
 
   useEffect(() => {
-    // fetchCurrentUser();
+      fetchCurrentUser();
 
   }, [id]);
   
   return (
   <>
     <Header />
-    <CompanyInfo/>
+    <CompanyInfo isLoggedInUser={currentUser.user_id == id}/>
     <div style={{ display: 'flex' }}>
       <div style={{ flex: '3' }}>
-        <CompanyVacancy />
+        <CompanyVacancy isLoggedInUser={currentUser.user_id == id}/>
       </div>
       <div style={{ flex: '2' }}>
-        <CompanyReviews />
+        <CompanyReviews isLoggedInUser={currentUser.user_id == id}/>
       </div>
     </div>
   </>
