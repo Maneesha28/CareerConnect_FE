@@ -60,12 +60,16 @@ const AddJobPost = () => {
   const handlePostJob = async () => {
     const requirementText = jobRequirements.map((req, index) => `${index + 1}. ${req}`).join('\n');
     setRequirementText(requirementText);
+    const updatedTransformedData = {
+      ...transformedData, // Spread the existing properties
+      requirements: requirementText, // Add or update the requirements property
+    };
     console.log('requirementText: ', requirementText);
     console.log('description: ', jobDescription);
     // Here you can save the job post data and navigate to "/companyVacancy"
     try {
-      console.log('newJobPost: ', transformedData);
-      const response = await axios.post("/api/jobpost", transformedData, {
+      console.log('newJobPost: ', updatedTransformedData);
+      const response = await axios.post("/api/jobpost", updatedTransformedData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -79,8 +83,6 @@ const AddJobPost = () => {
 
   return (
     <>
-      {/* <Header /> */}
-      <ClippedDrawer />
       <Container sx={{ marginTop: '36px' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
           <Typography variant="h6">Job Title:</Typography>
