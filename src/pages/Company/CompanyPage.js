@@ -44,13 +44,15 @@ const CompanyPage = () => {
       <Header />
       {currentUser !== null ? (
         <>
-          <CompanyInfo isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} />
+          <CompanyInfo isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} 
+            isJobseeker={currentUser.role === "jobseeker"}/>
           <div style={{ display: 'flex' }}>
             <div style={{ flex: '3' }}>
               <CompanyVacancy isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} />
             </div>
             <div style={{ flex: '2' }}>
-              <CompanyReviews isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} />
+              <CompanyReviews isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} 
+              isJobseeker={currentUser.role === "jobseeker"}/>
             </div>
           </div>
         </>

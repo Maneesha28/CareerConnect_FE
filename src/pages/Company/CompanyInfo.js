@@ -30,7 +30,7 @@ import axios from 'axios';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 
-function CompanyInfo({isLoggedInUser}) {
+function CompanyInfo({isLoggedInUser,isJobseeker}) {
   const [companyData,setCompanyData] = useState({});
   const [editedInfo, setEditedInfo] = useState({});
 
@@ -209,7 +209,7 @@ function CompanyInfo({isLoggedInUser}) {
       fetchAvgStars();
   }, [id]);
   useEffect(() => {
-    if(!isLoggedInUser) fetchIsFollowing();
+    if(isJobseeker) fetchIsFollowing();
 }, [id,isFollowing]);
 
   //useEffect hook to listen for changes in profile_pic
@@ -225,7 +225,7 @@ function CompanyInfo({isLoggedInUser}) {
   if(isLoadingCompany||isLoadingStars){
     return <div>Loading Company</div>;
   }
-  if(!isLoggedInUser && isLoadingFollowingInfo){
+  if(isJobseeker && isLoadingFollowingInfo){
     return <div>Loading Following Info</div>
   }
   if (error) {
@@ -337,7 +337,7 @@ function CompanyInfo({isLoggedInUser}) {
                     </Typography>
                   </IconButton>
                 }
-                {!isLoggedInUser &&
+                {isJobseeker &&
                 <IconButton
                   color="success" // Change to your desired green color
                   onClick={handleFollow} // Define handleFollow function for the "Follow+" button

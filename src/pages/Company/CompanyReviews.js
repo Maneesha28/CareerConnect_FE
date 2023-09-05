@@ -6,10 +6,11 @@ import axios from 'axios';
 import Rating from '@mui/material/Rating';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteConfirmationDialogue from '../../components/DeleteConfirmationDialogue';
 import EditIcon from '@mui/icons-material/Edit';
 import TextField from '@mui/material/TextField';
 
-const CompanyReviews = ({isLoggedInUser}) => {
+const CompanyReviews = ({isLoggedInUser,isJobseeker}) => {
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
   const [reviewData,setReviewData] = useState(null);
@@ -20,8 +21,10 @@ const CompanyReviews = ({isLoggedInUser}) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoadingUser,setIsLoadingUser] = useState(true);
   const [isAddReviewDialogOpen, setIsAddReviewDialogOpen] = useState(false);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState({});
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [reviewToDelete, setReviewToDelete] = useState(null);
 
   // Function to open the review dialog
   const handleAddReviewDialogOpen = () => {
@@ -33,65 +36,109 @@ const CompanyReviews = ({isLoggedInUser}) => {
     };
     // Function to handle posting a review
   const handlePostReview = async () => {
-    try {
-      const response = await axios.post('/api/review', {
-        company_id: id,
-        comment: comment,
-        stars: rating,
+    const newReview = {
+      company_id: id,
+      comment: comment,
+      stars: rating,
+    }
+    try{
+      console.log('new Review: ', newReview);
+      const response = await axios.post("/api/review", newReview, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
       });
-
-      // Handle success, e.g., clear form fields and close the dialog
+      console.log('response:', response);
       setRating(0);
       setComment('');
       setIsAddReviewDialogOpen(false);
+      fetchReviewData();
     } catch (error) {
-      // Handle error
+      console.error('Error saving new review:', error);
+      setIsAddReviewDialogOpen(false);
     }
+
   };
   // State for editing a review
   const [isEditReviewDialogOpen, setIsEditReviewDialogOpen] = useState(false);
-  const [editedRating, setEditedRating] = useState(0);
+  const [editedReview, setEditedReview] = useState(null);
   const [editedComment, setEditedComment] = useState('');
+  const [editedRating, setEditedRating] = useState(0);
 
   // Function to open the edit review dialog
   const handleEditReview = (review) => {
+    console.log('Edit icon clicked');
     setEditedRating(review.stars);
     setEditedComment(review.comment);
+    setEditedReview(review); // Set the review being edited
     setIsEditReviewDialogOpen(true);
   };
 
   // Function to close the edit review dialog
   const handleEditReviewDialogClose = () => {
+    setEditedComment('');
+    setEditedRating(0);
+    setEditedReview(null); // Reset the edited review
     setIsEditReviewDialogOpen(false);
   };
 
   // Function to handle updating a review
-  const handleUpdateReview = async (review) => {
+  const handleUpdateReview = async () => {
+    const updatedReview = {
+      ...editedReview,
+      comment: editedComment,
+      stars: editedRating,
+    };
+  
     try {
-      const response = await axios.put(`/api/review/${review.review_id}`, {
-        comment: editedComment,
-        stars: editedRating,
+      const response = await axios.put(`/api/review/${updatedReview.review_id}`, updatedReview, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
       });
-
+      console.log('response:', response);
+  
       // Handle success, e.g., clear form fields and close the dialog
       setEditedRating(0);
       setEditedComment('');
+      // Update the review in the state with the edited data
+      setReviewData((prevReviewData) =>
+        prevReviewData.map((review) =>
+          review.review_id === updatedReview.review_id ? updatedReview : review
+        )
+      );
       setIsEditReviewDialogOpen(false);
     } catch (error) {
-      // Handle error
+      console.error('Error saving edited review', error);
+      setIsEditReviewDialogOpen(false);
     }
   };
-  const handleDeleteReview = async (reviewId) => {
+  const handleDeleteReview = (reviewId) => {
+    setReviewToDelete(reviewId);
+    // Open the delete confirmation dialog here, for example by setting a state variable
+    setIsDeleteConfirmationOpen(true);
+  };
+  const handleConfirmDelete = async (reviewId) => {
     try {
       // Send a DELETE request to delete the review by its ID
-      await axios.delete(`/api/review/${reviewId}`);
-
+      const response = await axios.delete(`/api/review/${reviewId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log('response status: ', response.data.status);
       // Handle success, e.g., remove the deleted review from the state
       const updatedReviewData = reviewData.filter((review) => review.review_id !== reviewId);
       setReviewData(updatedReviewData);
+      //fetchReviewData();
+      setIsDeleteConfirmationOpen(false);
     } catch (error) {
       // Handle error
-      console.error(error);
+      console.error('Error deleting Review:', error);
+      setIsDeleteConfirmationOpen(false);
     }
   };
   const fetchCurrentUser = async() => {
@@ -129,6 +176,7 @@ const CompanyReviews = ({isLoggedInUser}) => {
 
     fetchReviewData();
     fetchCurrentUser();
+    setIsDeleteConfirmationOpen({});
   }, [id]);
   if (isLoadingReview||isLoadingUser) {
     return <div>Loading...</div>;
@@ -160,7 +208,7 @@ const CompanyReviews = ({isLoggedInUser}) => {
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
           Reviews
         </Typography>
-        {!isLoggedInUser && (
+        {isJobseeker && (
           <Button
             variant="contained"
             color="success"
@@ -189,7 +237,7 @@ const CompanyReviews = ({isLoggedInUser}) => {
               <Typography variant="body1" gutterBottom sx={{ fontSize: 28 }}>
                 {review.comment}
               </Typography>
-              <Typography component="legend">Read only</Typography>
+              {/* <Typography component="legend">Read only</Typography> */}
               <Rating name="read-only" value={review.stars} readOnly />
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="subtitle2" sx={{ alignSelf: 'flex-end', fontSize: 22 }}>
@@ -237,24 +285,27 @@ const CompanyReviews = ({isLoggedInUser}) => {
         </Button>
       </DialogActions>
     </Dialog>
-      <Dialog open={isAddReviewDialogOpen} onClose={handleAddReviewDialogClose}>
-        <DialogTitle>Please give a rating</DialogTitle>
-        <Rating
-          name="controlled"
-          value={rating}
-          onChange={(event, newValue) => {
-            setRating(newValue);
-          }}
-        />
-        <TextField
-          id="outlined-multiline-static"
-          label="Review"
-          multiline
-          rows={4}
-          variant="outlined"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-        />
+    <Dialog open={isAddReviewDialogOpen} onClose={handleAddReviewDialogClose}>
+    <DialogTitle>Please give a rating</DialogTitle>
+    <DialogContent sx={{ width: '400px', padding: '20px' }}>
+      <Rating
+        name="controlled"
+        value={rating}
+        onChange={(event, newValue) => {
+          setRating(newValue);
+        }}
+      />
+      <TextField
+        id="outlined-multiline-static"
+        label="Review"
+        multiline
+        rows={4}
+        variant="outlined"
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        fullWidth  // This makes the text field take up the entire width of the dialog
+      />
+    </DialogContent>
         <DialogActions>
           <Button onClick={handleAddReviewDialogClose} color="primary">
             Cancel
@@ -264,6 +315,49 @@ const CompanyReviews = ({isLoggedInUser}) => {
           </Button>
         </DialogActions>
       </Dialog>
+      {Object.keys(isDeleteConfirmationOpen).length > 0 && (
+      <DeleteConfirmationDialogue
+        isOpen={isDeleteConfirmationOpen}
+        onClose={() => {
+          setIsDeleteConfirmationOpen({});
+          // Optionally reset the reviewToDelete state here
+          setReviewToDelete(null);
+        }}
+        onDelete={() => {
+          handleConfirmDelete(reviewToDelete);
+          // Optionally reset the reviewToDelete state here
+          setReviewToDelete(null);
+        }}
+      />
+    )}
+      <Dialog open={isEditReviewDialogOpen} onClose={handleEditReviewDialogClose}>
+      <DialogTitle>Edit Review</DialogTitle>
+      <DialogContent>
+        {/* Edit form for the review */}
+        <TextField
+          label="Edit Comment"
+          variant="outlined"
+          fullWidth
+          value={editedComment}
+          onChange={(e) => setEditedComment(e.target.value)}
+        />
+        <Rating
+          name="edited-rating"
+          value={editedRating}
+          onChange={(event, newValue) => {
+            setEditedRating(newValue);
+          }}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleEditReviewDialogClose} color="primary">
+          Cancel
+        </Button>
+        <Button onClick={handleUpdateReview} color="primary">
+          Save Changes
+        </Button>
+      </DialogActions>
+    </Dialog>
     </>
   );
 };
