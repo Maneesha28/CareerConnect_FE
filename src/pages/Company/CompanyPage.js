@@ -25,9 +25,6 @@ const CompanyPage = () => {
         setCurrentUser(response.data);
         console.log(response.data);
         console.log('current user fetched',currentUser);
-        console.log(currentUser.user_id,' ',id);
-        console.log(currentUser.user_id === id);
-        console.log(parseInt(currentUser.user_id) === parseInt(id));
       } catch (error) {
         setError('Error fetching current user information.');
         console.log(error);

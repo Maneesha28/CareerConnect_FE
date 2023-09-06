@@ -27,6 +27,7 @@ import MuiAppBar from '@mui/material/AppBar';
 import axios from 'axios';
 import LogoutButton from './LogoutButton';
 import { useParams } from 'react-router-dom';
+import Notification from './notification';
 
 const Header = () => {
   const [contactMenuAnchor, setContactMenuAnchor] = useState(null);
@@ -102,11 +103,12 @@ const Header = () => {
             </IconButton> */}
           </Box>
           <Box>
-            <IconButton color="inherit" onClick={handleOpenNotificationMenu} paddingRight='2'>
+            <Notification />
+            {/* <IconButton color="inherit" onClick={handleOpenNotificationMenu} paddingRight='2'>
               <Badge badgeContent={3} color="error">
                 <Notifications fontSize="large" />
               </Badge>
-            </IconButton>
+            </IconButton> */}
           </Box>
           <Menu
             anchorEl={notificationAnchor}
@@ -118,7 +120,18 @@ const Header = () => {
             <MenuItem>Notification 3</MenuItem>
           </Menu>
           <Box>
-            {currentUser &&
+            {currentUser && currentUser.role==='company' &&
+            <Typography
+            color="inherit"
+            onClick={handleCloseUserMenu}
+            component={Link}
+            to={`/company/${currentUser.user_id}`}
+            style={{ cursor: 'pointer', marginRight: '20px', fontWeight: 'bold' }}
+          >
+            Profile
+          </Typography>
+            }
+             {currentUser && currentUser.role==='jobseeker' &&
             <Typography
             color="inherit"
             onClick={handleCloseUserMenu}

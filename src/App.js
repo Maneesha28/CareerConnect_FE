@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import SignUp from "./pages/Authentication/Signup";
 import SignIn from "./pages/Authentication/SignIn";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import JobSeekerProfile from "./pages/JobSeeker/JobSeekerProfile";
 import CompanyProfile from "./pages/CompanyProfile";
 import Home from './pages/Home';
@@ -31,11 +31,17 @@ import ViewShortListedJobs from './pages/JobSeeker/ViewShortListedJobs';
 
 import SidebarOptionsCompany from './components/SidebarOptionsCompany';
 
+import { NotificationContext } from "./context/notificationContext";
+
 // changed by any
 function App() {
   const action = useNavigationType();
   const location = useLocation();
   const pathname = location.pathname;
+
+  const [allNotifications, setAllNotifications] = useState([]);
+  const [unreadNotifications, setUnreadNotifications] = useState([]);
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
 
   useEffect(() => {
     if (action !== "POP") {
@@ -73,6 +79,8 @@ function App() {
     // urls are searched & matched in top down fashion (I guess), so "/" need to at first position 
     // if any "localhost:3001/" is used
     //<BrowserRouter>
+    <NotificationContext.Provider value={{allNotifications, setAllNotifications, unreadNotifications, setUnreadNotifications, unreadNotificationsCount, setUnreadNotificationsCount}}>
+      
     <Routes>
       <Route path="/auth/login" element={<SignIn />} />
       <Route path="/auth/register" element={<SignUp />} />
@@ -98,7 +106,9 @@ function App() {
       <Route path="/viewCompanyVacancies" element={<ViewCompanyVacancies/>}/>
       <Route path="/viewShortlistedJobs" element={<ViewShortListedJobs/>}/>
       <Route path="*" element={<NotFound/>}/>
+      
     </Routes>
+    </NotificationContext.Provider>
     //</BrowserRouter>
   );
 }
