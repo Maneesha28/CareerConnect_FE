@@ -33,7 +33,7 @@ const CompanyReviews = ({ isLoggedInUser, isJobseeker }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [isAddReviewDialogOpen, setIsAddReviewDialogOpen] = useState(false);
-  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState({});
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [reviewToDelete, setReviewToDelete] = useState(null);
@@ -191,7 +191,7 @@ const CompanyReviews = ({ isLoggedInUser, isJobseeker }) => {
   useEffect(() => {
     fetchReviewData();
     fetchCurrentUser();
-    setIsDeleteConfirmationOpen({});
+    setIsDeleteConfirmationOpen(false);
   }, [id]);
   if (isLoadingReview || isLoadingUser) {
     return <div>Loading...</div>;
@@ -343,11 +343,11 @@ const CompanyReviews = ({ isLoggedInUser, isJobseeker }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      {Object.keys(isDeleteConfirmationOpen).length > 0 && (
+      {isDeleteConfirmationOpen && (
         <DeleteConfirmationDialogue
           isOpen={isDeleteConfirmationOpen}
           onClose={() => {
-            setIsDeleteConfirmationOpen({});
+            setIsDeleteConfirmationOpen(false);
             // Optionally reset the reviewToDelete state here
             setReviewToDelete(null);
           }}
