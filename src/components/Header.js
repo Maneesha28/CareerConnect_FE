@@ -96,7 +96,7 @@ const Header = () => {
       >
         <Toolbar>
           <Box flexGrow={1} display="flex" alignItems="center" sx={{ pt: 1 }}>
-            <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <Link to="#" style={{ textDecoration: "none", color: "inherit" }}>
               <Typography variant="h6" style={typographyStyle}>
                 CareerConnect
               </Typography>
@@ -106,9 +106,9 @@ const Header = () => {
             <Box>
               <IconButton
                 color="inherit"
-                paddingRight="2"
                 component={Link}
                 to={`/company/${currentUser.user_id}`}
+
               >
                 <Home />
               </IconButton>
@@ -116,51 +116,42 @@ const Header = () => {
           )}
           {currentUser && currentUser.role === "jobseeker" && (
             <Box>
-              <IconButton color="inherit" paddingRight="2" component={Link}>
+              <IconButton color="inherit"  component={Link} to={`/jobseeker/${currentUser.user_id}`}>
+
                 <Home />
               </IconButton>
             </Box>
           )}
           <Box>
-           <Typography>
-              Home
-            </Typography>
-            {/* <IconButton color="inherit" component={Link} to="/">
-                <Home fontSize="medium" />
-            </IconButton> */}
           </Box>
           <Box>
             <Notification />
-            {/* <IconButton color="inherit" onClick={handleOpenNotificationMenu} paddingRight='2'>
-              <Badge badgeContent={3} color="error">
-                <Notifications fontSize="large" />
-              </Badge>
-            </IconButton> */}
           </Box>
-          <Menu
-            anchorEl={notificationAnchor}
-            open={Boolean(notificationAnchor)}
-            onClose={handleCloseNotificationMenu}
-          >
-            <MenuItem>Notification 1</MenuItem>
-            <MenuItem>Notification 2</MenuItem>
-            <MenuItem>Notification 3</MenuItem>
-          </Menu>
           <Box>
             {currentUser && currentUser.role === "jobseeker" && (
               <IconButton
                 color="inherit"
-                paddingRight="2"
+                
                 onClick={handleCloseUserMenu}
                 component={Link}
                 to={`/jobseeker/${currentUser.user_id}`}
-                sx={{ paddingLeft: 4 }}
+              >
+                <AccountCircleIcon />
+              </IconButton>
+            )}
+             {currentUser && currentUser.role === "company" && (
+              <IconButton
+                color="inherit"
+                
+                onClick={handleCloseUserMenu}
+                component={Link}
+                to={`/company/${currentUser.user_id}`}
               >
                 <AccountCircleIcon />
               </IconButton>
             )}
           </Box>
-          <Box sx={{ paddingLeft: 3 }}>
+          <Box sx={{ paddingLeft: 4 }}>
             <LogoutButton />
           </Box>
         </Toolbar>

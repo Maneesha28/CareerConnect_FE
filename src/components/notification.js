@@ -51,6 +51,24 @@ function Notification() {
         }
     };
 
+    const markNotificationsRead = async () => {
+      try {
+          const response = await axios.put('/api/notification/mark_read', {
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              withCredentials: true,
+          });
+          if(response.data.status === 'Marked as read'){
+              fetchUnreadNotificationsCount();
+              fetchUnreadNotifications();
+          }
+      } catch (error) {
+          console.error('Error fetching notifications:', error);
+      }
+  };
+
+
   useEffect(() => {
     fetchAllNotifications();
     fetchUnreadNotifications();
@@ -59,6 +77,7 @@ function Notification() {
 
   const handleOpenNotifications = (event) => {
     setAnchorEl(event.currentTarget);
+    markNotificationsRead();
   };
 
   const handleCloseNotifications = () => {
@@ -81,6 +100,7 @@ function Notification() {
         color="inherit"
         aria-label="Notifications"
         onClick={handleOpenNotifications}
+        sx={{ paddingRight: 4, paddingLeft: 4 }}
       >
         <Badge badgeContent={unreadNotificationsCount.count > 0 ? unreadNotificationsCount.count : null} color="error">
           <NotificationsIcon />
