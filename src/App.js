@@ -88,6 +88,7 @@ function App() {
       <Route path="/auth/register" element={<SignUp />} />
       <Route path="/jobseeker/:jobseeker_id" element={<JobSeekerProfile />} />
       <Route path="/company/:company_id" element={<CompanyPage />} />
+      <Route path="/companyJobPosts/:company_id" element={<JobListsAndPost/>}/>
       <Route path="/" element={<Home/>}/>
       <Route path="/jobseeker/:jobseeker_id/accountInfo" element={<AccountInfo/>}/>
       

@@ -411,7 +411,7 @@ const CompanyVacancy = ({isLoggedInUser}) => {
               <Grid item xs={12} sm={6} md={6} key={job.jobpost_id}>
                 <Paper elevation={3} sx={{ padding: '16px' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Link to={`/companyViewJobPost/${job.jobpost_id}`} style={{ textDecoration: 'none' }}>
+                  <Link to={`/companyJobPosts/${id}`} state={{ jobpost_id: job.jobpost_id }} style={{ textDecoration: 'none' }}>
                       <Typography variant="h6" gutterBottom>
                         {job.title}
                       </Typography>
