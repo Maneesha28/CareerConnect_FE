@@ -30,7 +30,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteConfirmationDialogue from '../../components/DeleteConfirmationDialogue';
 
-const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
+const JobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,fetch,selectedJob,setSelectedJob}) => {
   const [selectedTab, setSelectedTab] = useState(0); // 0 for Job List, 1 for Archived Job List
   const [searchKeyword, setSearchKeyword] = useState('');
   const [jobPostData,setJobPostData] = useState([]);
@@ -52,7 +52,7 @@ const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
   const [editedJobPost, setEditedJobPost] = useState(null);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState({});
   // useEffect conditions
-  const [fetch,setFetch] = useState(true);
+  //const [fetch,setFetch] = useState(fetch);
   const [applyFilter,setApplyFilter] = useState(true);
 
   const [newJobPost, setNewJobPost] = useState({
@@ -415,11 +415,21 @@ const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
               <Grid item xs={12} sm={6} md={6} key={job.jobpost_id}>
                 <Paper elevation={3} sx={{ padding: '16px' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Link to={`/companyJobPosts/${id}`} state={{ jobpost_id: job.jobpost_id }} style={{ textDecoration: 'none' }}>
+                    {/* <Link to={`/companyJobPosts/${id}`} style={{ textDecoration: 'none' }}>
                       <Typography variant="h6" gutterBottom>
                         {job.title}
                       </Typography>
-                    </Link>
+                    </Link> */}
+                    <div
+                    onClick={() => {
+                        setSelectedJob(job);
+                    }}
+                    style={{ textDecoration: 'none', cursor: 'pointer' }}
+                    >
+                    <Typography variant="h6" gutterBottom style={{ color: 'blue' }}>
+                        {job.title}
+                    </Typography>
+                    </div>
                     {isLoggedInUser && (
                       <div>
                         <IconButton color="primary" onClick={() => handleEditJobPost(job)}>
@@ -538,4 +548,4 @@ const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
   );
 };
 
-export default CompanyVacancy;
+export default JobLists;

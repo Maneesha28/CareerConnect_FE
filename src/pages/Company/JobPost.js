@@ -23,33 +23,17 @@ import {
 import Header from '../../components/Header';
 import SearchIcon from '@mui/icons-material/Search';
 
-// Sample data for job and applicants (replace with actual data from API)
-const jobData = {
-  jobTitle: 'Software Engineer',
-  jobDescription: 'This is a software engineer position...',
-  jobRequirements: ['Bachelor\'s degree in Computer Science', 'Experience with JavaScript frameworks'],
-  vacancy: 3,
-  applicationDeadline: '2023-09-30',
-  employmentType: 'Full-time',
-  salary: '80000',
-};
-
-const applicantsData = [
-  { id: 1, name: 'John Doe', resumeLink: 'link_to_resume_1' },
-  { id: 2, name: 'Jane Smith', resumeLink: 'link_to_resume_2' },
-  { id: 3, name: 'Alex Johnson', resumeLink: 'link_to_resume_3' },
-  // Add more applicants here...
-];
-
-const CompanyViewJobPost = () => {
-  const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] = useState(false);
-  const id = useParams().jobpost_id;
-  const [jobPost, setJobPost] = useState(null);
+const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,fetch,setFetch,selectedJob,setSelectedJob}) => {
+  console.log("seelectedjob",selectedJob);
+  const company_id = useParams().company_id;
+  // const [jobPost, setJobPost] = useState(selectedJob);
+  // console.log(jobPost);
   const [error, setError] = useState(null);
+  const [applications,setApplications] = useState([]);
   const [isLoadingJobPost, setIsLoadingJobPost] = useState(true);
 
   const fetchJobData = async () => {
-    const endpoint = `/api/jobpost/${id}`;
+    const endpoint = `/api/jobpost/${selectedJob.jobpost_id}`;
     try {
       const response = await axios.get(endpoint, {
         headers: {
@@ -73,7 +57,7 @@ const CompanyViewJobPost = () => {
   };
 
   const fetchApplicantsData = async () => {
-    const endpoint = `/api/jobpost/${id}`;
+    const endpoint = `/api/application/${selectedJob.jobpost_id}`;
     try {
       const response = await axios.get(endpoint, {
         headers: {
@@ -88,7 +72,8 @@ const CompanyViewJobPost = () => {
         setIsLoadingJobPost(false);
         return;
       }
-      setJobPost(response.data);
+      setApplications(response.data);
+      console.log(applications);
       setIsLoadingJobPost(false);
     } catch (error) {
       setError(`Error fetching information.`);
@@ -97,29 +82,21 @@ const CompanyViewJobPost = () => {
   };
 
   useEffect(() => {
-  fetchJobData();
-  }, [id]);
-
-  const handleJobDetailsDialogOpen = () => {
-    setIsJobDetailsDialogOpen(true);
-  };
-
-  const handleJobDetailsDialogClose = () => {
-    setIsJobDetailsDialogOpen(false);
-  };
+  //fetchJobData();
+  fetchApplicantsData();
+  }, [selectedJob]);
 
   if(isLoadingJobPost) {
-    return (<div>Loading...</div>);
+    return (<div>Loading JobPost</div>);
   }
 
   return (
     <>
-      <Header />
       <Container sx={{ marginTop: '36px' }}>
         <Box>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px' }}>
           <Typography variant="h2" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
-            {jobPost.title}
+            {selectedJob.title}
           </Typography>
         </Box>
           <Paper elevation={3} sx={{ padding: '16px', marginBottom: '16px' }}>
@@ -130,7 +107,7 @@ const CompanyViewJobPost = () => {
                     Job Description:
                   </Typography>
                   <Typography variant="subtitle1" sx={{ marginLeft: '8px' }}>
-                    {jobPost.description}
+                    {selectedJob.description}
                   </Typography>
                 </div>
                 <div style={{ marginTop: '16px' }}>
@@ -138,36 +115,31 @@ const CompanyViewJobPost = () => {
                     Job Requirements:
                   </Typography>
                   <Typography variant="subtitle1" sx={{ marginLeft: '8px' }}>
-                    {jobPost.requirements}
+                    {selectedJob.requirements}
                   </Typography>
                 </div>
               </div>
             </Box>
-            {/* <Button onClick={handleJobDetailsDialogOpen}>View More</Button> */}
-          </Paper>
-        </Box>
-        <Box sx={{ display: 'flex', marginBottom: '16px' }}>
-          {/* Sidebar */}
-          <Paper elevation={3} sx={{ width: '30%', padding: '16px', marginRight: '16px' }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
               Vacancy:
             </Typography>
-            <Typography variant="body1">{jobPost.vacancy}</Typography>
+            <Typography variant="body1">{selectedJob.vacancy}</Typography>
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
               Application Deadline:
             </Typography>
-            <Typography variant="body1">{jobPost.deadline}</Typography>
+            <Typography variant="body1">{selectedJob.deadline}</Typography>
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
               Employment Type:
             </Typography>
-            <Typography variant="body1">{jobPost.employment_type}</Typography>
+            <Typography variant="body1">{selectedJob.employment_type}</Typography>
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
               Salary:
             </Typography>
-            <Typography variant="body1">{jobPost.salary}</Typography>
+            <Typography variant="body1">{selectedJob.salary}</Typography>
           </Paper>
           {/* Applicants List */}
-          <Paper elevation={3} sx={{ padding: '16px', flex: 1 }}>
+        </Box>
+        <Paper elevation={3} sx={{ padding: '16px', flex: 1 }}>
             <Typography variant="h6">Applicants:</Typography>
             <Box sx={{ flexGrow: 1 }} />
             <TextField
@@ -184,39 +156,21 @@ const CompanyViewJobPost = () => {
                   ),
                 }}
               />
-            <List>
-              {applicantsData.map((applicant) => (
-                <ListItem key={applicant.id}>
-                  <ListItemText primary={applicant.name} />
-                  <Button variant="outlined" component="a" href={applicant.resumeLink} target="_blank">
-                    View Resume
-                  </Button>
-                </ListItem>
-              ))}
-            </List>
+              <List>
+                {Array.isArray(applications) &&
+                  applications.map((applicant) => (
+                    <ListItem key={applicant.jobseeker_id}>
+                      <ListItemText primary={applicant.name} />
+                      <Button variant="outlined" component="a" href={applicant.resume} target="_blank">
+                        View Resume
+                      </Button>
+                    </ListItem>
+                  ))}
+              </List>
           </Paper>
-        </Box>
       </Container>
-      {/* Job Details Dialog */}
-      {/* <Dialog open={isJobDetailsDialogOpen} onClose={handleJobDetailsDialogClose}>
-        <DialogTitle>Job Details</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{jobPost.description}</DialogContentText>
-          <Typography variant="subtitle2" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
-            Job Requirements:
-          </Typography> */}
-          {/* {jobPost.requirements.map((requirement, index) => (
-            <Typography key={index} variant="body2">{`${index + 1}. ${requirement}`}</Typography>
-          ))} */}
-        {/* </DialogContent>
-        <DialogActions>
-          <Button onClick={handleJobDetailsDialogClose} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog> */}
     </>
   );
 };
 
-export default CompanyViewJobPost;
+export default JobPost;
