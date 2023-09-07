@@ -19,9 +19,10 @@ import CompanyInfo from './pages/Company/CompanyInfo';
 import CompanyPage from './pages/Company/CompanyPage';
 import CompanyReviews from './pages/Company/CompanyReviews';
 import CompanyVacancy from './pages/Company/CompanyVacancy';
+import JobListsAndPost from "./pages/Company/JobListsAndPost";
 
 import AddJobPost from './pages/Company/AddJobPost';
-import JobPost from './pages/Company/JobPost';
+// import CompanyViewJobPost from './pages/Company/CompanyViewJobPost';
 
 import ViewCompanyPage from './pages/JobSeeker/ViewCompanyPage';
 import ViewJobPost from './pages/JobSeeker/ViewJobPost';
@@ -30,7 +31,6 @@ import ViewCompanyVacancies from './pages/JobSeeker/ViewCompanyVacancies';
 import ViewShortListedJobs from './pages/JobSeeker/ViewShortListedJobs';
 
 import SidebarOptionsCompany from './components/SidebarOptionsCompany';
-import JobListsAndPost from "./pages/Company/JobListsAndPost";
 
 // changed by any
 function App() {
@@ -85,7 +85,6 @@ function App() {
       
       <Route path="/companyPage" element={<CompanyPage/>}/>
       <Route path="/companyInfo/:company_id" element={<CompanyInfo/>}/>
-
       <Route path="/companyAccountInfo" element={<CompanyAccountInfo/>}/>
       <Route path="/companyReviews/:company_id" element={<CompanyReviews/>}/>
       <Route path="/companyVacancy/:company_id" element={<CompanyVacancy/>}/>
@@ -93,7 +92,7 @@ function App() {
       <Route path="/companySidebar" element={<SidebarOptionsCompany/>}/>
 
       <Route path="/addJobPost/:company_id" element={<AddJobPost/>}/>
-      <Route path="/companyViewJobPost/:company_id" element={<JobPost isLoggedInUser={true} isJobSeeker={false} jobseeker_id={3} jobpost_id={18}/>}/>
+      {/* <Route path="/companyViewJobPost/:jobpost_id" element={<CompanyViewJobPost/>}/> */}
 
       <Route path="/viewCompanyPage/*" element={<ViewCompanyPage/>}/>
       <Route path="/viewJobPost/:jobpost_id" element={<ViewJobPost/>}/>
