@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -7,9 +7,9 @@ import {
   MenuItem,
   Badge,
   Box,
+  Divider,
   Typography,
   CssBaseline,
-<<<<<<< HEAD
 } from '@mui/material';
 import {
   Home,
@@ -28,13 +28,6 @@ import axios from 'axios';
 import LogoutButton from './LogoutButton';
 import { useParams } from 'react-router-dom';
 import Notification from './notification';
-} from "@mui/material";
-import { Home, Notifications } from "@mui/icons-material";
-import { Link } from "react-router-dom";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import axios from "axios";
-import LogoutButton from "./LogoutButton";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const Header = () => {
   const [contactMenuAnchor, setContactMenuAnchor] = useState(null);
@@ -54,85 +47,54 @@ const Header = () => {
     setAnchorElUser(null);
   };
 
-  //for current logged in user
-  const [currentUser, setCurrentUser] = useState(null);
+      //for current logged in user
+    const [currentUser, setCurrentUser] = useState(null);
+  
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get('/api/auth/user', {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        });
+        setCurrentUser(response.data);
+        console.log('current user fetched');
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await axios.get("/api/auth/user", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
-      setCurrentUser(response.data);
-      console.log("current user fetched");
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
+    useEffect(() => {
+      fetchCurrentUser();
+    }, []);
 
   // TODO remove, this demo shouldn't need to reset the theme.
-  const defaultTheme = createTheme({
-    typography: {
-      fontSize: 20,
-    },
-  });
-
-  const typographyStyle = {
-    fontWeight: "bold",
-    fontFamily: "Didot, serif",
-    textDecoration: "none",
-    color: "inherit",
-  };
+  const defaultTheme = createTheme(
+      {
+          typography: {
+              fontSize: 20,
+          },
+      }
+  );
 
   return (
     <ThemeProvider theme={defaultTheme}>
       <CssBaseline />
-      <AppBar
-        position="static"
-        sx={{
-          height: 80,
-          backgroundColor: "#124559",
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
-      >
+      <AppBar position="static" sx={{height: 80, backgroundColor: 'rgb(101, 39, 190)', zIndex: (theme) => theme.zIndex.drawer + 1}} >
         <Toolbar>
-          <Box flexGrow={1} display="flex" alignItems="center" sx={{ pt: 1 }}>
-            <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-              <Typography variant="h6" style={typographyStyle}>
-                CareerConnect
-              </Typography>
-            </Link>
+        <Box flexGrow={1} display="flex" alignItems="center" sx={{pt: 1}}>
+              <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Typography variant="h6" style={{ fontWeight: 'bold' }}>CareerConnect</Typography>
+              </Link>
           </Box>
-          {currentUser && currentUser.role === "company" && (
-            <Box>
-              <IconButton
-                color="inherit"
-                paddingRight="2"
-                component={Link}
-                to={`/company/${currentUser.user_id}`}
-              >
-                <Home />
-              </IconButton>
-            </Box>
-          )}
-          {currentUser && currentUser.role === "jobseeker" && (
-            <Box>
-              <IconButton color="inherit" paddingRight="2" component={Link}>
-                <Home />
-              </IconButton>
-            </Box>
-          )}
           <Box>
-            <IconButton
+            <Typography
               color="inherit"
-              onClick={handleOpenNotificationMenu}
-              sx={{ paddingLeft: 4 }}
+              onClick={handleCloseUserMenu}
+              // component={Link}
+              to={`#`}
+              style={{ cursor: 'pointer', marginRight: '20px', fontWeight: 'bold' }}
             >
               Home
             </Typography>
@@ -145,8 +107,6 @@ const Header = () => {
             {/* <IconButton color="inherit" onClick={handleOpenNotificationMenu} paddingRight='2'>
               <Badge badgeContent={3} color="error">
                 <Notifications fontSize="large" />
-              <Badge badgeContent={2} color="error">
-                <Notifications />
               </Badge>
             </IconButton> */}
           </Box>
@@ -182,22 +142,10 @@ const Header = () => {
             Profile
           </Typography>
             }
-            {currentUser && currentUser.role === "jobseeker" && (
-              <IconButton
-                color="inherit"
-                paddingRight="2"
-                onClick={handleCloseUserMenu}
-                component={Link}
-                to={`/jobseeker/${currentUser.user_id}`}
-                sx={{ paddingLeft: 4 }}
-              >
-                <AccountCircleIcon />
-              </IconButton>
-            )}
           </Box>
-          <Box sx={{ paddingLeft: 3 }}>
+          <Box>
             <LogoutButton />
-          </Box>
+        </Box>
         </Toolbar>
       </AppBar>
     </ThemeProvider>
