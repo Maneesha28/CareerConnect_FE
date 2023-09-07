@@ -7,14 +7,13 @@ import {
 } from "react-router-dom";
 import SignUp from "./pages/Authentication/Signup";
 import SignIn from "./pages/Authentication/SignIn";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import JobSeekerProfile from "./pages/JobSeeker/JobSeekerProfile";
 import CompanyProfile from "./pages/CompanyProfile";
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import AccountInfo from './pages/JobSeeker/AccountInfo';
 
-import CompanyAccountInfo from './pages/Company/CompanyAccountInfo';
 import CompanyInfo from './pages/Company/CompanyInfo';
 import CompanyPage from './pages/Company/CompanyPage';
 import CompanyReviews from './pages/Company/CompanyReviews';
@@ -31,12 +30,20 @@ import ViewCompanyVacancies from './pages/JobSeeker/ViewCompanyVacancies';
 import ViewShortListedJobs from './pages/JobSeeker/ViewShortListedJobs';
 
 import SidebarOptionsCompany from './components/SidebarOptionsCompany';
+import HtmlToPdfConverter from "./pages/HtmlToPdfConverter";
+import FollowersList from "./pages/test";
+
+import { NotificationContext } from "./context/notificationContext";
 
 // changed by any
 function App() {
   const action = useNavigationType();
   const location = useLocation();
   const pathname = location.pathname;
+
+  const [allNotifications, setAllNotifications] = useState([]);
+  const [unreadNotifications, setUnreadNotifications] = useState([]);
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
 
   useEffect(() => {
     if (action !== "POP") {
@@ -74,18 +81,18 @@ function App() {
     // urls are searched & matched in top down fashion (I guess), so "/" need to at first position 
     // if any "localhost:3001/" is used
     //<BrowserRouter>
+    <NotificationContext.Provider value={{allNotifications, setAllNotifications, unreadNotifications, setUnreadNotifications, unreadNotificationsCount, setUnreadNotificationsCount}}>
+      
     <Routes>
       <Route path="/auth/login" element={<SignIn />} />
       <Route path="/auth/register" element={<SignUp />} />
       <Route path="/jobseeker/:jobseeker_id" element={<JobSeekerProfile />} />
       <Route path="/company/:company_id" element={<CompanyPage />} />
-      <Route path="/companyJobPosts/:company_id" element={<JobListsAndPost />} />
       <Route path="/" element={<Home/>}/>
       <Route path="/jobseeker/:jobseeker_id/accountInfo" element={<AccountInfo/>}/>
       
       <Route path="/companyPage" element={<CompanyPage/>}/>
       <Route path="/companyInfo/:company_id" element={<CompanyInfo/>}/>
-      <Route path="/companyAccountInfo" element={<CompanyAccountInfo/>}/>
       <Route path="/companyReviews/:company_id" element={<CompanyReviews/>}/>
       <Route path="/companyVacancy/:company_id" element={<CompanyVacancy/>}/>
 
@@ -99,8 +106,12 @@ function App() {
       <Route path="/viewCompanyReviews" element={<ViewCompanyReviews/>}/>
       <Route path="/viewCompanyVacancies" element={<ViewCompanyVacancies/>}/>
       <Route path="/viewShortlistedJobs" element={<ViewShortListedJobs/>}/>
+      <Route path="/h2p" element={<HtmlToPdfConverter/>}/>
+      <Route path="/f" element={<FollowersList/>}/>
       <Route path="*" element={<NotFound/>}/>
+      
     </Routes>
+    </NotificationContext.Provider>
     //</BrowserRouter>
   );
 }

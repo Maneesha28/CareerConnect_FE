@@ -22,6 +22,7 @@ import {
   DialogActions,
   MenuItem
 } from '@mui/material';
+import Header from '../../components/Header';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useParams } from 'react-router-dom';
@@ -29,15 +30,16 @@ import axios from 'axios';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteConfirmationDialogue from '../../components/DeleteConfirmationDialogue';
+import CompanyReviews from './CompanyReviews';
 
-const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
+const CompanyVacancy = ({isLoggedInUser}) => {
   const [selectedTab, setSelectedTab] = useState(0); // 0 for Job List, 1 for Archived Job List
   const [searchKeyword, setSearchKeyword] = useState('');
   const [jobPostData,setJobPostData] = useState([]);
   const [archivedJobPostData,setArchivedJobPostData] = useState([]);
   const [jobsToShow, setJobsToShow] = useState([]);
-  const [minSalary, setMinSalary] = useState(Infinity);
-  const [maxSalary, setMaxSalary] = useState(0);
+  const [minSalary, setMinSalary] = useState(0);
+  const [maxSalary, setMaxSalary] = useState(Infinity);
   const [salaryRange, setSalaryRange] = useState([minSalary, maxSalary]);
   const [jobTypeFilters, setJobTypeFilters] = useState({
     fullTime: true,
@@ -65,12 +67,7 @@ const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
     deadline: '',
   });
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  function updateMinMaxSalary(jobData) {
-    let min = Math.min(...jobData.map(job => job.salary));
-    let max = Math.max(...jobData.map(job => job.salary));
-    setMinSalary(Math.min(min, minSalary));
-    setMaxSalary(Math.max(max, maxSalary));
-  }
+
   const fetchJobPostData = async () => {
     try {
       const response = await axios.get(`/api/jobpost/all/${id}`, {
@@ -81,8 +78,15 @@ const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
       });
 
       const jobData = response.data;
+      const min = Math.min(...jobData.map(job => job.salary));
+      const max = Math.max(...jobData.map(job => job.salary));
+
       setJobPostData(jobData);
       console.log(jobData);
+      console.log('fetched jobpostdata',jobPostData);
+      setMinSalary(min);
+      setMaxSalary(max);
+      setSalaryRange([min, max]);
       setIsLoadingJobPost(false);
     } catch (error) {
       setError('Error fetching jobpost information.');
@@ -99,6 +103,7 @@ const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
       });
       setArchivedJobPostData(response.data);
       setIsLoadingArchivedJobPost(false);
+      console.log('hello2');
     } catch (error) {
       setError('Error fetching archived jobpost information.');
       setIsLoadingArchivedJobPost(false);
@@ -140,7 +145,6 @@ const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
   };
 
   const handleSalaryRangeChange = (event, newValue) => {
-    console.log("handle salary range change:",newValue);
     setSalaryRange(newValue);
     setApplyFilter(!applyFilter);
   };
@@ -160,11 +164,9 @@ const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
     if (selectedTab === 0) {
       const filteredJobs = jobPostData ? jobPostData.filter(filterJobs) : [];
       setJobsToShow(filteredJobs);
-      console.log("JobPostData: ",filteredJobs);
     } else if (selectedTab === 1) {
       const filteredArchivedJobs = archivedJobPostData ? archivedJobPostData.filter(filterJobs) : [];
       setJobsToShow(filteredArchivedJobs);
-      console.log("Archived:",filteredArchivedJobs);
     }
     console.log("JobPostData: ",jobPostData,"Archived:",archivedJobPostData);
   };
@@ -181,20 +183,14 @@ const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
   
     fetchData();
   }, [id, fetch]);
+  
   useEffect(() => {
-    updateMinMaxSalary(jobPostData);
-  }, [jobPostData]);
-  useEffect(() => {
-    setSalaryRange([minSalary,maxSalary]);
-  }, [minSalary,maxSalary]);
-  useEffect(() => {
-    updateMinMaxSalary(archivedJobPostData);
-  }, [archivedJobPostData]);
-  useEffect(() => {
-    console.log(salaryRange);
     switchTabs(); // Call switchTabs whenever jobPostData or archivedJobPostData changes
-  }, [salaryRange,selectedTab, applyFilter]);
-
+  }, [jobPostData, archivedJobPostData, selectedTab, applyFilter]);
+  
+  // useEffect(()=>{
+  //   switchTabs();
+  // },[selectedTab]);
   if (isLoadingJobPost||isLoadingArchivedJobPost) {
     return <div>Loading...</div>;
   }
@@ -415,7 +411,7 @@ const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
               <Grid item xs={12} sm={6} md={6} key={job.jobpost_id}>
                 <Paper elevation={3} sx={{ padding: '16px' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Link to={`/companyJobPosts/${id}`} state={{ jobpost_id: job.jobpost_id }} style={{ textDecoration: 'none' }}>
+                    <Link to={`/companyViewJobPost/${job.jobpost_id}`} style={{ textDecoration: 'none' }}>
                       <Typography variant="h6" gutterBottom>
                         {job.title}
                       </Typography>
@@ -443,7 +439,7 @@ const CompanyVacancy = ({isLoggedInUser,isJobSeeker,user_id}) => {
                     Salary: {job.salary}
                   </Typography>
                   <Typography variant="subtitle1" gutterBottom>
-                    Type: {job.employment_type}
+                    Applicants: {job.applicants}
                   </Typography>
                 </Paper>
               </Grid>

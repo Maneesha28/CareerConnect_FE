@@ -78,13 +78,15 @@ function PersonalInfo({isLoggedInUser}) {
   }, [id]);
 
   //useEffect hook to listen for changes in profile_pic
-  useEffect(() => {
-    if(editedInfo.profile_pic)
-    {
-      sendEditedInfoToBackend();
-    }
-    fetchJobseekerData();
-  }, [editedInfo.profile_pic]);
+  if(isLoggedInUser)
+  {
+    useEffect(() => {
+      if(editedInfo.profile_pic)
+      {
+        sendEditedInfoToBackend();
+      }
+    }, [editedInfo.profile_pic]);
+  }
 
   if(error)
       return (
@@ -181,7 +183,7 @@ function PersonalInfo({isLoggedInUser}) {
             </Box>
             <Box p={3} display="flex">
             <Box flex={1}>
-                {isImageEditMode ? (
+                {isLoggedInUser && isImageEditMode ? (
                   <Box display="flex" flexDirection="column" alignItems="center">
                     <label htmlFor="image-upload">
                       {editedInfo.profile_pic ? (

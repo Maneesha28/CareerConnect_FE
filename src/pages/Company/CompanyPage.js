@@ -25,9 +25,6 @@ const CompanyPage = () => {
         setCurrentUser(response.data);
         console.log(response.data);
         console.log('current user fetched',currentUser);
-        console.log(currentUser.user_id,' ',id);
-        console.log(currentUser.user_id === id);
-        console.log(parseInt(currentUser.user_id) === parseInt(id));
       } catch (error) {
         setError('Error fetching current user information.');
         console.log(error);
@@ -48,10 +45,7 @@ const CompanyPage = () => {
             isJobseeker={currentUser.role === "jobseeker"}/>
           <div style={{ display: 'flex' }}>
             <div style={{ flex: '3' }}>
-              <CompanyVacancy isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} 
-                isJobseeker={currentUser.role === "jobseeker"}
-                jobseeker_id={parseInt(currentUser.user_id)}
-                />
+              <CompanyVacancy isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} />
             </div>
             <div style={{ flex: '2' }}>
               <CompanyReviews isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} 
