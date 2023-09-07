@@ -122,11 +122,7 @@ const Header = () => {
             </Box>
           )}
           <Box>
-            <IconButton
-              color="inherit"
-              onClick={handleOpenNotificationMenu}
-              sx={{ paddingLeft: 4 }}
-            >
+           <Typography>
               Home
             </Typography>
             {/* <IconButton color="inherit" component={Link} to="/">
