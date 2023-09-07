@@ -44,6 +44,7 @@ const JobListsAndPost = () => {
   };
   const [currentUser, setCurrentUser] = useState(null);
   const fetchCurrentUser = async() => {
+    console.log("current user fetching----------");
     try{
       const response = await axios.get('/api/auth/user', {
         headers: {
@@ -52,10 +53,11 @@ const JobListsAndPost = () => {
         withCredentials: true,
       });
         setCurrentUser(response.data);
-        setIsCompany(currentUser.role === "company");
-        setIsJobseeker(currentUser.role === "jobseeker");
-        setIsLoggedInUser(parseInt(currentUser.user_id) === parseInt(company_id));
+        setIsCompany(response.data.role === "company");
+        setIsJobseeker(response.data.role === "jobseeker");
+        setIsLoggedInUser(parseInt(response.data.user_id) === parseInt(company_id));
         console.log('----------------------------------------------------------------------------');
+        console.log("IsLoggedUser ? ",parseInt(response.data.user_id) === parseInt(company_id));
         setUserID(parseInt(response.data.user_id));
         setIsLoadingUser(false);
       } catch (error) {
