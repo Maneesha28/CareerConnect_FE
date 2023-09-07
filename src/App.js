@@ -14,7 +14,6 @@ import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import AccountInfo from './pages/JobSeeker/AccountInfo';
 
-import CompanyAccountInfo from './pages/Company/CompanyAccountInfo';
 import CompanyInfo from './pages/Company/CompanyInfo';
 import CompanyPage from './pages/Company/CompanyPage';
 import CompanyReviews from './pages/Company/CompanyReviews';
@@ -30,6 +29,8 @@ import ViewCompanyVacancies from './pages/JobSeeker/ViewCompanyVacancies';
 import ViewShortListedJobs from './pages/JobSeeker/ViewShortListedJobs';
 
 import SidebarOptionsCompany from './components/SidebarOptionsCompany';
+import HtmlToPdfConverter from "./pages/HtmlToPdfConverter";
+import FollowersList from "./pages/test";
 
 import { NotificationContext } from "./context/notificationContext";
 
@@ -91,7 +92,6 @@ function App() {
       
       <Route path="/companyPage" element={<CompanyPage/>}/>
       <Route path="/companyInfo/:company_id" element={<CompanyInfo/>}/>
-      <Route path="/companyAccountInfo" element={<CompanyAccountInfo/>}/>
       <Route path="/companyReviews/:company_id" element={<CompanyReviews/>}/>
       <Route path="/companyVacancy/:company_id" element={<CompanyVacancy/>}/>
 
@@ -105,6 +105,8 @@ function App() {
       <Route path="/viewCompanyReviews" element={<ViewCompanyReviews/>}/>
       <Route path="/viewCompanyVacancies" element={<ViewCompanyVacancies/>}/>
       <Route path="/viewShortlistedJobs" element={<ViewShortListedJobs/>}/>
+      <Route path="/h2p" element={<HtmlToPdfConverter/>}/>
+      <Route path="/f" element={<FollowersList/>}/>
       <Route path="*" element={<NotFound/>}/>
       
     </Routes>

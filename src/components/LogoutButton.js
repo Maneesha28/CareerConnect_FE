@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
-import { Button } from '@mui/material';
+import {IconButton } from '@mui/material';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
 const LogoutButton = () => {
   const handleLogout = () => {
@@ -21,8 +22,8 @@ const LogoutButton = () => {
   };
 
   return (
-    <Button variant='text' color='inherit' style={{ cursor: 'pointer', fontWeight: 'bold' }} 
-      onClick={handleLogout}>LogOut</Button>
+    <IconButton color='inherit' style={{ cursor: 'pointer', fontWeight: 'bold'}} 
+      onClick={handleLogout}><LogoutOutlinedIcon/></IconButton>
   );
 };
 
