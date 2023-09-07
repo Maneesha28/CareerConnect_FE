@@ -34,6 +34,8 @@ import HtmlToPdfConverter from "./pages/HtmlToPdfConverter";
 import FollowersList from "./pages/test";
 
 import { NotificationContext } from "./context/notificationContext";
+import JobPostApplicationForm from "./components/ResumeBuilder/JobPostApplicationForm";
+import ResumeBuilder from "./components/ResumeBuilder/ResumeBuilder";
 
 // changed by any
 function App() {
@@ -110,6 +112,8 @@ function App() {
       <Route path="/h2p" element={<HtmlToPdfConverter/>}/>
       <Route path="/f" element={<FollowersList/>}/>
       <Route path="*" element={<NotFound/>}/>
+
+      <Route path="/application/:jobseeker_id" element={<ResumeBuilder/>}/>
       
     </Routes>
     </NotificationContext.Provider>
