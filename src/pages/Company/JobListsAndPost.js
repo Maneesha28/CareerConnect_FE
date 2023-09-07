@@ -11,8 +11,8 @@ const JobListsAndPost = () => {
   const location = useLocation();
   const company_id = useParams().company_id;
   const jobpost_id = location.state?.jobpost_id;
-  console.log('company_id:', company_id);
-  console.log('jobpost_id:', jobpost_id);
+//   console.log('company_id:', company_id);
+//   console.log('jobpost_id:', jobpost_id);
   const [user_id,setUserID] = useState(null);
   const [isCompany,setIsCompany] = useState(false);
   const [isJobseeker,setIsJobseeker] = useState(false);
@@ -25,9 +25,9 @@ const JobListsAndPost = () => {
   const [isLoadingUser,setIsLoadingUser] = useState(true);
   const [error,setError] = useState(null);
   const fetchCompanyData = async () => {
-    console.log(1);
+    //console.log(1);
     try {
-        console.log(company_id);
+        //console.log(company_id);
       const response = await axios.get(`/api/company/${company_id}`, {
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ const JobListsAndPost = () => {
       });
       setCompanyData(response.data);
       setIsLoadingCompany(false);
-      console.log(response.data);
+      //console.log(response.data);
     } catch (error) {
       setError('Error fetching company information.');
       setIsLoadingCompany(false);
@@ -54,10 +54,10 @@ const JobListsAndPost = () => {
         setCurrentUser(response.data);
         setIsCompany(currentUser.role === "company");
         setIsJobseeker(currentUser.role === "jobseeker");
-        setIsLoggedInUser(parseInt(currentUser.user_id) === jobpost_id)
+        setIsLoggedInUser(parseInt(currentUser.user_id) === parseInt(company_id));
+        console.log('----------------------------------------------------------------------------');
         setUserID(parseInt(response.data.user_id));
         setIsLoadingUser(false);
-        console.log(response.data);
       } catch (error) {
         setError('Error fetching current user information.');
         console.log(error);
@@ -74,14 +74,13 @@ const JobListsAndPost = () => {
             });
             setSelectedJob(response.data);
             setIsLoadingJobpost(false);
-            console.log("job selected:",response.data);
+            console.log("job selected in mother:",response.data);
           } catch (error) {
             setError('Error fetching company information.');
             setIsLoadingJobpost(false);
           }
     };
   useEffect(() => {
-    console.log('here');
     fetchCompanyData();   
     fetchCurrentUser(); 
     fetchJobPost();

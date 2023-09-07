@@ -92,6 +92,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,fetch,setFetch,se
 
   return (
     <>
+    {selectedJob !== null? (
       <Container sx={{ marginTop: '36px' }}>
         <Box>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px' }}>
@@ -169,6 +170,9 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,fetch,setFetch,se
               </List>
           </Paper>
       </Container>
+      ) : (
+        <div></div>
+      )}
     </>
   );
 };

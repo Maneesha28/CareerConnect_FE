@@ -31,6 +31,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteConfirmationDialogue from '../../components/DeleteConfirmationDialogue';
 
 const JobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,fetch,selectedJob,setSelectedJob}) => {
+    // console.log(isLoggedInUser);
   const [selectedTab, setSelectedTab] = useState(0); // 0 for Job List, 1 for Archived Job List
   const [searchKeyword, setSearchKeyword] = useState('');
   const [jobPostData,setJobPostData] = useState([]);
@@ -430,7 +431,7 @@ const JobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,fetch,selectedJo
                         {job.title}
                     </Typography>
                     </div>
-                    {isLoggedInUser && (
+                    {/* {isLoggedInUser && (
                       <div>
                         <IconButton color="primary" onClick={() => handleEditJobPost(job)}>
                           <EditIcon />
@@ -439,7 +440,7 @@ const JobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,fetch,selectedJo
                           <DeleteIcon />
                         </IconButton>
                       </div>
-                    )}
+                    )} */}
                     <DeleteConfirmationDialogue
                       isOpen={isDeleteConfirmationOpen[job.jobpost_id]}
                       onClose={() => handleCloseDeleteConfirmation(job.jobpost_id)}
