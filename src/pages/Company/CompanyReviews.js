@@ -21,7 +21,7 @@ const CompanyReviews = ({isLoggedInUser,isJobseeker}) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoadingUser,setIsLoadingUser] = useState(true);
   const [isAddReviewDialogOpen, setIsAddReviewDialogOpen] = useState(false);
-  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState({});
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [reviewToDelete, setReviewToDelete] = useState(null);
@@ -116,6 +116,7 @@ const CompanyReviews = ({isLoggedInUser,isJobseeker}) => {
     }
   };
   const handleDeleteReview = (reviewId) => {
+    console.log("delete icon clicked: ",reviewId);
     setReviewToDelete(reviewId);
     // Open the delete confirmation dialog here, for example by setting a state variable
     setIsDeleteConfirmationOpen(true);
@@ -176,7 +177,7 @@ const CompanyReviews = ({isLoggedInUser,isJobseeker}) => {
 
     fetchReviewData();
     fetchCurrentUser();
-    setIsDeleteConfirmationOpen({});
+    //setIsDeleteConfirmationOpen({});
   }, [id]);
   if (isLoadingReview||isLoadingUser) {
     return <div>Loading...</div>;
@@ -315,7 +316,7 @@ const CompanyReviews = ({isLoggedInUser,isJobseeker}) => {
           </Button>
         </DialogActions>
       </Dialog>
-      {Object.keys(isDeleteConfirmationOpen).length > 0 && (
+      {/* {Object.keys(isDeleteConfirmationOpen).length > 0 && (
       <DeleteConfirmationDialogue
         isOpen={isDeleteConfirmationOpen}
         onClose={() => {
@@ -329,7 +330,21 @@ const CompanyReviews = ({isLoggedInUser,isJobseeker}) => {
           setReviewToDelete(null);
         }}
       />
-    )}
+    )} */}
+      <DeleteConfirmationDialogue
+          isOpen={isDeleteConfirmationOpen}
+          onClose={() => {
+            setIsDeleteConfirmationOpen(false);
+            // Optionally reset the reviewToDelete state here
+            setReviewToDelete(null);
+          }}
+          onDelete={() => {
+            handleConfirmDelete(reviewToDelete);
+            // Optionally reset the reviewToDelete state here
+            setReviewToDelete(null);
+          }}
+        />
+
       <Dialog open={isEditReviewDialogOpen} onClose={handleEditReviewDialogClose}>
       <DialogTitle>Edit Review</DialogTitle>
       <DialogContent>

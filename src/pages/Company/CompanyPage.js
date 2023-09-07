@@ -45,7 +45,10 @@ const CompanyPage = () => {
             isJobseeker={currentUser.role === "jobseeker"}/>
           <div style={{ display: 'flex' }}>
             <div style={{ flex: '3' }}>
-              <CompanyVacancy isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} />
+              <CompanyVacancy isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} 
+                isJobseeker={currentUser.role === "jobseeker"}
+                jobseeker_id={parseInt(currentUser.user_id)}
+                />
             </div>
             <div style={{ flex: '2' }}>
               <CompanyReviews isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} 
