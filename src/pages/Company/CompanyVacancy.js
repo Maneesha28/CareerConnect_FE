@@ -38,8 +38,8 @@ const CompanyVacancy = ({isLoggedInUser}) => {
   const [jobPostData,setJobPostData] = useState([]);
   const [archivedJobPostData,setArchivedJobPostData] = useState([]);
   const [jobsToShow, setJobsToShow] = useState([]);
-  const [minSalary, setMinSalary] = useState(0);
-  const [maxSalary, setMaxSalary] = useState(Infinity);
+  const [minSalary, setMinSalary] = useState(Infinity);
+  const [maxSalary, setMaxSalary] = useState(0);
   const [salaryRange, setSalaryRange] = useState([minSalary, maxSalary]);
   const [jobTypeFilters, setJobTypeFilters] = useState({
     fullTime: true,
@@ -67,7 +67,12 @@ const CompanyVacancy = ({isLoggedInUser}) => {
     deadline: '',
   });
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-
+  function updateMinMaxSalary(jobData) {
+    let min = Math.min(...jobData.map(job => job.salary));
+    let max = Math.max(...jobData.map(job => job.salary));
+    setMinSalary(Math.min(min, minSalary));
+    setMaxSalary(Math.max(max, maxSalary));
+  }
   const fetchJobPostData = async () => {
     try {
       const response = await axios.get(`/api/jobpost/all/${id}`, {
@@ -78,15 +83,8 @@ const CompanyVacancy = ({isLoggedInUser}) => {
       });
 
       const jobData = response.data;
-      const min = Math.min(...jobData.map(job => job.salary));
-      const max = Math.max(...jobData.map(job => job.salary));
-
       setJobPostData(jobData);
       console.log(jobData);
-      console.log('fetched jobpostdata',jobPostData);
-      setMinSalary(min);
-      setMaxSalary(max);
-      setSalaryRange([min, max]);
       setIsLoadingJobPost(false);
     } catch (error) {
       setError('Error fetching jobpost information.');
@@ -103,7 +101,6 @@ const CompanyVacancy = ({isLoggedInUser}) => {
       });
       setArchivedJobPostData(response.data);
       setIsLoadingArchivedJobPost(false);
-      console.log('hello2');
     } catch (error) {
       setError('Error fetching archived jobpost information.');
       setIsLoadingArchivedJobPost(false);
@@ -145,6 +142,7 @@ const CompanyVacancy = ({isLoggedInUser}) => {
   };
 
   const handleSalaryRangeChange = (event, newValue) => {
+    console.log("handle salary range change:",newValue);
     setSalaryRange(newValue);
     setApplyFilter(!applyFilter);
   };
@@ -164,9 +162,11 @@ const CompanyVacancy = ({isLoggedInUser}) => {
     if (selectedTab === 0) {
       const filteredJobs = jobPostData ? jobPostData.filter(filterJobs) : [];
       setJobsToShow(filteredJobs);
+      console.log("JobPostData: ",filteredJobs);
     } else if (selectedTab === 1) {
       const filteredArchivedJobs = archivedJobPostData ? archivedJobPostData.filter(filterJobs) : [];
       setJobsToShow(filteredArchivedJobs);
+      console.log("Archived:",filteredArchivedJobs);
     }
     console.log("JobPostData: ",jobPostData,"Archived:",archivedJobPostData);
   };
@@ -183,14 +183,20 @@ const CompanyVacancy = ({isLoggedInUser}) => {
   
     fetchData();
   }, [id, fetch]);
-  
   useEffect(() => {
+    updateMinMaxSalary(jobPostData);
+  }, [jobPostData]);
+  useEffect(() => {
+    setSalaryRange([minSalary,maxSalary]);
+  }, [minSalary,maxSalary]);
+  useEffect(() => {
+    updateMinMaxSalary(archivedJobPostData);
+  }, [archivedJobPostData]);
+  useEffect(() => {
+    console.log(salaryRange);
     switchTabs(); // Call switchTabs whenever jobPostData or archivedJobPostData changes
-  }, [jobPostData, archivedJobPostData, selectedTab, applyFilter]);
-  
-  // useEffect(()=>{
-  //   switchTabs();
-  // },[selectedTab]);
+  }, [salaryRange,selectedTab, applyFilter]);
+
   if (isLoadingJobPost||isLoadingArchivedJobPost) {
     return <div>Loading...</div>;
   }
@@ -439,7 +445,7 @@ const CompanyVacancy = ({isLoggedInUser}) => {
                     Salary: {job.salary}
                   </Typography>
                   <Typography variant="subtitle1" gutterBottom>
-                    Applicants: {job.applicants}
+                    Type: {job.employment_type}
                   </Typography>
                 </Paper>
               </Grid>

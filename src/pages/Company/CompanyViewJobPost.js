@@ -72,6 +72,30 @@ const CompanyViewJobPost = () => {
     }
   };
 
+  const fetchApplicantsData = async () => {
+    const endpoint = `/api/jobpost/${id}`;
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      // Modify data (e.g., remove columns containing "_id")
+      if(response.data.status === 'Access Denied') {
+        setError(response.data.status);
+        setIsLoadingJobPost(false);
+        return;
+      }
+      setJobPost(response.data);
+      setIsLoadingJobPost(false);
+    } catch (error) {
+      setError(`Error fetching information.`);
+      setIsLoadingJobPost(false);
+    }
+  };
+
   useEffect(() => {
   fetchJobData();
   }, [id]);
@@ -98,22 +122,9 @@ const CompanyViewJobPost = () => {
             {jobPost.title}
           </Typography>
         </Box>
-        {/* <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px' }}>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
-            Applicants' List
-          </Typography>
-        </Box> */}
           <Paper elevation={3} sx={{ padding: '16px', marginBottom: '16px' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
               <div>
-                {/* <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                    Job title:
-                  </Typography>
-                  <Typography variant="subtitle1" sx={{ marginLeft: '8px' }}>
-                    {jobPost.title}
-                  </Typography>
-                </div> */}
                 <div style={{ marginTop: '16px' }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
                     Job Description:
