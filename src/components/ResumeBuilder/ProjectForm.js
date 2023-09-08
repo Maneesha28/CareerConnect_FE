@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,7 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
 
-const ProjectForm = ({ projects, handleChange }) => {
+const ProjectForm = ({ projects, handleChange, setSelectedProjects }) => {
   const [selectedRows, setSelectedRows] = useState([]);
 
   const handleCheckboxChange = (event, id) => {
@@ -17,6 +17,11 @@ const ProjectForm = ({ projects, handleChange }) => {
       setSelectedRows(selectedRows.filter((rowId) => rowId !== id));
     }
   };
+
+  useEffect(() => {
+    //add selected row projects to selectedProjects
+    setSelectedProjects(projects.filter((row) => selectedRows.includes(row.project_id)));
+  }, [selectedRows]);
 
   return (
     <div>
@@ -41,50 +46,12 @@ const ProjectForm = ({ projects, handleChange }) => {
                 onChange={(event) => handleCheckboxChange(event, row.project_id)}
               />
             </TableCell>
-            <TableCell>
-              <TextField
-                name={row.title}
-                value={row.title || ''}
-                onChange={handleChange}
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.description}
-                value={row.description || ''}
-                onChange={handleChange}
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.technologies}
-                value={row.technologies || ''}
-                onChange={handleChange}
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.link}
-                value={row.link || ''}
-                onChange={handleChange}
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.start_date}
-                value={new Date(row.start_date).toLocaleDateString('en-CA') || ''}
-                onChange={handleChange}
-                type='date'
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.end_date}
-                value={new Date(row.end_date).toLocaleDateString('en-CA') || ''}
-                onChange={handleChange}
-                type='date'
-              />
-            </TableCell>
+            <TableCell>{row.title}</TableCell>
+            <TableCell>{row.description}</TableCell>
+            <TableCell>{row.technologies}</TableCell>
+            <TableCell>{row.project_link ? row.project_link : 'n/a'}</TableCell>
+            <TableCell>{new Date(row.start_date).toLocaleDateString('en-CA')}</TableCell>
+            <TableCell>{row.end_date ? new Date(row.end_date).toLocaleDateString('en-CA') : 'Present'}</TableCell>
           </TableRow>
         ))}
       </TableBody>

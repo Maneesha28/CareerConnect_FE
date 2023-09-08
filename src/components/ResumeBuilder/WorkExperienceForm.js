@@ -1,5 +1,5 @@
 // WorkExperienceForm.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
 
-const WorkExperienceForm = ({ workExperience, handleChange }) => {
+const WorkExperienceForm = ({ workExperience, handleChange, setSelectedWorkExperience }) => {
   const [selectedRows, setSelectedRows] = useState([]);
 
   const handleCheckboxChange = (event, id) => {
@@ -18,6 +18,11 @@ const WorkExperienceForm = ({ workExperience, handleChange }) => {
       setSelectedRows(selectedRows.filter((rowId) => rowId !== id));
     }
   };
+
+  useEffect(() => {
+    //add selected row workExperience to selectedWorkExperience
+    setSelectedWorkExperience(workExperience.filter((row) => selectedRows.includes(row.exp_id)));
+  }, [selectedRows]);
 
   return (
     <div>
@@ -41,43 +46,11 @@ const WorkExperienceForm = ({ workExperience, handleChange }) => {
                 onChange={(event) => handleCheckboxChange(event, row.exp_id)}
               />
             </TableCell>
-            <TableCell>
-              <TextField
-                name={row.designation}
-                value={row.designation || ''}
-                onChange={handleChange}
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.organization}
-                value={row.organization || ''}
-                onChange={handleChange}
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.employment_type}
-                value={row.employment_type || ''}
-                onChange={handleChange}
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.start_date}
-                value={new Date(row.start_date).toLocaleDateString('en-CA') || ''}
-                onChange={handleChange}
-                type='date'
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.end_date}
-                value={new Date(row.end_date).toLocaleDateString('en-CA') || ''}
-                onChange={handleChange}
-                type='date'
-              />
-            </TableCell>
+            <TableCell>{row.designation}</TableCell>
+            <TableCell>{row.organization}</TableCell>
+            <TableCell>{row.employment_type}</TableCell>
+            <TableCell>{new Date(row.start_date).toLocaleDateString('en-CA')}</TableCell>
+            <TableCell>{row.end_date ? new Date(row.end_date).toLocaleDateString('en-CA') : 'Present'}</TableCell>
           </TableRow>
         ))}
       </TableBody>

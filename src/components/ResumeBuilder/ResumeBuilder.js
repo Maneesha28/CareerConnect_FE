@@ -17,6 +17,7 @@ import ProjectForm from './ProjectForm';
 import PublicationForm from './PublicationForm';
 import SkillForm from './SkillForm';
 import Header from '../Header';
+import generatePDF from './generatePDF';
 
 const steps = ['Personal Information', 'Educational Background', 'Work Experience', 'Achievements', 'Skills',
 'Projects', 'Publications' ];
@@ -33,6 +34,14 @@ const ResumeBuilder = () => {
   const [projects, setProjects] = useState({});
   const [publications, setPublications] = useState({});
   const [error, setError] = useState('');
+  const [index, setIndex] = useState(0);
+
+  const [selectedEducation, setSelectedEducation] = useState([]);
+  const [selectedWorkExperience, setSelectedWorkExperience] = useState([]);
+  const [selectedAchievements, setSelectedAchievements] = useState([]);
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [selectedProjects, setSelectedProjects] = useState([]);
+  const [selectedPublications, setSelectedPublications] = useState([]);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -200,8 +209,6 @@ const ResumeBuilder = () => {
     fetchPublicationInfo();
     }, []);
 
-    console.log(publications);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (activeStep === 0) {
@@ -235,6 +242,7 @@ const ResumeBuilder = () => {
           <EducationForm
             education={education}
             handleChange={handleChange}
+            setSelectedEducation={setSelectedEducation}
           />
         );
       case 2:
@@ -242,36 +250,41 @@ const ResumeBuilder = () => {
           <WorkExperienceForm
             workExperience={workExperience}
             handleChange={handleChange}
+            setSelectedWorkExperience={setSelectedWorkExperience}
           />
         );
-        case 3:
-          return (
-            <AchievementForm
-              achievements={achievements}
-              handleChange={handleChange}
-            />
-          );
-          case 4:
-            return (
-              <SkillForm
-                skills={skills}
-                handleChange={handleChange}
-              />
-            );
-            case 5:
-              return (
-                <ProjectForm
-                  projects={projects}
-                  handleChange={handleChange}
-                />
-              );
-            case 6:
-              return (
-                <PublicationForm
-                  publications={publications}
-                  handleChange={handleChange}
-                />
-              );
+      case 3:
+        return (
+          <AchievementForm
+            achievements={achievements}
+            handleChange={handleChange}
+            setSelectedAchievements={setSelectedAchievements}
+          />
+        );
+      case 4:
+        return (
+          <SkillForm
+            skills={skills}
+            handleChange={handleChange}
+            setSelectedSkills={setSelectedSkills}
+          />
+        );
+      case 5:
+        return (
+          <ProjectForm
+            projects={projects}
+            handleChange={handleChange}
+            setSelectedProjects={setSelectedProjects}
+          />
+        );
+      case 6:
+        return (
+          <PublicationForm
+            publications={publications}
+            handleChange={handleChange}
+            setSelectedPublications={setSelectedPublications}
+          />
+        );
       default:
         return 'Unknown stepIndex';
     }
@@ -280,24 +293,21 @@ const ResumeBuilder = () => {
   return (
     <>
     <Header/>
-    <Container style={{marginLeft: 450, marginTop: 150, width: 1200}}>
+    <Container maxWidth='fixed' style={{ marginTop: 150}}>
       <Paper elevation={3} style={{ padding: '20px'}}>
         <Typography variant="h4" style={{marginBottom: '20px', textAlign: 'center', fontWeight: 'bold'}}>
           Build Your Resume
         </Typography>
-        <Stepper activeStep={activeStep} >
+        <Stepper activeStep={activeStep} style={{marginBottom: '40px'}}>
             {steps.map((label, index) => (
             <Step key={label}>
-                <StepLabel>{label}</StepLabel>
+                <StepLabel><Typography variant='h5'>{label}</Typography></StepLabel>
             </Step>
             ))}
         </Stepper>
         <div>
         {activeStep === steps.length ? (
-          <div>
-            <h2>Your Resume</h2>
-            {/* Display the generated resume here */}
-          </div>
+          generatePDF(personalInfo, selectedEducation, selectedWorkExperience, selectedAchievements, selectedSkills, selectedProjects, selectedPublications)
         ) : (
           <div>
             {getStepContent(activeStep)}

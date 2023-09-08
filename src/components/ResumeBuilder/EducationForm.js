@@ -1,5 +1,4 @@
-// EducationForm.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,7 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
 
-const EducationForm = ({ education, handleChange }) => {
+const EducationForm = ({ education, handleChange, setSelectedEducation }) => {
   const [selectedRows, setSelectedRows] = useState([]);
 
   const handleCheckboxChange = (event, id) => {
@@ -17,6 +16,15 @@ const EducationForm = ({ education, handleChange }) => {
     } else {
       setSelectedRows(selectedRows.filter((rowId) => rowId !== id));
     }
+  };
+
+  useEffect(() => {
+    //add selected row educations to selectedEducation
+    setSelectedEducation(education.filter((row) => selectedRows.includes(row.degree_id)));
+  }, [selectedRows]);
+
+  const divStyle = {
+    fontSize: '24px',
   };
 
   return (
@@ -42,50 +50,12 @@ const EducationForm = ({ education, handleChange }) => {
                 onChange={(event) => handleCheckboxChange(event, row.degree_id)}
               />
             </TableCell>
-            <TableCell>
-              <TextField
-                name={row.degree}
-                value={row.degree || ''}
-                onChange={handleChange}
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.subject}
-                value={row.subject || ''}
-                onChange={handleChange}
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.institution}
-                value={row.institution || ''}
-                onChange={handleChange}
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.result}
-                value={row.result || ''}
-                onChange={handleChange}
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.start_date}
-                value={new Date(row.start_date).toLocaleDateString('en-CA') || ''}
-                onChange={handleChange}
-                type='date'
-              />
-            </TableCell>
-            <TableCell>
-              <TextField
-                name={row.end_date}
-                value={new Date(row.end_date).toLocaleDateString('en-CA') || ''}
-                onChange={handleChange}
-                type='date'
-              />
-            </TableCell>
+            <TableCell>{row.degree}</TableCell>
+            <TableCell>{row.subject}</TableCell>
+            <TableCell>{row.institution}</TableCell>
+            <TableCell>{row.result}</TableCell>
+            <TableCell>{new Date(row.start_date).toLocaleDateString('en-CA')}</TableCell>
+            <TableCell>{new Date(row.end_date).toLocaleDateString('en-CA')}</TableCell>
           </TableRow>
         ))}
       </TableBody>
