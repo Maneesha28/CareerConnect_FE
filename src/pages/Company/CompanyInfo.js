@@ -418,7 +418,7 @@ function CompanyInfo({ isLoggedInUser, isJobseeker }) {
             </Box>
             <Box display="flex" alignItems="center" sx={{ paddingLeft: 10}}>
               <Box>
-                {isImageEditMode ? (
+                {isLoggedInUser && isImageEditMode ? (
                   <Box
                     display="flex"
                     flexDirection="column"
@@ -455,14 +455,17 @@ function CompanyInfo({ isLoggedInUser, isJobseeker }) {
                       onChange={handleImageUpload}
                     />
                     <Button component="label" color="primary">
-                      Select New Logo
+                    Select New Logo
+                    {isLoggedInUser ? (
                       <input
                         type="file"
                         accept="image/*"
                         style={{ display: "none" }}
                         onChange={handleImageUpload}
                       />
-                    </Button>
+                    ) : null}
+                  </Button>
+
                   </Box>
                 ) : (
                   <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>

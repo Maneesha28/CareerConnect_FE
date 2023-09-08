@@ -38,6 +38,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
   const company_id = useParams().company_id;
   const [error, setError] = useState(null);
   const [applications,setApplications] = useState([]);
+  const [applicationCount,setApplicationCount] = useState(0);
   const [isLoadingJobPost, setIsLoadingJobPost] = useState(true);
 
   const [isEditMode, setIsEditMode] = useState(false);
@@ -99,6 +100,21 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
     } catch (error) {
       setError(`Error fetching information.`);
       setIsLoadingJobPost(false);
+    }
+  };
+  const fetchApplicationsCount = async () => {
+
+    try {
+      const response = await axios.get(`/api/application/count/${selectedJob.jobpost_id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log('response ', response.data);
+      setApplicationCount(response.data.application_count);
+    } catch (error) {
+      console.error('Error fetching count:', error);
     }
   };
   const fetchIsApplied = async () => {
@@ -232,7 +248,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
   useEffect(() => {
   if(selectedJob){
     fetchApplicantsData();
-  
+    fetchApplicationsCount();
     console.log('2)fetch: ',fetch);
     if(isJobseeker){
       fetchIsApplied();
@@ -318,6 +334,24 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
                     <Typography>{selectedJob.requirements}</Typography>
                   )}
                 </Box>
+                {isLoggedInUser && isCompany && (
+                  <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+                    <Typography>Keywords: </Typography>
+                    {isEditMode ? (
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        margin="dense"
+                        label="Keywords"
+                        value={editedInfo.keywords || ''}
+                        onChange={(e) => setEditedInfo({ ...editedInfo, keywords: e.target.value })}
+                      />
+                    ) : (
+                      <Typography>{selectedJob.keywords}</Typography>
+                    )}
+                  </Box>
+                )}
+
                 <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
                   <Typography>Vacancy: </Typography>
                   {isEditMode ? (
@@ -394,7 +428,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
         </Box>
         {isLoggedInUser && isCompany && (
         <Paper elevation={3} sx={{ padding: '16px', flex: 1 }}>
-            <Typography variant="h6">Applicants:</Typography>
+            <Typography variant="h6">Applicants ( {applicationCount} ):</Typography>
             <Box sx={{ flexGrow: 1 }} />
             <TextField
                 label="Search by Applicant's name"
@@ -452,6 +486,15 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
                 rows={4}
                 value={editedInfo.requirements}
                 onChange={(e) => setEditedInfo({ ...editedInfo, requirements: e.target.value })}
+              />
+              <TextField
+                label="Keywords"
+                fullWidth
+                margin="dense"
+                multiline
+                rows={4}
+                value={editedInfo.keywords}
+                onChange={(e) => setEditedInfo({ ...editedInfo, keywords: e.target.value })}
               />
               <TextField
                 select

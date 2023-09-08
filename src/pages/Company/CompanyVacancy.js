@@ -65,6 +65,7 @@ const CompanyVacancy = ({isLoggedInUser}) => {
     salary: 0,
     employment_type: '',
     deadline: '',
+    keywords: ''
   });
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
@@ -216,6 +217,7 @@ const CompanyVacancy = ({isLoggedInUser}) => {
       salary: job.salary,
       employment_type: job.employment_type,
       deadline: job.deadline,
+      keywords: job.keywords
     });
     setIsEditDialogOpen(true);
   };
@@ -231,6 +233,7 @@ const CompanyVacancy = ({isLoggedInUser}) => {
       salary: 0,
       employment_type: 'full-time',
       deadline: '',
+      keywords: ''
     });
   };
   
@@ -259,6 +262,7 @@ const CompanyVacancy = ({isLoggedInUser}) => {
           salary: 0,
           employment_type: 'full-time',
           deadline: '',
+          keywords: ''
         });
       } catch (error) {
         console.error('Error updating Jobpost:', error);
@@ -290,8 +294,6 @@ const CompanyVacancy = ({isLoggedInUser}) => {
   const handleCloseDeleteConfirmation = (jobpostId) => {
     setIsDeleteConfirmationOpen({ ...isDeleteConfirmationOpen, [jobpostId]: false });
   };
-
-  //const filteredJobs = jobsToShow.filter(filterJobs);
 
 
   return (
@@ -393,6 +395,11 @@ const CompanyVacancy = ({isLoggedInUser}) => {
             <Typography variant="h6" sx={{ marginTop: '15px' }}>
               Salary Range
             </Typography>
+            {minSalary === maxSalary ? (
+            <Typography variant="body2">
+              {minSalary} 
+            </Typography>
+          ) : (
             <Slider
               value={salaryRange}
               onChange={handleSalaryRangeChange}
@@ -400,6 +407,7 @@ const CompanyVacancy = ({isLoggedInUser}) => {
               min={minSalary}
               max={maxSalary}
             />
+          )}
             {/* <Button variant="contained" color="primary" sx={{ marginTop: '16px' }}>
               Apply Filter
             </Button> */}
@@ -439,8 +447,11 @@ const CompanyVacancy = ({isLoggedInUser}) => {
                     Salary: {job.salary}
                   </Typography>
                   <Typography variant="subtitle1" gutterBottom>
-                    Applicants: {job.applicants}
+                    Type: {job.employment_type}
                   </Typography>
+                  {/* <Typography variant="subtitle1" gutterBottom>
+                    Applicants: {getApplicantsCount(job.jobpost_id)}
+                  </Typography> */}
                 </Paper>
               </Grid>
             ))}
@@ -481,6 +492,15 @@ const CompanyVacancy = ({isLoggedInUser}) => {
                 rows={4}
                 value={newJobPost.requirements}
                 onChange={(e) => setNewJobPost({ ...newJobPost, requirements: e.target.value })}
+              />
+              <TextField
+                label="Keywords"
+                fullWidth
+                margin="dense"
+                multiline
+                rows={4}
+                value={newJobPost.keywords}
+                onChange={(e) => setNewJobPost({ ...newJobPost, keywords: e.target.value })}
               />
               <TextField
                 select
