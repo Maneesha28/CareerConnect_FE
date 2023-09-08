@@ -61,12 +61,13 @@ const HomePage = () => {
         <>
         
           <div style={{ display: 'flex' }}>
-            <div style={{ flex: '1' }}>
+            <div style={{ flex: '2' }}>
               <AllJobLists user_id={user_id} isCompany={isCompany} isJobseeker={isJobseeker} isLoggedInUser={isLoggedInUser}
                selectedJob={selectedJob} setSelectedJob={setSelectedJob}
                 />
             </div>
-            <div style={{ flex: '3' }}>
+            
+            <div style={{ flex: '4', marginTop: '50px' }}>
               <JobPost user_id={user_id} isCompany={isCompany} isJobseeker={isJobseeker} isLoggedInUser={isLoggedInUser}
               selectedJob={selectedJob} setSelectedJob={setSelectedJob}/>
             </div>

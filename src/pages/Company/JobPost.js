@@ -176,6 +176,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
         console.log(response.data);
         setShortListButtonText('Shortlisted');
         setIsShortListed(1);
+        setFetch(true);
       } catch (error) {
         console.error(error);
       }
@@ -192,6 +193,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
         console.log(response.data);
         setShortListButtonText('Shortlist');
         setIsShortListed(0);
+        setFetch(true);
       } catch (error) {
         console.error(error);
       }
@@ -246,7 +248,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
   return (
     <>
     {selectedJob !== null? (
-      <Container sx={{ marginTop: '36px' }}>
+      <Container sx={{ marginTop: '40px' }}>
         <Box p={0} width="100%">
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px' }}>
           <Typography variant="h2" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
@@ -255,7 +257,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
         </Box>
           <Paper elevation={3} sx={{ padding: '16px', marginBottom: '16px' }}>
           <Box p={0} display="flex" alignItems="center" justifyContent="flex-end">
-              {isLoggedInUser && isEditMode && 
+              {isLoggedInUser && isCompany && isEditMode && 
                   <>
                   <IconButton color="primary" onClick={handleSave}>
                     <SaveIcon />
@@ -265,7 +267,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
                   </IconButton>
                 </>
               }
-              {isLoggedInUser && !isEditMode &&
+              {isLoggedInUser && isCompany&& !isEditMode &&
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Button variant="outlined" startIcon={<EditIcon />} onClick={handleEdit}>
                   Edit
@@ -390,7 +392,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
             </div>
           )}
         </Box>
-        {isLoggedInUser && (
+        {isLoggedInUser && isCompany && (
         <Paper elevation={3} sx={{ padding: '16px', flex: 1 }}>
             <Typography variant="h6">Applicants:</Typography>
             <Box sx={{ flexGrow: 1 }} />
@@ -517,7 +519,9 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
       </Container>
       
       ) : (
-        <div>Select A Post to Show</div>
+        <div style={{ textAlign: 'center', marginTop: '70px' }}>
+          <h1>Select A Post to Show</h1>
+        </div>
       )}
     </>
   );

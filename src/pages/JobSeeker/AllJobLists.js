@@ -11,60 +11,16 @@ import {
   Grid,
   Paper,
   Divider,
+  InputAdornment,
+  IconButton,
+  TextField,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Header from '../../components/Header';
-
+import axios from 'axios'; // Import axios for API requests
+import { Link } from 'react-router-dom';
+import { useFetch } from '../Company/FetchContext';
 const drawerWidth = 300;
-// Define sample data for different job lists
-const jobLists = {
-  'Latest Jobs': [
-    { jobpost_id: 1, title: 'Job 1', vacancy: 3, salary: '50000', employment_type: 'Full-Time' },
-    { jobpost_id: 2, title: 'Job 2', vacancy: 2, salary: '60000', employment_type: 'Part-Time' },
-    // Add more job data here
-  ],
-  'Shortlisted Jobs': [
-    { jobpost_id: 3, title: 'Job 3', vacancy: 5, salary: '55000', employment_type: 'Full-Time' },
-    { jobpost_id: 4, title: 'Job 4', vacancy: 1, salary: '70000', employment_type: 'Internship' },
-    // Add more job data here
-  ],
-  'Followed Jobs': [
-    { jobpost_id: 5, title: 'Job 5', vacancy: 4, salary: '65000', employment_type: 'Part-Time' },
-    // Add more job data here
-  ],
-  'Applied Jobs': [
-    { jobpost_id: 6, title: 'Job 6', vacancy: 2, salary: '75000', employment_type: 'Full-Time' },
-    { jobpost_id: 7, title: 'Job 7', vacancy: 3, salary: '60000', employment_type: 'Internship' },
-    // Add more job data here
-  ],
-};
-
-const JobList = ({ jobs }) => (
-  <Box sx={{ width: '100%' }}>
-    <Grid container spacing={2}>
-      {jobs.map((job) => (
-        <Grid item xs={12} key={job.jobpost_id}>
-          <Paper elevation={3} sx={{ padding: '16px' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="h6" gutterBottom>
-                {job.title}
-              </Typography>
-            </Box>
-            <Typography variant="subtitle1" gutterBottom>
-              Vacancy: {job.vacancy}
-            </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-              Salary: {job.salary}
-            </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-              Type: {job.employment_type}
-            </Typography>
-          </Paper>
-        </Grid>
-      ))}
-    </Grid>
-  </Box>
-);
 
 const CompanyList = ({ companies }) => (
   <Box sx={{ width: '100%' }}>
@@ -97,19 +53,147 @@ const CompanyList = ({ companies }) => (
   </Box>
 );
 
-const AllJobLists = () => {
+const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSelectedJob}) => {
+  const { fetch, setFetch } = useFetch();
   const [selectedList, setSelectedList] = useState('Latest Jobs');
-  const [jobData, setJobData] = useState(jobLists['Latest Jobs']);
+  const [jobData, setJobData] = useState([]);
   const [companyData, setCompanyData] = useState([]);
+  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState(''); // State for search query
+  const [isLoadingJobPost,setIsLoadingJobPost] = useState(false);
 
+  const JobList = ({ jobs}) => (
+      <Box sx={{ width: '100%' }}>
+        <Grid container spacing={2}>
+          {jobs.map((job) => (
+            <Grid item xs={12} key={job.jobpost_id}>
+              <Paper elevation={3} sx={{ padding: '16px' }}>
+              <div
+                onClick={() => {
+                  setSelectedJob(job);
+                }}
+                style={{
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  transition: 'color 0.3s, background-color 0.3s', // Add transitions for color and background-color
+                  color: 'blue',
+                  backgroundColor: 'transparent', // Initial background color
+                }}
+              >
+                <Typography variant="h4" gutterBottom>
+                  {job.title}
+                </Typography>
+              </div>
+
+              <div
+                style={{
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  transition: 'color 0.3s, background-color 0.3s', // Add transitions for color and background-color
+                  color: 'blue',
+                  backgroundColor: 'transparent', // Initial background color
+                }}
+              >
+                <Link
+                  to={`/companyJobPosts/${job.company_id}`}
+                  state={{ jobpost_id: job.jobpost_id }}
+                  style={{ textDecoration: 'none' }}
+                >
+                  <Typography variant="h6" gutterBottom>
+                    {job.company_name}
+                  </Typography>
+                </Link>
+              </div>
+
+                <Typography variant="subtitle1" gutterBottom>
+                  Vacancy: {job.vacancy}
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  Salary: {job.salary}
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  Type: {job.employment_type}
+                </Typography>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    );
+
+  const fetchJobData = async (listType) => {
+    try {
+      let response;
+      switch (listType) {
+        case 'Latest Jobs':
+          setSearchQuery('');
+          setIsLoadingJobPost(true);
+          response = await axios.get(`/api/jobpost/recent`);
+          break;
+        case 'Shortlisted Jobs':
+          setSearchQuery('');
+          setIsLoadingJobPost(true);
+          response = await axios.get(`/api/jobpost/shortlisted`);
+          break;
+        case 'Followed Jobs':
+          setSearchQuery('');
+          setIsLoadingJobPost(true);
+          response = await axios.get(`/api/jobpost/followed`);
+          break;
+        case 'Applied Jobs':
+          setSearchQuery('');
+          setIsLoadingJobPost(true);
+          response = await axios.get(`/api/jobpost/applied`);
+          break;
+        default:
+          // Handle other cases or errors
+          break;
+      }
+
+      const jobdata = response.data;
+      setJobData(jobdata);
+      console.log(`Fetched ${listType}:`, jobdata);
+    } catch (error) {
+      setError(`Error fetching ${listType} jobpost information.`);
+    }
+  };
+  //------------------------- search -------------------------
+  
+  const fetchSearchedJobPosts = async () => {
+    try {
+      const response = await axios.get(`/api/jobpost/searched?keyword=${searchQuery}`);
+      const jobdata = response.data;
+      setJobData(jobdata);
+      setSelectedList('');
+      console.log('Fetched searched job posts:', jobdata);
+    } catch (error) {
+      setError('Error fetching searched job posts.');
+    }
+  };
+  //-----------------------------------------------------------
   useEffect(() => {
+    console.log('In Use Effect: ',selectedList);
     // Fetch data from the database based on the selected list
-    if (selectedList in jobLists) {
-      setJobData(jobLists[selectedList]);
+    if (selectedList === 'Explore Companies') {
+      // Handle fetching company data here
+      // Example: fetchCompanyData();
     } else {
-      setJobData([]);
+      fetchJobData(selectedList);
     }
   }, [selectedList]);
+  useEffect(()=>{
+    if(isLoadingJobPost){
+      setIsLoadingJobPost(false);
+    }
+  },[jobData]);
+  useEffect(() => {
+    if(fetch){
+      if (selectedList === 'Latest Jobs' || selectedList === 'Shortlisted Jobs' ||
+      selectedList === 'Followed Jobs' || selectedList === 'Applied Jobs')
+        fetchJobData(selectedList);
+        setFetch(false);
+    }
+  }, [fetch]);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -136,12 +220,15 @@ const AllJobLists = () => {
         
         <Box sx={{ overflow: 'auto' }}>
         <List>
-          {Object.keys(jobLists).map((text) => (
+          {['Latest Jobs', 'Shortlisted Jobs', 'Followed Jobs', 'Applied Jobs'].map((text) => (
             <ListItem
               button
               key={text}
               selected={selectedList === text}
-              onClick={() => setSelectedList(text)}
+              onClick={() => {
+                console.log('Clicked:', text);
+                setSelectedList(text);
+              }}
             >
               <ListItemText primary={text} />
             </ListItem>
@@ -164,14 +251,49 @@ const AllJobLists = () => {
         </List>
         </Box>
       </Drawer>
+              
       <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: '50px' }}>
-        <Toolbar />
-        {selectedList === 'Latest Jobs' ? (
+      <Toolbar />
+      {/* Search Bar */}
+      <TextField
+        label="Search Jobs"
+        variant="outlined"
+        fullWidth
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyPress={(e) => {
+          if (e.key === 'Enter' && searchQuery.trim() !== '') {
+            fetchSearchedJobPosts();
+          }
+        }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={fetchSearchedJobPosts}>
+                <SearchIcon />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+
+      <Toolbar />
+      {isLoadingJobPost ? (
+        <Typography variant="h5">Loading...</Typography>
+      ) : (
+        searchQuery ? ( // Display searched jobs when searchQuery is not empty
           <JobList jobs={jobData} />
         ) : (
-          <CompanyList companies={companyData} />
-        )}
-      </Box>
+          selectedList === 'Latest Jobs' || selectedList === 'Shortlisted Jobs' ||
+          selectedList === 'Followed Jobs' || selectedList === 'Applied Jobs' ? (
+            <JobList jobs={jobData} />
+          ) : (
+            <CompanyList companies={companyData} />
+          )
+        )
+      )}
+    </Box>
+
     </Box>
   );
 };
