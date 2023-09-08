@@ -19,59 +19,68 @@ const WorkExperienceForm = ({ workExperience, handleChange }) => {
     }
   };
 
-  const workExperienceData = [
-    { id: 1, company: 'Company A', position: 'Engineer', year: '2018-2020' },
-    { id: 2, company: 'Company B', position: 'Manager', year: '2021-2023' },
-    // Add more work experience data here
-  ];
-
   return (
     <div>
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>Select</TableCell>
-            <TableCell>Company</TableCell>
-            <TableCell>Position</TableCell>
-            <TableCell>Year</TableCell>
+            <TableCell>Designation</TableCell>
+            <TableCell>Organization</TableCell>
+            <TableCell>Employment Type</TableCell>
+            <TableCell>Start Date</TableCell>
+            <TableCell>End Date</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {workExperienceData.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>
-                <Checkbox
-                  checked={selectedRows.includes(row.id)}
-                  onChange={(event) => handleCheckboxChange(event, row.id)}
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  label="Company"
-                  name={`company_${row.id}`}
-                  value={workExperience[`company_${row.id}`] || ''}
-                  onChange={handleChange}
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  label="Position"
-                  name={`position_${row.id}`}
-                  value={workExperience[`position_${row.id}`] || ''}
-                  onChange={handleChange}
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  label="Year"
-                  name={`year_${row.id}`}
-                  value={workExperience[`year_${row.id}`] || ''}
-                  onChange={handleChange}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
+        {workExperience.map((row) => (
+          <TableRow key={row.exp_id}>
+            <TableCell>
+              <Checkbox
+                checked={selectedRows.includes(row.exp_id)}
+                onChange={(event) => handleCheckboxChange(event, row.exp_id)}
+              />
+            </TableCell>
+            <TableCell>
+              <TextField
+                name={row.designation}
+                value={row.designation || ''}
+                onChange={handleChange}
+              />
+            </TableCell>
+            <TableCell>
+              <TextField
+                name={row.organization}
+                value={row.organization || ''}
+                onChange={handleChange}
+              />
+            </TableCell>
+            <TableCell>
+              <TextField
+                name={row.employment_type}
+                value={row.employment_type || ''}
+                onChange={handleChange}
+              />
+            </TableCell>
+            <TableCell>
+              <TextField
+                name={row.start_date}
+                value={new Date(row.start_date).toLocaleDateString('en-CA') || ''}
+                onChange={handleChange}
+                type='date'
+              />
+            </TableCell>
+            <TableCell>
+              <TextField
+                name={row.end_date}
+                value={new Date(row.end_date).toLocaleDateString('en-CA') || ''}
+                onChange={handleChange}
+                type='date'
+              />
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
       </Table>
     </div>
   );

@@ -1,5 +1,5 @@
 // PersonalInfoForm.js
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
@@ -7,6 +7,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import { format } from 'date-fns';
+import { Checkbox } from '@mui/material';
 
 const PersonalInfoForm = ({ personalInfo, handleChange }) => {
 
@@ -19,14 +20,14 @@ const PersonalInfoForm = ({ personalInfo, handleChange }) => {
   }
 
   const [selectedFields, setSelectedFields] = useState({
-    name: false,
-    about: false,
-    email: false,
-    gender: false,
-    date_of_birth: false,
-    phone_no: false,
-    address: false,
-    nationality: false,
+    name: true,
+    about: true,
+    email: true,
+    gender: true,
+    date_of_birth: true,
+    phone_no: true,
+    address: true,
+    nationality: true,
   });
 
   const handleCheckboxChange = (fieldName) => {
@@ -36,124 +37,180 @@ const PersonalInfoForm = ({ personalInfo, handleChange }) => {
     });
   };
 
-  console.log("inside personalInfo", personalInfo)
-
   return (
-    <div>
-    <div style={{ marginBottom: '16px' }}>
-      <TextField
+    <div style={{padding: '6px'}}>
+    <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'row', display: 'flex', flexDirection: 'row' }}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={selectedFields.name}
+            onChange={() => handleCheckboxChange('name')}
+            disabled
+          />
+        }
         label="Full Name"
-        name="name"
-        value={personalInfo.name}
-        onChange={handleChange}
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
+        style={{ width: '160px' }} 
       />
-    </div>
-    <div style={{ marginBottom: '16px' }}>
-      <TextField
-        label="About"
-        name="about"
-        value={personalInfo.about}
-        onChange={handleChange}
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
-      />
-    </div>
-    <div style={{ marginBottom: '16px' }}>
-      <TextField
-        label="Email"
-        name="email"
-        type="email"
-        value={personalInfo.email}
-        onChange={handleChange}
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
-      />
-    </div>
-    <div style={{ marginBottom: '16px' }}>
-      <FormControl component="fieldset">
-        <FormLabel component="legend">Gender</FormLabel>
-        <RadioGroup
-          aria-label="gender"
-          name="gender"
-          value={personalInfo.gender}
+      {selectedFields.name && (
+        <TextField
+          name="name"
+          disabled
+          value={personalInfo.name}
           onChange={handleChange}
-        >
-          <FormControlLabel
-            value="male"
-            control={<Radio />}
-            label="Male"
-          />
-          <FormControlLabel
-            value="female"
-            control={<Radio />}
-            label="Female"
-          />
-          <FormControlLabel
-            value="other"
-            control={<Radio />}
-            label="Other"
-          />
-        </RadioGroup>
-      </FormControl>
+          fullWidth
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      )}
     </div>
-    <div style={{ marginBottom: '16px' }}>
-      <TextField
+    <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'row' }}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={selectedFields.about}
+            onChange={() => handleCheckboxChange('about')}
+          />
+        }
+        label="About"
+        style={{ width: '160px' }}
+      />
+      {selectedFields.about && (
+        <TextField
+          name="about"
+          value={personalInfo.about}
+          onChange={handleChange}
+          fullWidth
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      )}
+    </div>
+    <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'row' }}>
+  <FormControlLabel
+    control={
+      <Checkbox
+        checked={selectedFields.email}
+        onChange={() => handleCheckboxChange('email')}
+        disabled
+      />
+    }
+    label="Email"
+    style={{ width: '160px' }}
+  />
+  {selectedFields.email && (
+    <TextField
+      name="email"
+      value={personalInfo.email}
+      onChange={handleChange}
+      fullWidth
+      InputLabelProps={{
+        shrink: true,
+      }}
+      disabled
+    />
+  )}
+</div>
+
+<div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+  <FormControlLabel
+    control={
+      <Checkbox
+        checked={selectedFields.gender}
+        onChange={() => handleCheckboxChange('gender')}
+      />
+    }
+    label="Gender"
+    style={{ width: '160px' }}
+  />
+  {selectedFields.gender && (
+    <FormControl component="fieldset">
+      <RadioGroup
+        aria-label="gender"
+        name="gender"
+        value={personalInfo.gender || ''}
+        onChange={handleChange}
+        row
+      >
+        <FormControlLabel value="male" control={<Radio />} label="Male" />
+        <FormControlLabel value="female" control={<Radio />} label="Female" />
+        <FormControlLabel value="other" control={<Radio />} label="Other" />
+      </RadioGroup>
+    </FormControl>
+  )}
+</div>
+    <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'row' }}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={selectedFields.date_of_birth}
+            onChange={() => handleCheckboxChange('date_of_birth')}
+          />
+        }
         label="Date of Birth"
-        name="date_of_birth"
-        type="date"
-        value={formatDate(personalInfo.date_of_birth)}
-        onChange={handleChange}
-        InputLabelProps={{
-          shrink: true,
-        }}
-        fullWidth
+        style={{ width: '160px' }}
       />
+      {selectedFields.date_of_birth && (
+        <TextField
+          name="date_of_birth"
+          type="date"
+          value={new Date(personalInfo.date_of_birth).toLocaleDateString('en-CA')}
+          onChange={handleChange}
+          fullWidth
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      )}
     </div>
-    <div style={{ marginBottom: '16px' }}>
-      <TextField
-        label="Phone"
-        name="phone_no"
-        value={personalInfo.phone_no}
-        onChange={handleChange}
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
-      />
-    </div>
-    <div style={{ marginBottom: '16px' }}>
-      <TextField
+    <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'row' }}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={selectedFields.address}
+            onChange={() => handleCheckboxChange('address')}
+          />
+        }
         label="Address"
-        name="address"
-        multiline
-        rows={3}
-        value={personalInfo.address}
-        onChange={handleChange}
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
+        style={{ width: '160px' }}
       />
+      {selectedFields.address && (
+        <TextField
+          name="address"
+          multiline
+          rows={2}
+          value={personalInfo.address}
+          onChange={handleChange}
+          fullWidth
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      )}
     </div>
-    <div style={{ marginBottom: '16px' }}>
-      <TextField
+    <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'row' }}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={selectedFields.nationality}
+            onChange={() => handleCheckboxChange('nationality')}
+          />
+        }
         label="Nationality"
-        name="nationality"
-        value={personalInfo.nationality}
-        onChange={handleChange}
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-        }}
+        style={{ width: '160px' }}
       />
+      {selectedFields.nationality && (
+        <TextField
+          name="nationality"
+          value={personalInfo.nationality}
+          onChange={handleChange}
+          fullWidth
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      )}
     </div>
   </div>
 

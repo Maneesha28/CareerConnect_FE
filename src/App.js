@@ -34,7 +34,6 @@ import HtmlToPdfConverter from "./pages/HtmlToPdfConverter";
 import FollowersList from "./pages/test";
 
 import { NotificationContext } from "./context/notificationContext";
-import JobPostApplicationForm from "./components/ResumeBuilder/JobPostApplicationForm";
 import ResumeBuilder from "./components/ResumeBuilder/ResumeBuilder";
 
 // changed by any

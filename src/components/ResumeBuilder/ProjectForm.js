@@ -1,4 +1,3 @@
-// EducationForm.js
 import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Table from '@mui/material/Table';
@@ -8,7 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
 
-const EducationForm = ({ education, handleChange }) => {
+const ProjectForm = ({ projects, handleChange }) => {
   const [selectedRows, setSelectedRows] = useState([]);
 
   const handleCheckboxChange = (event, id) => {
@@ -25,48 +24,48 @@ const EducationForm = ({ education, handleChange }) => {
         <TableHead>
           <TableRow>
             <TableCell>Select</TableCell>
-            <TableCell>Degree</TableCell>
-            <TableCell>Subject</TableCell>
-            <TableCell>Institution</TableCell>
-            <TableCell>Result</TableCell>
+            <TableCell>Title</TableCell>
+            <TableCell>Description</TableCell>
+            <TableCell>Technologies</TableCell>
+            <TableCell>Link</TableCell>
             <TableCell>Start Date</TableCell>
             <TableCell>End Date</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-        {education.map((row) => (
-          <TableRow key={row.degree_id}>
+        {projects.map((row) => (
+          <TableRow key={row.project_id}>
             <TableCell>
               <Checkbox
-                checked={selectedRows.includes(row.degree_id)}
-                onChange={(event) => handleCheckboxChange(event, row.degree_id)}
+                checked={selectedRows.includes(row.project_id)}
+                onChange={(event) => handleCheckboxChange(event, row.project_id)}
               />
             </TableCell>
             <TableCell>
               <TextField
-                name={row.degree}
-                value={row.degree || ''}
+                name={row.title}
+                value={row.title || ''}
                 onChange={handleChange}
               />
             </TableCell>
             <TableCell>
               <TextField
-                name={row.subject}
-                value={row.subject || ''}
+                name={row.description}
+                value={row.description || ''}
                 onChange={handleChange}
               />
             </TableCell>
             <TableCell>
               <TextField
-                name={row.institution}
-                value={row.institution || ''}
+                name={row.technologies}
+                value={row.technologies || ''}
                 onChange={handleChange}
               />
             </TableCell>
             <TableCell>
               <TextField
-                name={row.result}
-                value={row.result || ''}
+                name={row.link}
+                value={row.link || ''}
                 onChange={handleChange}
               />
             </TableCell>
@@ -94,4 +93,4 @@ const EducationForm = ({ education, handleChange }) => {
   );
 };
 
-export default EducationForm;
+export default ProjectForm;

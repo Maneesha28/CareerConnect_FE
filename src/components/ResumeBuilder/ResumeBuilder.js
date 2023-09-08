@@ -12,21 +12,27 @@ import Paper from '@mui/material/Paper';
 import PersonalInfoForm from './PersonalInfoForm';
 import EducationForm from './EducationForm';
 import WorkExperienceForm from './WorkExperienceForm';
+import AchievementForm from './AchievementForm';
+import ProjectForm from './ProjectForm';
+import PublicationForm from './PublicationForm';
+import SkillForm from './SkillForm';
+import Header from '../Header';
 
-const steps = ['Personal Information', 'Education', 'Work Experience'];
+const steps = ['Personal Information', 'Educational Background', 'Work Experience', 'Achievements', 'Skills',
+'Projects', 'Publications' ];
 
 const ResumeBuilder = () => {
 
   const [activeStep, setActiveStep] = useState(0);
 
-  const [personalInfo, setPersonalInfo] = useState({
-    fullName: '',
-    // Initialize other personal info fields here
-  });
-
+  const [personalInfo, setPersonalInfo] = useState({});
   const [education, setEducation] = useState({});
-
   const [workExperience, setWorkExperience] = useState({});
+  const [achievements, setAchievements] = useState({});
+  const [skills, setSkills] = useState({});
+  const [projects, setProjects] = useState({});
+  const [publications, setPublications] = useState({});
+  const [error, setError] = useState('');
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -58,9 +64,143 @@ const ResumeBuilder = () => {
     }
   };
 
+  const fetchEducationInfo = async () => {
+    const endpoint = `/api/education/all/${id}`;
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      // Modify data (e.g., remove columns containing "_id")
+      if(response.data.status === 'Access Denied') {
+        setError(response.data.status);
+        return;
+      }
+      setEducation(response.data);
+    } catch (error) {
+      setError(`Error fetching information.`);
+    }
+  };
+
+  const fetchWorkExperienceInfo = async () => {
+    const endpoint = `/api/workexperience/all/${id}`;
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      // Modify data (e.g., remove columns containing "_id")
+      if(response.data.status === 'Access Denied') {
+        setError(response.data.status);
+        return;
+      }
+      setWorkExperience(response.data);
+    } catch (error) {
+      setError(`Error fetching information.`);
+    }
+  };
+
+  const fetchProjectInfo = async () => {
+    const endpoint = `/api/project/all/${id}`;
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      // Modify data (e.g., remove columns containing "_id")
+      if(response.data.status === 'Access Denied') {
+        setError(response.data.status);
+        return;
+      }
+      setProjects(response.data);
+    } catch (error) {
+      setError(`Error fetching information.`);
+    }
+  };
+
+  const fetchAchievementInfo = async () => {
+    const endpoint = `/api/achievement/all/${id}`;
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      // Modify data (e.g., remove columns containing "_id")
+      if(response.data.status === 'Access Denied') {
+        setError(response.data.status);
+        return;
+      }
+      setAchievements(response.data);
+    } catch (error) {
+      setError(`Error fetching information.`);
+    }
+  };
+
+  const fetchSkillInfo = async () => {
+    const endpoint = `/api/skill/all/${id}`;
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      // Modify data (e.g., remove columns containing "_id")
+      if(response.data.status === 'Access Denied') {
+        setError(response.data.status);
+        return;
+      }
+      setSkills(response.data);
+    } catch (error) {
+      setError(`Error fetching information.`);
+    }
+  };
+
+  const fetchPublicationInfo = async () => {
+    const endpoint = `/api/publication/all/${id}`;
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      // Modify data (e.g., remove columns containing "_id")
+      if(response.data.status === 'Access Denied') {
+        setError(response.data.status);
+        return;
+      }
+      setPublications(response.data);
+    } catch (error) {
+      setError(`Error fetching information.`);
+    }
+  };
+
   useEffect(() => {
     fetchPersonalInfo();
+    fetchEducationInfo();
+    fetchWorkExperienceInfo();
+    fetchProjectInfo();
+    fetchAchievementInfo();
+    fetchSkillInfo();
+    fetchPublicationInfo();
     }, []);
+
+    console.log(publications);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -70,8 +210,15 @@ const ResumeBuilder = () => {
       setEducation({ ...education, [name]: value });
     } else if (activeStep === 2) {
       setWorkExperience({ ...workExperience, [name]: value });
+    } else if (activeStep === 3) {
+      setAchievements({ ...achievements, [name]: value });
+    } else if (activeStep === 4) {
+      setSkills({...skills, [name]: value });
+    } else if (activeStep === 5) {
+      setProjects({ ...projects, [name]: value });
+    } else if (activeStep === 6) {
+      setPublications({...achievements, [name]: value });
     }
-    console.log(personalInfo);
   };
 
   const getStepContent = (stepIndex) => {
@@ -97,6 +244,34 @@ const ResumeBuilder = () => {
             handleChange={handleChange}
           />
         );
+        case 3:
+          return (
+            <AchievementForm
+              achievements={achievements}
+              handleChange={handleChange}
+            />
+          );
+          case 4:
+            return (
+              <SkillForm
+                skills={skills}
+                handleChange={handleChange}
+              />
+            );
+            case 5:
+              return (
+                <ProjectForm
+                  projects={projects}
+                  handleChange={handleChange}
+                />
+              );
+            case 6:
+              return (
+                <PublicationForm
+                  publications={publications}
+                  handleChange={handleChange}
+                />
+              );
       default:
         return 'Unknown stepIndex';
     }
@@ -104,9 +279,10 @@ const ResumeBuilder = () => {
 
   return (
     <>
-    <Container >
-      <Paper elevation={3} style={{ padding: '20px' }}>
-        <Typography variant="h5" style={{marginBottom: '20px'}}>
+    <Header/>
+    <Container style={{marginLeft: 450, marginTop: 150, width: 1200}}>
+      <Paper elevation={3} style={{ padding: '20px'}}>
+        <Typography variant="h4" style={{marginBottom: '20px', textAlign: 'center', fontWeight: 'bold'}}>
           Build Your Resume
         </Typography>
         <Stepper activeStep={activeStep} >
@@ -125,11 +301,11 @@ const ResumeBuilder = () => {
         ) : (
           <div>
             {getStepContent(activeStep)}
-            <div>
-              <Button disabled={activeStep === 0} onClick={handleBack}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <Button disabled={activeStep === 0} variant="contained" color="secondary" onClick={handleBack} style={{ marginRight: '10px' }}>
                 Back
               </Button>
-              <Button variant="contained" color="primary" onClick={handleNext}>
+              <Button variant="contained" color="secondary" onClick={handleNext}>
                 {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
               </Button>
             </div>
