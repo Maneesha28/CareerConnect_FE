@@ -22,8 +22,10 @@ import DeleteConfirmationDialogue from "../../components/DeleteConfirmationDialo
 import EditIcon from "@mui/icons-material/Edit";
 import TextField from "@mui/material/TextField";
 import { FormatItalic } from "@mui/icons-material";
+import { useFetch } from './FetchContext';
 
 const CompanyReviews = ({ isLoggedInUser, isJobseeker }) => {
+  const { fetch, setFetch } = useFetch();
   const [selectedReview, setSelectedReview] = useState(null);
   const [reviewData, setReviewData] = useState(null);
   const [isLoadingReview, setIsLoadingReview] = useState(true);
@@ -66,6 +68,7 @@ const CompanyReviews = ({ isLoggedInUser, isJobseeker }) => {
       setComment("");
       setIsAddReviewDialogOpen(false);
       fetchReviewData();
+      setFetch(true);
     } catch (error) {
       console.error("Error saving new review:", error);
       setIsAddReviewDialogOpen(false);
@@ -125,6 +128,7 @@ const CompanyReviews = ({ isLoggedInUser, isJobseeker }) => {
         )
       );
       setIsEditReviewDialogOpen(false);
+      setFetch(true);
     } catch (error) {
       console.error("Error saving edited review", error);
       setIsEditReviewDialogOpen(false);
@@ -151,6 +155,7 @@ const CompanyReviews = ({ isLoggedInUser, isJobseeker }) => {
       );
       setReviewData(updatedReviewData);
       setIsDeleteConfirmationOpen(false);
+      setFetch(true);
     } catch (error) {
       // Handle error
       console.error("Error deleting Review:", error);
