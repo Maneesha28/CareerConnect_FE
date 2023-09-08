@@ -9,7 +9,7 @@ import SignUp from "./pages/Authentication/Signup";
 import SignIn from "./pages/Authentication/SignIn";
 import { useState, useEffect } from "react";
 import JobSeekerProfile from "./pages/JobSeeker/JobSeekerProfile";
-
+import CompanyVacancy from './pages/Company/CompanyVacancy';
 import NotFound from './pages/NotFound';
 import AccountInfo from './pages/JobSeeker/AccountInfo';
 import CompanyPage from './pages/Company/CompanyPage';
@@ -85,7 +85,7 @@ function App() {
       <Route path="/companyPage" element={<CompanyPage/>}/>
 
       <Route path="/companySidebar" element={<SidebarOptionsCompany/>}/>
-
+      <Route path="/companyVacancy/:company_id" element={<CompanyVacancy/>}/>
       <Route path="/addJobPost/:company_id" element={<AddJobPost/>}/>
       {/* <Route path="/companyViewJobPost/:jobpost_id" element={<CompanyViewJobPost/>}/> */}
       <Route path="/h2p" element={<HtmlToPdfConverter/>}/>
