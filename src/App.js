@@ -34,6 +34,7 @@ import HtmlToPdfConverter from "./pages/HtmlToPdfConverter";
 import FollowersList from "./pages/test";
 
 import { NotificationContext } from "./context/notificationContext";
+import HomePage from "./pages/JobSeeker/HomePage";
 
 // changed by any
 function App() {
@@ -89,7 +90,7 @@ function App() {
       <Route path="/jobseeker/:jobseeker_id" element={<JobSeekerProfile />} />
       <Route path="/company/:company_id" element={<CompanyPage />} />
       <Route path="/companyJobPosts/:company_id" element={<JobListsAndPost/>}/>
-      <Route path="/" element={<Home/>}/>
+      <Route path="/home/:jobseeker_id" element={<HomePage/>}/>
       <Route path="/jobseeker/:jobseeker_id/accountInfo" element={<AccountInfo/>}/>
       
       <Route path="/companyPage" element={<CompanyPage/>}/>

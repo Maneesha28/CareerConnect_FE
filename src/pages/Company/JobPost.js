@@ -239,7 +239,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
   }
   }, [selectedJob]);
 
-  if(isLoadingJobPost) {
+  if(selectedJob && isLoadingJobPost) {
     return (<div>Loading JobPost</div>);
   }
 
