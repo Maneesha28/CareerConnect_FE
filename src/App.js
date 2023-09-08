@@ -9,25 +9,14 @@ import SignUp from "./pages/Authentication/Signup";
 import SignIn from "./pages/Authentication/SignIn";
 import { useState, useEffect } from "react";
 import JobSeekerProfile from "./pages/JobSeeker/JobSeekerProfile";
-import CompanyProfile from "./pages/CompanyProfile";
-import Home from './pages/Home';
+import CompanyVacancy from './pages/Company/CompanyVacancy';
 import NotFound from './pages/NotFound';
 import AccountInfo from './pages/JobSeeker/AccountInfo';
-
-import CompanyInfo from './pages/Company/CompanyInfo';
 import CompanyPage from './pages/Company/CompanyPage';
-import CompanyReviews from './pages/Company/CompanyReviews';
-import CompanyVacancy from './pages/Company/CompanyVacancy';
 import JobListsAndPost from "./pages/Company/JobListsAndPost";
 
 import AddJobPost from './pages/Company/AddJobPost';
 // import CompanyViewJobPost from './pages/Company/CompanyViewJobPost';
-
-import ViewCompanyPage from './pages/JobSeeker/ViewCompanyPage';
-import ViewJobPost from './pages/JobSeeker/ViewJobPost';
-import ViewCompanyReviews from './pages/JobSeeker/ViewCompanyReviews';
-import ViewCompanyVacancies from './pages/JobSeeker/ViewCompanyVacancies';
-import ViewShortListedJobs from './pages/JobSeeker/ViewShortListedJobs';
 
 import SidebarOptionsCompany from './components/SidebarOptionsCompany';
 import HtmlToPdfConverter from "./pages/HtmlToPdfConverter";
@@ -35,6 +24,7 @@ import FollowersList from "./pages/test";
 
 import { NotificationContext } from "./context/notificationContext";
 import ResumeBuilder from "./components/ResumeBuilder/ResumeBuilder";
+import HomePage from "./pages/JobSeeker/HomePage";
 
 // changed by any
 function App() {
@@ -90,24 +80,15 @@ function App() {
       <Route path="/jobseeker/:jobseeker_id" element={<JobSeekerProfile />} />
       <Route path="/company/:company_id" element={<CompanyPage />} />
       <Route path="/companyJobPosts/:company_id" element={<JobListsAndPost/>}/>
-      <Route path="/" element={<Home/>}/>
+      <Route path="/home/:jobseeker_id" element={<HomePage/>}/>
       <Route path="/jobseeker/:jobseeker_id/accountInfo" element={<AccountInfo/>}/>
       
       <Route path="/companyPage" element={<CompanyPage/>}/>
-      <Route path="/companyInfo/:company_id" element={<CompanyInfo/>}/>
-      <Route path="/companyReviews/:company_id" element={<CompanyReviews/>}/>
-      <Route path="/companyVacancy/:company_id" element={<CompanyVacancy/>}/>
 
       <Route path="/companySidebar" element={<SidebarOptionsCompany/>}/>
-
+      <Route path="/companyVacancy/:company_id" element={<CompanyVacancy/>}/>
       <Route path="/addJobPost/:company_id" element={<AddJobPost/>}/>
       {/* <Route path="/companyViewJobPost/:jobpost_id" element={<CompanyViewJobPost/>}/> */}
-
-      <Route path="/viewCompanyPage/*" element={<ViewCompanyPage/>}/>
-      <Route path="/viewJobPost/:jobpost_id" element={<ViewJobPost/>}/>
-      <Route path="/viewCompanyReviews" element={<ViewCompanyReviews/>}/>
-      <Route path="/viewCompanyVacancies" element={<ViewCompanyVacancies/>}/>
-      <Route path="/viewShortlistedJobs" element={<ViewShortListedJobs/>}/>
       <Route path="/h2p" element={<HtmlToPdfConverter/>}/>
       <Route path="/f" element={<FollowersList/>}/>
       <Route path="*" element={<NotFound/>}/>

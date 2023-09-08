@@ -41,6 +41,7 @@ const CompanyPage = () => {
       <Header />
       {currentUser !== null ? (
         <>
+        <div style={{ display: 'flex',marginTop: '70px' }}></div>
           <CompanyInfo isLoggedInUser={parseInt(currentUser.user_id) === parseInt(id)} 
             isJobseeker={currentUser.role === "jobseeker"}/>
           <div style={{ display: 'flex' }}>

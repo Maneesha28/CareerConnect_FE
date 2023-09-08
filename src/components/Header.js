@@ -86,8 +86,9 @@ const Header = () => {
   return (
     <ThemeProvider theme={defaultTheme}>
       <CssBaseline />
+      {/* position="static" */}
       <AppBar
-        position="static"
+        position="fixed"
         sx={{
           height: 80,
           backgroundColor: "#124559",

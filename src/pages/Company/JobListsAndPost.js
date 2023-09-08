@@ -7,6 +7,7 @@ import JobLists from './JobLists';
 import JobPost from './JobPost';
 import { useLocation } from 'react-router-dom';
 import { Box,Typography } from '@mui/material';
+import { FetchProvider } from './FetchContext';
 const JobListsAndPost = () => {
   const location = useLocation();
   const company_id = useParams().company_id;
@@ -87,6 +88,10 @@ const JobListsAndPost = () => {
     fetchCurrentUser(); 
     fetchJobPost();
     }, [company_id]);
+    useEffect(()=>{
+        console.log(fetch);
+        console.log(selectedJob);
+    },[fetch,selectedJob]);
     if(isLoadingCompany){
         return <div>Loading Company.........</div>
     }
@@ -97,9 +102,10 @@ const JobListsAndPost = () => {
         return <div>Loading User</div>
     }
   return (
+    <FetchProvider>
     <>
       <Header />
-      {currentUser !== null && selectedJob !== null? (
+      {currentUser !== null? (
         <>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px' }}>
           <Typography variant="h2" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
@@ -107,14 +113,14 @@ const JobListsAndPost = () => {
           </Typography>
         </Box>
           <div style={{ display: 'flex' }}>
-            <div style={{ flex: '3' }}>
+            <div style={{ flex: '1' }}>
               <JobLists user_id={user_id} isCompany={isCompany} isJobseeker={isJobseeker} isLoggedInUser={isLoggedInUser}
-              fetch={fetch} selectedJob={selectedJob} setSelectedJob={setSelectedJob}
+               selectedJob={selectedJob} setSelectedJob={setSelectedJob}
                 />
             </div>
-            <div style={{ flex: '2' }}>
+            <div style={{ flex: '3' }}>
               <JobPost user_id={user_id} isCompany={isCompany} isJobseeker={isJobseeker} isLoggedInUser={isLoggedInUser}
-              fetch={fetch} setFetch={setFetch} selectedJob={selectedJob} setSelectedJob={setSelectedJob}/>
+              selectedJob={selectedJob} setSelectedJob={setSelectedJob}/>
             </div>
           </div>
         </>
@@ -122,6 +128,7 @@ const JobListsAndPost = () => {
                 <p>Loading 1 2 3</p>
               )}
     </>
+    </FetchProvider>
   );
 };
 
