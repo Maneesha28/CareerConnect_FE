@@ -151,6 +151,11 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
       }
 
       const jobdata = response.data;
+      if (jobdata.length > 0) {
+        setSelectedJob(jobdata[0]);
+      } else {
+        setSelectedJob(null);
+      }
       setJobData(jobdata);
       console.log(`Fetched ${listType}:`, jobdata);
     } catch (error) {
