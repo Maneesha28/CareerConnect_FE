@@ -36,8 +36,10 @@ import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import { useFetch } from './FetchContext';
 
 function CompanyInfo({ isLoggedInUser, isJobseeker }) {
+  const { fetch, setFetch } = useFetch();
   const [companyData, setCompanyData] = useState({});
   const [editedInfo, setEditedInfo] = useState({});
 
@@ -199,6 +201,12 @@ function CompanyInfo({ isLoggedInUser, isJobseeker }) {
     fetchAvgStars();
   }, [id]);
 
+  useEffect(() => {
+    if(fetch){
+      fetchAvgStars();
+      setFetch(false);
+    }
+  }, [fetch]);
   useEffect(() => {
     if (isJobseeker) fetchIsFollowing();
   }, [id, isFollowing]);
@@ -418,7 +426,7 @@ function CompanyInfo({ isLoggedInUser, isJobseeker }) {
             </Box>
             <Box display="flex" alignItems="center" sx={{ paddingLeft: 10}}>
               <Box>
-                {isImageEditMode ? (
+                {isLoggedInUser && isImageEditMode ? (
                   <Box
                     display="flex"
                     flexDirection="column"
@@ -455,14 +463,17 @@ function CompanyInfo({ isLoggedInUser, isJobseeker }) {
                       onChange={handleImageUpload}
                     />
                     <Button component="label" color="primary">
-                      Select New Logo
+                    Select New Logo
+                    {isLoggedInUser ? (
                       <input
                         type="file"
                         accept="image/*"
                         style={{ display: "none" }}
                         onChange={handleImageUpload}
                       />
-                    </Button>
+                    ) : null}
+                  </Button>
+
                   </Box>
                 ) : (
                   <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>

@@ -300,13 +300,19 @@ const JobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setS
             <Typography variant="h6" sx={{ marginTop: '15px' }}>
               Salary Range
             </Typography>
-            <Slider
-              value={salaryRange}
-              onChange={handleSalaryRangeChange}
-              valueLabelDisplay="auto"
-              min={minSalary}
-              max={maxSalary}
-            />
+            {minSalary === maxSalary ? (
+            <Typography variant="body2">
+                {minSalary} 
+            </Typography>
+            ) : (
+              <Slider
+                value={salaryRange}
+                onChange={handleSalaryRangeChange}
+                valueLabelDisplay="auto"
+                min={minSalary}
+                max={maxSalary}
+              />
+            )}
             {/* <Button variant="contained" color="primary" sx={{ marginTop: '16px' }}>
               Apply Filter
             </Button> */}

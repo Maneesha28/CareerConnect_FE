@@ -25,8 +25,12 @@ const AddJobPost = () => {
   const [employmentType, setEmploymentType] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [jobRequirements, setJobRequirements] = useState([]);
+  const [jobKeywords, setJobKeywords] = useState([]);
   const [newRequirement, setNewRequirement] = useState('');
   const [requirementText, setRequirementText] = useState('');
+  const [keywords, setKeywords] = useState([]);
+  const [newKeyword, setNewKeyword] = useState('');
+  const [keywordText, setKeywordText] = useState('');
 
   const id = useParams().company_id;
 
@@ -37,7 +41,8 @@ const AddJobPost = () => {
     employment_type: '',
     salary: '',
     vacancy: '',
-    deadline: ''
+    deadline: '',
+    keywords: ''
   });
 
   const transformedData = {
@@ -47,7 +52,8 @@ const AddJobPost = () => {
     employment_type: employmentType,
     salary: salary,
     vacancy: vacancy,
-    deadline: applicationDeadline
+    deadline: applicationDeadline,
+    keywords: keywordText
   };
 
   const handleAddRequirement = () => {
@@ -57,15 +63,25 @@ const AddJobPost = () => {
     }
   };
 
+  const handleAddKeyword = () => {
+    if (newKeyword) {
+      setJobKeywords([...jobKeywords, newKeyword]);
+      setNewKeyword('');
+    }
+  };
+
   const handlePostJob = async () => {
     const requirementText = jobRequirements.map((req, index) => `${index + 1}. ${req}`).join('\n');
     setRequirementText(requirementText);
+    const keywordText = jobKeywords.map((req, index) => ` ${req}`).join('|');
+    setKeywordText(keywordText);
+
     const updatedTransformedData = {
       ...transformedData, // Spread the existing properties
       requirements: requirementText, // Add or update the requirements property
+      keywords: keywordText
     };
-    console.log('requirementText: ', requirementText);
-    console.log('description: ', jobDescription);
+    console.log('requirementText: ', requirementText,' keywordText: ',keywordText);
     // Here you can save the job post data and navigate to "/companyVacancy"
     try {
       console.log('newJobPost: ', updatedTransformedData);
@@ -171,6 +187,23 @@ const AddJobPost = () => {
                 Add Requirement
               </Button>
               {jobRequirements.map((req, index) => (
+                <Typography key={index} variant="body2">
+                  {`${index + 1}. ${req}`}
+                </Typography>
+              ))}
+              <Typography variant="subtitle1">Job Keywords:</Typography>
+              <TextField
+                value={newKeyword}
+                onChange={(e) => setNewKeyword(e.target.value)}
+                variant="outlined"
+                size="small"
+                fullWidth
+                sx={{ marginBottom: '8px' }}
+              />
+              <Button variant="outlined" onClick={handleAddKeyword}>
+                Add Keyword
+              </Button>
+              {jobKeywords.map((req, index) => (
                 <Typography key={index} variant="body2">
                   {`${index + 1}. ${req}`}
                 </Typography>

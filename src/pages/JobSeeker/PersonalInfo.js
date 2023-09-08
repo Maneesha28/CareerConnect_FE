@@ -139,7 +139,7 @@ function PersonalInfo({isLoggedInUser}) {
   };
 
   const handleImageClick = () => {
-    setIsImageEditMode(true);
+    if(isLoggedInUser) setIsImageEditMode(true);
   };
 
   const handleImageUpload = async (event) => {

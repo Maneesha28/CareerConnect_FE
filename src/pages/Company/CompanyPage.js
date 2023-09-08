@@ -6,6 +6,7 @@ import axios from 'axios';
 import CompanyInfo from './CompanyInfo';
 import CompanyVacancy from './CompanyVacancy';
 import CompanyReviews from './CompanyReviews';
+import { FetchProvider } from './FetchContext';
 
 const CompanyPage = () => {
   const id = useParams().company_id;
@@ -37,6 +38,7 @@ const CompanyPage = () => {
   }, [id]);
 
   return (
+    <FetchProvider>
     <>
       <Header />
       {currentUser !== null ? (
@@ -58,6 +60,7 @@ const CompanyPage = () => {
         <p>Loading...</p>
       )}
     </>
+    </FetchProvider>
   );
 };
 
