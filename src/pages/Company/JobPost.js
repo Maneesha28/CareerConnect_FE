@@ -633,7 +633,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
                 fullWidth
                 margin="dense"
                 type="date"
-                value={new Date(editedInfo.deadline).toLocaleDateString('en-CA')}
+                value={new Date(editedInfo.deadline).toLocaleDateString('en-CA')||''}
                 onChange={(e) => setEditedInfo({ ...editedInfo, deadline: e.target.value })}
               />
             </Box>

@@ -221,8 +221,13 @@ function AchievementInfo({isLoggedInUser}) {
             fullWidth
             margin="dense"
             type="date"
-            value={newAchievement.date}
-            onChange={(e) => setNewAchievement({ ...newAchievement, date: e.target.value })}
+            value={new Date(newAchievement.date).toLocaleDateString('en-CA') || ''}
+              onChange={(e) => setNewAchievement({ ...newAchievement, date: e.target.value })}
+              InputProps={{
+                inputProps: {
+                  max: new Date().toISOString().split('T')[0], // Set the max date to today
+                },
+              }}
           />
           <TextField
             label="Position"
@@ -266,8 +271,13 @@ function AchievementInfo({isLoggedInUser}) {
                 fullWidth
                 margin="dense"
                 type="date"
-                value={newAchievement.date}
-                onChange={(e) => setNewAchievement({ ...newAchievement, date: e.target.value })}
+                value={new Date(newAchievement.date).toLocaleDateString('en-CA') || ''}
+                  onChange={(e) => setNewAchievement({ ...newAchievement, date: e.target.value })}
+                  InputProps={{
+                    inputProps: {
+                      max: new Date().toISOString().split('T')[0], // Set the max date to today
+                    },
+                  }}
               />
               <TextField
                 label="Position"
