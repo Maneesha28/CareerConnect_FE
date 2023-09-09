@@ -123,26 +123,37 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
                       {company.company_name}
                     </Typography>
                   </Link>
-                  <Rating name="read-only" value={company.avg_stars} readOnly />
+                  {company.avg_stars && (
+                    <Rating name="read-only" value={company.avg_stars} readOnly />
+                  )}
                 </div>
-                <Typography variant="body0" gutterBottom>
-                  {company.about}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Address: {company.address}
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Website: <a href={company.website_address}>{company.website_address}</a>
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                  Phone: {company.phone_no}
-                </Typography>
+                {company.about && (
+                  <Typography variant="body0" gutterBottom>
+                    {company.about}
+                  </Typography>
+                )}
+                {company.address && (
+                  <Typography variant="body1" gutterBottom>
+                    Address: {company.address}
+                  </Typography>
+                )}
+                {company.website_address && (
+                  <Typography variant="body1" gutterBottom>
+                    Website: <a href={company.website_address}>{company.website_address}</a>
+                  </Typography>
+                )}
+                {company.phone_no && (
+                  <Typography variant="body1" gutterBottom>
+                    Phone: {company.phone_no}
+                  </Typography>
+                )}
               </Paper>
             </Grid>
           ))}
         </Grid>
       </Box>
     );
+    
     
 
   const fetchJobData = async (listType) => {
@@ -333,9 +344,9 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
                   primaryTypographyProps={{
                     variant: 'h6',
                     sx: {
-                      fontFamily: 'cursive',
+                      fontFamily: 'Times New Roman, serif',
                       fontWeight: 'bold',
-                      fontSize: '1.2rem',
+                      fontSize: '1.8rem',
                       color: 'white',
                       transition: 'color 0.3s, background-color 0.3s',
                     },
@@ -360,9 +371,9 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
                 primaryTypographyProps={{
                   variant: 'h6',
                   sx: {
-                    fontFamily: 'cursive',
+                    fontFamily: 'Times New Roman, serif',
                     fontWeight: 'bold',
-                    fontSize: '1.2rem',
+                    fontSize: '1.8rem',
                     color: 'white',
                     transition: 'color 0.3s, background-color 0.3s',
                   },
@@ -385,9 +396,9 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
                 primaryTypographyProps={{
                   variant: 'h6',
                   sx: {
-                    fontFamily: 'cursive',
+                    fontFamily: 'Times New Roman, serif',
                     fontWeight: 'bold',
-                    fontSize: '1.2rem',
+                    fontSize: '1.8rem',
                     color: 'white',
                     transition: 'color 0.3s, background-color 0.3s',
                   },

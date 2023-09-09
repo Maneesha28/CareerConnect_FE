@@ -27,6 +27,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import BookmarkAddTwoToneIcon from '@mui/icons-material/BookmarkAddTwoTone';
 import BookmarkAddedTwoToneIcon from '@mui/icons-material/BookmarkAddedTwoTone';
 import { StyledTableCell, StyledTableRow, commonStyles } from '../JobSeeker/ComponentStyles';
@@ -38,6 +42,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
   const company_id = useParams().company_id;
   const [error, setError] = useState(null);
   const [applications,setApplications] = useState([]);
+  const [applications2,setApplications2] = useState([]);
   const [applicationCount,setApplicationCount] = useState(0);
   const [isLoadingJobPost, setIsLoadingJobPost] = useState(true);
 
@@ -89,7 +94,11 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
     setIsEditMode(false);
   };
   //--------------------------Application---------------------------------
-  const fetchApplicantsData = async () => {
+  const [selectedTab, setSelectedTab] = useState('Get All');
+  const [sortAscending, setSortAscending] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const fetchAllApplications = async () => {
     const endpoint = `/api/application/${selectedJob.jobpost_id}`;
     try {
       const response = await axios.get(endpoint, {
@@ -106,15 +115,75 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
         return;
       }
       setApplications(response.data);
+      setApplications2(response.data);
       console.log("Application: ",response.data);
       setIsLoadingJobPost(false);
     } catch (error) {
-      setError(`Error fetching information.`);
+      setError(`Error fetching all applications.`);
       setIsLoadingJobPost(false);
     }
   };
+  const fetchSuggestedApplications = async () =>{
+    const endpoint = `/api/application/suggested/${selectedJob.jobpost_id}`;
+    try {
+      const response = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+  
+      // Modify data (e.g., remove columns containing "_id")
+      if(response.data.status === 'Access Denied') {
+        setError(response.data.status);
+        setIsLoadingJobPost(false);
+        return;
+      }
+      setApplications(response.data);
+      setApplications2(response.data);
+      console.log("Application: ",response.data);
+      setIsLoadingJobPost(false);
+    } catch (error) {
+      setError(`Error fetching suggested applications.`);
+      setIsLoadingJobPost(false);
+    }
+  };
+  const handleTabClick = (tab) => {
+    setSelectedTab(tab);
+  
+    // Perform the corresponding action based on the selected tab
+    if (tab === 'Get All') {
+      fetchAllApplications();
+    } else if (tab === 'Get Suggested') {
+      fetchSuggestedApplications();
+    }
+  };
+  
+  const handleSortClick = () => {
+    // Toggle sorting order
+    setSortAscending(!sortAscending);
+  
+    // Sort applications based on the sorting order and re-render
+    const sortedApplications = [...applications].sort((a, b) => {
+      const compareResult = a.name.localeCompare(b.name);
+      return sortAscending ? compareResult : -compareResult;
+    });
+  
+    setApplications(sortedApplications);
+  };
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+  
+    // Filter applications based on the search query
+    const filteredApplications = applications2.filter((applicant) =>
+      applicant.name.toLowerCase().includes(query.toLowerCase())
+    );
+  
+    setApplications(filteredApplications);
+  };
+  
   const fetchApplicationsCount = async () => {
-
     try {
       const response = await axios.get(`/api/application/count/${selectedJob.jobpost_id}`, {
         headers: {
@@ -258,7 +327,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
 
   useEffect(() => {
   if(selectedJob){
-    fetchApplicantsData();
+    fetchAllApplications();
     fetchApplicationsCount();
     console.log('2)fetch: ',fetch);
     if(isJobseeker){
@@ -442,35 +511,56 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
         </Box>
         {isLoggedInUser && isCompany && (
         <Paper elevation={3} sx={{ padding: '16px', flex: 1 }}>
-            <Typography variant="h6">Applicants ( {applicationCount} ):</Typography>
-            <Box sx={{ flexGrow: 1 }} />
+          <Typography variant="h6">Total Applicants ( {applicationCount} ):</Typography>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Tabs
+              value={selectedTab}
+              onChange={(e, newValue) => handleTabClick(newValue)}
+              style={{ marginRight: '16px' }} // Add margin to create space
+            >
+              <Tab label="Get All" value="Get All" />
+              <Tab label="Get Suggested" value="Get Suggested" />
+            </Tabs>
             <TextField
-                label="Search by Applicant's name"
-                variant="outlined"
-                size="small"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton>
-                        <SearchIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <List>
-                {Array.isArray(applications) &&
-                  applications.map((applicant) => (
-                    <ListItem key={applicant.jobseeker_id}>
-                      <ListItemText primary={applicant.name} />
-                      <Button variant="outlined" component="a" href={applicant.resume} target="_blank">
-                        View Resume
-                      </Button>
-                    </ListItem>
-                  ))}
-              </List>
-          </Paper>
-          )}
+            label="Search by Applicant's name"
+            variant="outlined"
+            size="small"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton>
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+            <Button
+              variant="outlined"
+              onClick={handleSortClick}
+              startIcon={sortAscending ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+              style={{ marginLeft: '400px' }} // Add margin to create space
+            >
+              Sort by Name
+            </Button>
+
+          </div>
+          <List>
+            {Array.isArray(applications) &&
+              applications.map((applicant) => (
+                <ListItem key={applicant.jobseeker_id}>
+                  <ListItemText primary={applicant.name} />
+                  <Button variant="outlined" component="a" href={applicant.resume} target="_blank">
+                    View Resume
+                  </Button>
+                </ListItem>
+              ))}
+          </List>
+        </Paper>
+      )}
+
           <Dialog open={isDialogOpen} onClose={handleCancel} fullWidth maxWidth="md">
           <DialogTitle>Edit Job Post</DialogTitle>
           <DialogContent>
