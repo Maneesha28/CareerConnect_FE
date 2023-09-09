@@ -6,9 +6,12 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
-const PublicationForm = ({ publications, handleChange, setSelectedPublications }) => {
-  const [selectedRows, setSelectedRows] = useState([]);
+const PublicationForm = ({ publications, setSelectedPublications }) => {
+  const [selectedRows, setSelectedRows] = useState(publications.map(row => row.publication_id)); // Initially, all rows are selected
 
   const handleCheckboxChange = (event, id) => {
     if (event.target.checked) {
@@ -19,12 +22,25 @@ const PublicationForm = ({ publications, handleChange, setSelectedPublications }
   };
 
   useEffect(() => {
-    //add selected row publications to selectedPublications
+    // Add selected row publications to setSelectedPublications
     setSelectedPublications(publications.filter((row) => selectedRows.includes(row.publication_id)));
   }, [selectedRows]);
 
+  const handleSelectAll = () => {
+    if (selectedRows.length === publications.length) {
+      // If all rows are selected, clear the selection
+      setSelectedRows([]);
+    } else {
+      // Otherwise, select all rows
+      setSelectedRows(publications.map(row => row.publication_id));
+    }
+  };
+
   return (
     <div>
+      <Button onClick={handleSelectAll}>
+        {selectedRows.length === publications.length ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+      </Button>
       <Table>
         <TableHead>
           <TableRow>

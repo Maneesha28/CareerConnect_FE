@@ -1,15 +1,17 @@
-// WorkExperienceForm.js
 import React, { useState, useEffect } from 'react';
-import TextField from '@mui/material/TextField';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
-const WorkExperienceForm = ({ workExperience, handleChange, setSelectedWorkExperience }) => {
-  const [selectedRows, setSelectedRows] = useState([]);
+const WorkExperienceForm = ({ workExperience, setSelectedWorkExperience }) => {
+  // Initially, all rows are selected
+  const [selectedRows, setSelectedRows] = useState(workExperience.map(row => row.exp_id));
 
   const handleCheckboxChange = (event, id) => {
     if (event.target.checked) {
@@ -20,12 +22,25 @@ const WorkExperienceForm = ({ workExperience, handleChange, setSelectedWorkExper
   };
 
   useEffect(() => {
-    //add selected row workExperience to selectedWorkExperience
+    // Add selected row workExperience to setSelectedWorkExperience
     setSelectedWorkExperience(workExperience.filter((row) => selectedRows.includes(row.exp_id)));
   }, [selectedRows]);
 
+  const handleSelectAll = () => {
+    if (selectedRows.length === workExperience.length) {
+      // If all rows are selected, clear the selection
+      setSelectedRows([]);
+    } else {
+      // Otherwise, select all rows
+      setSelectedRows(workExperience.map(row => row.exp_id));
+    }
+  };
+
   return (
     <div>
+      <Button onClick={handleSelectAll}>
+        {selectedRows.length === workExperience.length ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+      </Button>
       <Table>
         <TableHead>
           <TableRow>

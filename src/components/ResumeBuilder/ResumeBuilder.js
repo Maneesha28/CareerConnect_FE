@@ -209,39 +209,18 @@ const ResumeBuilder = () => {
     fetchPublicationInfo();
     }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (activeStep === 0) {
-      setPersonalInfo({ ...personalInfo, [name]: value });
-    } else if (activeStep === 1) {
-      setEducation({ ...education, [name]: value });
-    } else if (activeStep === 2) {
-      setWorkExperience({ ...workExperience, [name]: value });
-    } else if (activeStep === 3) {
-      setAchievements({ ...achievements, [name]: value });
-    } else if (activeStep === 4) {
-      setSkills({...skills, [name]: value });
-    } else if (activeStep === 5) {
-      setProjects({ ...projects, [name]: value });
-    } else if (activeStep === 6) {
-      setPublications({...achievements, [name]: value });
-    }
-  };
-
   const getStepContent = (stepIndex) => {
     switch (stepIndex) {
       case 0:
         return (
           <PersonalInfoForm
             personalInfo={personalInfo}
-            handleChange={handleChange}
           />
         );
       case 1:
         return (
           <EducationForm
             education={education}
-            handleChange={handleChange}
             setSelectedEducation={setSelectedEducation}
           />
         );
@@ -249,7 +228,6 @@ const ResumeBuilder = () => {
         return (
           <WorkExperienceForm
             workExperience={workExperience}
-            handleChange={handleChange}
             setSelectedWorkExperience={setSelectedWorkExperience}
           />
         );
@@ -257,7 +235,6 @@ const ResumeBuilder = () => {
         return (
           <AchievementForm
             achievements={achievements}
-            handleChange={handleChange}
             setSelectedAchievements={setSelectedAchievements}
           />
         );
@@ -265,7 +242,6 @@ const ResumeBuilder = () => {
         return (
           <SkillForm
             skills={skills}
-            handleChange={handleChange}
             setSelectedSkills={setSelectedSkills}
           />
         );
@@ -273,7 +249,6 @@ const ResumeBuilder = () => {
         return (
           <ProjectForm
             projects={projects}
-            handleChange={handleChange}
             setSelectedProjects={setSelectedProjects}
           />
         );
@@ -281,7 +256,6 @@ const ResumeBuilder = () => {
         return (
           <PublicationForm
             publications={publications}
-            handleChange={handleChange}
             setSelectedPublications={setSelectedPublications}
           />
         );
@@ -307,8 +281,16 @@ const ResumeBuilder = () => {
         </Stepper>
         <div>
         {activeStep === steps.length ? (
-          generatePDF(personalInfo, selectedEducation, selectedWorkExperience, selectedAchievements, selectedSkills, selectedProjects, selectedPublications)
-        ) : (
+          generatePDF({
+            personalInfo,
+            education: selectedEducation,
+            workExperience: selectedWorkExperience,
+            achievements: selectedAchievements,
+            skills: selectedSkills,
+            projects: selectedProjects,
+            publications: selectedPublications,
+          })
+          ) : (
           <div>
             {getStepContent(activeStep)}
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>

@@ -6,9 +6,12 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
-const ProjectForm = ({ projects, handleChange, setSelectedProjects }) => {
-  const [selectedRows, setSelectedRows] = useState([]);
+const ProjectForm = ({ projects, setSelectedProjects }) => {
+  const [selectedRows, setSelectedRows] = useState(projects.map(row => row.project_id)); // Initially, all rows are selected
 
   const handleCheckboxChange = (event, id) => {
     if (event.target.checked) {
@@ -19,12 +22,25 @@ const ProjectForm = ({ projects, handleChange, setSelectedProjects }) => {
   };
 
   useEffect(() => {
-    //add selected row projects to selectedProjects
+    // Add selected row projects to setSelectedProjects
     setSelectedProjects(projects.filter((row) => selectedRows.includes(row.project_id)));
   }, [selectedRows]);
 
+  const handleSelectAll = () => {
+    if (selectedRows.length === projects.length) {
+      // If all rows are selected, clear the selection
+      setSelectedRows([]);
+    } else {
+      // Otherwise, select all rows
+      setSelectedRows(projects.map(row => row.project_id));
+    }
+  };
+
   return (
     <div>
+      <Button onClick={handleSelectAll}>
+        {selectedRows.length === projects.length ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+      </Button>
       <Table>
         <TableHead>
           <TableRow>

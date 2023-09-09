@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import TextField from '@mui/material/TextField';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
-const AchievementForm = ({ achievements, handleChange, setSelectedAchievements }) => {
-  const [selectedRows, setSelectedRows] = useState([]);
+const AchievementForm = ({ achievements, setSelectedAchievements }) => {
+  const [selectedRows, setSelectedRows] = useState(achievements.map(row => row.achievement_id)); // Initially, all rows are selected
 
   const handleCheckboxChange = (event, id) => {
     if (event.target.checked) {
@@ -19,12 +21,25 @@ const AchievementForm = ({ achievements, handleChange, setSelectedAchievements }
   };
 
   useEffect(() => {
-    //add selected row achievements to selectedAchievements
+    // Add selected row achievements to setSelectedAchievements
     setSelectedAchievements(achievements.filter((row) => selectedRows.includes(row.achievement_id)));
   }, [selectedRows]);
 
+  const handleSelectAll = () => {
+    if (selectedRows.length === achievements.length) {
+      // If all rows are selected, clear the selection
+      setSelectedRows([]);
+    } else {
+      // Otherwise, select all rows
+      setSelectedRows(achievements.map(row => row.achievement_id));
+    }
+  };
+
   return (
     <div>
+      <Button onClick={handleSelectAll}>
+        {selectedRows.length === achievements.length ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+      </Button>
       <Table>
         <TableHead>
           <TableRow>
