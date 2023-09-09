@@ -297,22 +297,25 @@ const JobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setS
                 label="Internship"
               />
             </FormGroup>
-            <Typography variant="h6" sx={{ marginTop: '15px' }}>
-              Salary Range
-            </Typography>
-            {minSalary === maxSalary ? (
-            <Typography variant="body2">
-                {minSalary} 
-            </Typography>
-            ) : (
-              <Slider
-                value={salaryRange}
-                onChange={handleSalaryRangeChange}
-                valueLabelDisplay="auto"
-                min={minSalary}
-                max={maxSalary}
-              />
+            {jobsToShow.length >= 1 && (
+            <>
+              <Typography variant="h6" sx={{ marginTop: '15px' }}>
+                Salary Range
+              </Typography>
+              {minSalary === maxSalary ? (
+                <Typography variant="body2">{maxSalary}</Typography>
+              ) : (
+                <Slider
+                  value={salaryRange}
+                  onChange={handleSalaryRangeChange}
+                  valueLabelDisplay="auto"
+                  min={minSalary}
+                  max={maxSalary}
+                />
+              )}
+            </>
             )}
+
             {/* <Button variant="contained" color="primary" sx={{ marginTop: '16px' }}>
               Apply Filter
             </Button> */}

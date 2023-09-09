@@ -51,11 +51,22 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
   //---------------------------Edit---------------------------------------
   const handleSave = async () => {
     try {
+      let updatedInfo;
+      if (editedInfo.keywords) {
+        console.log('here');
+        const words = editedInfo.keywords.split(",").join("|");
+        updatedInfo = { ...editedInfo, keywords: words };
+        // Now, you can use the updatedInfo object as needed
+        console.log(updatedInfo);
+      }else{
+        updatedInfo = editedInfo;
+      }
       setIsDialogOpen(false);
       setIsEditMode(false);
-  
+      console.log('They should be | separated: ',updatedInfo);
+      
       // Send editedInfo to the backend
-      const response = await axios.put(`/api/jobpost/${selectedJob.jobpost_id}`, editedInfo, {
+      const response = await axios.put(`/api/jobpost/${selectedJob.jobpost_id}`, updatedInfo, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -347,7 +358,10 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
                         onChange={(e) => setEditedInfo({ ...editedInfo, keywords: e.target.value })}
                       />
                     ) : (
-                      <Typography>{selectedJob.keywords}</Typography>
+                      <Typography>
+                        {selectedJob && selectedJob.keywords ? selectedJob.keywords.split("|").join(", ") : ""}
+                      </Typography>
+
                     )}
                   </Box>
                 )}
@@ -408,7 +422,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
                       margin="dense"
                       type="date"
                       label="Application Deadline"
-                      value={editedInfo.deadline || ''}
+                      value={new Date(editedInfo.deadline).toLocaleDateString() || ''}
                       onChange={(e) => setEditedInfo({ ...editedInfo, deadline: e.target.value })}
                     />
                   ) : (
@@ -529,7 +543,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
                 fullWidth
                 margin="dense"
                 type="date"
-                value={editedInfo.deadline}
+                value={new Date(editedInfo.deadline).toLocaleDateString('en-CA')}
                 onChange={(e) => setEditedInfo({ ...editedInfo, deadline: e.target.value })}
               />
             </Box>
