@@ -4,10 +4,12 @@ import { IconButton, Badge, Popover, List, ListItem, ListItemText, Dialog, Dialo
 import axios from 'axios';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { NotificationContext } from "../context/notificationContext";
+import { set } from 'date-fns';
 
 function Notification() {
   const { allNotifications, setAllNotifications, unreadNotifications, setUnreadNotifications, unreadNotificationsCount, setUnreadNotificationsCount } = useContext(NotificationContext);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [click, setClick] = useState(0);
 
   const fetchAllNotifications = async () => {
     try {
@@ -70,23 +72,23 @@ function Notification() {
 
 
   useEffect(() => {
-    fetchAllNotifications();
     fetchUnreadNotifications();
     fetchUnreadNotificationsCount();
   }, []);
 
   const handleOpenNotifications = (event) => {
     setAnchorEl(event.currentTarget);
-    markNotificationsRead();
   };
 
   const handleCloseNotifications = () => {
     setAnchorEl(null);
+    markNotificationsRead();
   };
 
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleOpenDialog = () => {
+    fetchAllNotifications();
     setOpenDialog(true);
   };
 
