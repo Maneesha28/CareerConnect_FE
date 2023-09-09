@@ -240,8 +240,16 @@ const CompanyVacancy = ({isLoggedInUser}) => {
   const handleSaveEdit = async () => {
     // Implement logic to navigate to the edit job page with the given jobId
     if (editedJobPost) {
-      console.log('editedJobPost: ', newJobPost);
-      console.log('jobId: ', editedJobPost.jobpost_id);
+      let updatedInfo;
+      if (newJobPost.keywords) {
+        console.log('here');
+        const words = newJobPost.keywords.split(",").join("|");
+        updatedInfo = { ...newJobPost, keywords: words };
+        // Now, you can use the updatedInfo object as needed
+        console.log(updatedInfo);
+      }else{
+        updatedInfo = newJobPost;
+      }
       try {
         const response = await axios.put(`/api/jobpost/${editedJobPost.jobpost_id}`, newJobPost, {
         headers: {
@@ -392,22 +400,24 @@ const CompanyVacancy = ({isLoggedInUser}) => {
                 label="Internship"
               />
             </FormGroup>
-            <Typography variant="h6" sx={{ marginTop: '15px' }}>
-              Salary Range
-            </Typography>
-            {minSalary === maxSalary ? (
-            <Typography variant="body2">
-              {minSalary} 
-            </Typography>
-          ) : (
-            <Slider
-              value={salaryRange}
-              onChange={handleSalaryRangeChange}
-              valueLabelDisplay="auto"
-              min={minSalary}
-              max={maxSalary}
-            />
-          )}
+            {jobsToShow.length >= 1 && (
+            <>
+              <Typography variant="h6" sx={{ marginTop: '15px' }}>
+                Salary Range
+              </Typography>
+              {minSalary === maxSalary ? (
+                <Typography variant="body2">{maxSalary}</Typography>
+              ) : (
+                <Slider
+                  value={salaryRange}
+                  onChange={handleSalaryRangeChange}
+                  valueLabelDisplay="auto"
+                  min={minSalary}
+                  max={maxSalary}
+                />
+              )}
+            </>
+            )}
             {/* <Button variant="contained" color="primary" sx={{ marginTop: '16px' }}>
               Apply Filter
             </Button> */}
@@ -499,7 +509,7 @@ const CompanyVacancy = ({isLoggedInUser}) => {
                 margin="dense"
                 multiline
                 rows={4}
-                value={newJobPost.keywords}
+                value={newJobPost && newJobPost.keywords ? newJobPost.keywords.split("|").join(", ") : ""}
                 onChange={(e) => setNewJobPost({ ...newJobPost, keywords: e.target.value })}
               />
               <TextField
@@ -535,7 +545,7 @@ const CompanyVacancy = ({isLoggedInUser}) => {
                 fullWidth
                 margin="dense"
                 type="date"
-                value={newJobPost.deadline}
+                value={new Date(newJobPost.deadline).toLocaleDateString('en-CA')}
                 onChange={(e) => setNewJobPost({ ...newJobPost, deadline: e.target.value })}
               />
             </Box>

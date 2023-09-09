@@ -269,13 +269,13 @@ function PersonalInfo({isLoggedInUser}) {
                       margin="dense"
                       type="date"
                       label="Date of Birth"
-                      value={editedInfo.date_of_birth || ''}
+                      value={new Date(editedInfo.date_of_birth).toLocaleDateString() || ''}
                       onChange={(e) =>
                         setEditedInfo({ ...editedInfo, date_of_birth: e.target.value })
                       }
                     />
                   ) : (
-                    <Typography><DateComponent isoDate={jobseekerData.date_of_birth}/></Typography>
+                    <Typography>{new Date(jobseekerData.date_of_birth).toLocaleDateString()}</Typography>
                   )}
                 </Box>
 
@@ -350,6 +350,45 @@ function PersonalInfo({isLoggedInUser}) {
                     <Typography>{jobseekerData.phone_no}</Typography>
                   )}
                 </Box>
+                <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+                  <Typography>Github Link:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      label="Github Link"
+                      value={editedInfo.github_link || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, github_link: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <a href={`http://${jobseekerData.github_link}`} target="_blank" rel="noopener noreferrer">
+                      {jobseekerData.github_link}
+                    </a>
+                  )}
+                </Box>
+                <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+                  <Typography>Linkedin Link:</Typography>
+                  {isEditMode ? (
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      margin="dense"
+                      label="Linkedin Link"
+                      value={editedInfo.linkedin_link || ''}
+                      onChange={(e) =>
+                        setEditedInfo({ ...editedInfo, linkedin_link: e.target.value })
+                      }
+                    />
+                  ) : (
+                    <a href={`http://${jobseekerData.linkedin_link}`} target="_blank" rel="noopener noreferrer">
+                      {jobseekerData.linkedin_link}
+                    </a>
+                  )}
+                </Box>
+
               </Box>
             </Box>
           </Paper>
@@ -385,8 +424,13 @@ function PersonalInfo({isLoggedInUser}) {
               margin="dense"
               label="Date of Birth"
               type="date"
-              value={editedInfo.dateOfBirth || ''}
-              onChange={(e) => setEditedInfo({ ...editedInfo, dateOfBirth: e.target.value })}
+              value={new Date(editedInfo.date_of_birth).toLocaleDateString('en-CA') || ''}
+              onChange={(e) => setEditedInfo({ ...editedInfo, date_of_birth: e.target.value })}
+              InputProps={{
+                inputProps: {
+                  max: new Date().toISOString().split('T')[0], // Set the max date to today
+                },
+              }}
             />
             <TextField
               fullWidth
@@ -422,14 +466,22 @@ function PersonalInfo({isLoggedInUser}) {
               value={editedInfo.phone_no || ''}
               onChange={(e) => setEditedInfo({ ...editedInfo, phone_no: e.target.value })}
             />
-            {/* <TextField
+            <TextField
               fullWidth
               variant="outlined"
               margin="dense"
               label="GitHub Link"
-              value={editedInfo.githubLink || ''}
-              onChange={(e) => setEditedInfo({ ...editedInfo, githubLink: e.target.value })}
-            /> */}
+              value={editedInfo.github_link || ''}
+              onChange={(e) => setEditedInfo({ ...editedInfo, github_link: e.target.value })}
+            />
+            <TextField
+              fullWidth
+              variant="outlined"
+              margin="dense"
+              label="Linkedin Link"
+              value={editedInfo.linkedin_link || ''}
+              onChange={(e) => setEditedInfo({ ...editedInfo, linkedin_link: e.target.value })}
+            />
           </Box>
         </DialogContent>
         <DialogActions>

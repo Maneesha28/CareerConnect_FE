@@ -8,6 +8,8 @@ import JobPost from './JobPost';
 import { useLocation } from 'react-router-dom';
 import { Box,Typography } from '@mui/material';
 import { FetchProvider } from './FetchContext';
+import { Link } from 'react-router-dom';
+
 const JobListsAndPost = () => {
   const location = useLocation();
   const company_id = useParams().company_id;
@@ -107,11 +109,21 @@ const JobListsAndPost = () => {
       <Header />
       {currentUser !== null? (
         <>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px' }}>
+        <div style={{ display: 'flex',marginTop: '90px' }}></div>
+        <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: '16px',
+        }}
+      >
+        <Link to={`/company/${company_id}`} style={{ textDecoration: 'none' }}>
           <Typography variant="h2" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
             {companyData.company_name}
           </Typography>
-        </Box>
+        </Link>
+      </Box>
           <div style={{ display: 'flex' }}>
             <div style={{ flex: '1' }}>
               <JobLists user_id={user_id} isCompany={isCompany} isJobseeker={isJobseeker} isLoggedInUser={isLoggedInUser}

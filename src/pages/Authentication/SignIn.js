@@ -42,7 +42,7 @@ function SignIn() {
       } 
       else if (response.data.jobseeker_id) {
         console.log(response.data);
-        window.location.href = '/jobseeker/'+response.data.jobseeker_id;
+        window.location.href = '/home/'+response.data.jobseeker_id;
       }
       else if (response.data.company_id) {
         window.location.href = '/company/'+response.data.company_id;

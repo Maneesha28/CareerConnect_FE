@@ -20,6 +20,7 @@ const HomePage = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const [isLoadingUser,setIsLoadingUser] = useState(true);
   const [error,setError] = useState(null);
+  const [showCompany,setShowCompany] = useState(false);
 
   const [currentUser, setCurrentUser] = useState(null);
   const fetchCurrentUser = async() => {
@@ -61,16 +62,25 @@ const HomePage = () => {
         <>
         
           <div style={{ display: 'flex' }}>
-            <div style={{ flex: '2' }}>
+          <div style={{ flex: showCompany ? '50' : '2' }}>
               <AllJobLists user_id={user_id} isCompany={isCompany} isJobseeker={isJobseeker} isLoggedInUser={isLoggedInUser}
-               selectedJob={selectedJob} setSelectedJob={setSelectedJob}
+               selectedJob={selectedJob} setSelectedJob={setSelectedJob} 
+               showCompany={showCompany} setShowCompany={setShowCompany}
                 />
             </div>
             
             <div style={{ flex: '4', marginTop: '50px' }}>
-              <JobPost user_id={user_id} isCompany={isCompany} isJobseeker={isJobseeker} isLoggedInUser={isLoggedInUser}
-              selectedJob={selectedJob} setSelectedJob={setSelectedJob}/>
-            </div>
+            {!showCompany && (
+              <JobPost
+                user_id={user_id}
+                isCompany={isCompany}
+                isJobseeker={isJobseeker}
+                isLoggedInUser={isLoggedInUser}
+                selectedJob={selectedJob}
+                setSelectedJob={setSelectedJob}
+              />
+            )}
+          </div>
           </div>
         </>
               ) : (

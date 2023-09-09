@@ -135,45 +135,76 @@ function EduInfo({isLoggedInUser}) {
   const handleSaveEduInfo = async () => {
     try {
       console.log('newEduInfo: ', newEduInfo);
-      const response = await axios.post("/api/education", transformedData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
-      console.log('response:', response);
-      fetchEducationData();
-      handleCloseDialog();
+      
+      // Check if endDate is empty or null, or if startDate is less than endDate
+      if (!newEduInfo.endDate || new Date(newEduInfo.startDate) < new Date(newEduInfo.endDate)) {
+        const response = await axios.post("/api/education", transformedData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        });
+        console.log('response:', response);
+        fetchEducationData();
+        handleCloseDialog();
+      } else {
+        console.error('End date should be greater than start date');
+        // You can add code here to display an error message to the user.
+      }
     } catch (error) {
       console.error('Error saving eduInfo:', error);
     }
+    
   };
 
   const handleSaveEdit = async () => {
     if (editedEduInfo) {
-      console.log('editedEduInfo: ', editedEduInfo);
-      try {
-        const response = await axios.put(`/api/education/${editedEduInfo.degree_id}`, transformedData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
-        console.log('response: ', response);
-        fetchEducationData();
-        setEditedEduInfo(null);
-        setIsEditDialogOpen(false);
-        setNewEduInfo({
-          degree: '',
-          subject: '',
-          institution: '',
-          result: '',
-          startDate: '',
-          endDate: '',
-        });
-      } catch (error) {
-        console.error('Error updating eduInfo:', error);
-      }
+            console.log('editedEduInfo: ', editedEduInfo);
+
+            try {
+              // Validate start and end dates
+              console.log('startDate:', transformedData.start_date);
+              console.log('endDate:', transformedData.end_date);
+
+              // Parse ISO date strings into Date objects
+              const startDate = new Date(transformedData.start_date);
+              const endDate = new Date(transformedData.end_date);
+
+              // Log the parsed Date objects
+              console.log('parsed startDate:', startDate);
+              console.log('parsed endDate:', endDate);
+            
+              if (!isNaN(startDate) && !isNaN(endDate) && (endDate === null || startDate < endDate)) {
+                const response = await axios.put(`/api/education/${editedEduInfo.degree_id}`, {
+                  ...transformedData,
+                  startDate: startDate.toISOString(), // Convert to UTC
+                  endDate: endDate.toISOString(),     // Convert to UTC
+                }, {
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  withCredentials: true,
+                });
+                console.log('response: ', response);
+                fetchEducationData();
+                setEditedEduInfo(null);
+                setIsEditDialogOpen(false);
+                setNewEduInfo({
+                  degree: '',
+                  subject: '',
+                  institution: '',
+                  result: '',
+                  startDate: '',
+                  endDate: '',
+                });
+              } else {
+                console.error('Invalid dates. End date should be greater than start date.');
+                // You can add code here to display an error message to the user.
+              }
+            } catch (error) {
+              console.error('Error updating eduInfo:', error);
+            }
+            
     }
   };  
 
@@ -255,16 +286,26 @@ function EduInfo({isLoggedInUser}) {
             fullWidth
             margin="dense"
             type="date"
-            value={newEduInfo.startDate}
-            onChange={(e) => setNewEduInfo({ ...newEduInfo, startDate: e.target.value })}
+            value={new Date(newEduInfo.startDate).toLocaleDateString('en-CA') || ''}
+              onChange={(e) => setNewEduInfo({ ...newEduInfo, startDate: e.target.value })}
+              InputProps={{
+                inputProps: {
+                  max: new Date().toISOString().split('T')[0], // Set the max date to today
+                },
+              }}
           />
           <TextField
             label="End Date"
             fullWidth
             margin="dense"
             type="date"
-            value={newEduInfo.endDate}
-            onChange={(e) => setNewEduInfo({ ...newEduInfo, endDate: e.target.value })}
+            value={new Date(newEduInfo.endDate).toLocaleDateString('en-CA') || ''}
+              onChange={(e) => setNewEduInfo({ ...newEduInfo, endDate: e.target.value })}
+              InputProps={{
+                inputProps: {
+                  max: new Date().toISOString().split('T')[0], // Set the max date to today
+                },
+              }}
           />
         </DialogContent>
         <DialogActions>
@@ -315,16 +356,26 @@ function EduInfo({isLoggedInUser}) {
                 fullWidth
                 margin="dense"
                 type="date"
-                value={newEduInfo.startDate}
+                value={new Date(newEduInfo.startDate).toLocaleDateString('en-CA') || ''}
                 onChange={(e) => setNewEduInfo({ ...newEduInfo, startDate: e.target.value })}
+                InputProps={{
+                  inputProps: {
+                    max: new Date().toISOString().split('T')[0], // Set the max date to today
+                  },
+                }}
               />
               <TextField
                 label="End Date"
                 fullWidth
                 margin="dense"
                 type="date"
-                value={newEduInfo.endDate}
+                value={new Date(newEduInfo.endDate).toLocaleDateString('en-CA') || ''}
                 onChange={(e) => setNewEduInfo({ ...newEduInfo, endDate: e.target.value })}
+                InputProps={{
+                  inputProps: {
+                    max: new Date().toISOString().split('T')[0], // Set the max date to today
+                  },
+                }}
               />
             </Box>
           )}

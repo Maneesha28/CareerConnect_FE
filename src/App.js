@@ -25,6 +25,7 @@ import FollowersList from "./pages/test";
 import { NotificationContext } from "./context/notificationContext";
 import ResumeBuilder from "./components/ResumeBuilder/ResumeBuilder";
 import HomePage from "./pages/JobSeeker/HomePage";
+import ViewJobPost from "./pages/Company/ViewJobPost";
 
 // changed by any
 function App() {
@@ -81,7 +82,7 @@ function App() {
       <Route path="/company/:company_id" element={<CompanyPage />} />
       <Route path="/companyJobPosts/:company_id" element={<JobListsAndPost/>}/>
       <Route path="/home/:jobseeker_id" element={<HomePage/>}/>
-      <Route path="/jobseeker/:jobseeker_id/accountInfo" element={<AccountInfo/>}/>
+      <Route path="/viewJobPost/:jobpost_id" element={<ViewJobPost/>}/>
       
       <Route path="/companyPage" element={<CompanyPage/>}/>
 

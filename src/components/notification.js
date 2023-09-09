@@ -159,7 +159,7 @@ function Notification() {
                 key={notification.notification_id}
                 href={
                   notification.notification_type === 'jobpost'
-                    ? `/companyViewJobPost/${notification.related_id}`
+                    ? `/viewJobPost/${notification.related_id}`
                     : `/jobseeker/${notification.related_id}`
                 }
                 style={{ textDecoration: 'none' }}

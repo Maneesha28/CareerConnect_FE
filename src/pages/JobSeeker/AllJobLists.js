@@ -15,45 +15,15 @@ import {
   IconButton,
   TextField,
 } from '@mui/material';
+import Rating from '@mui/material/Rating';
 import SearchIcon from '@mui/icons-material/Search';
 import Header from '../../components/Header';
 import axios from 'axios'; // Import axios for API requests
 import { Link } from 'react-router-dom';
 import { useFetch } from '../Company/FetchContext';
-const drawerWidth = 300;
+const drawerWidth = 350;
 
-const CompanyList = ({ companies }) => (
-  <Box sx={{ width: '100%' }}>
-    <Grid container spacing={2}>
-      {companies.map((company) => (
-        <Grid item xs={12} key={company.company_name}>
-          <Paper elevation={3} sx={{ padding: '16px' }}>
-            <Typography variant="h6" gutterBottom>
-              {company.company_name}
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              {company.about}
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              Address: {company.address}
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              Website: <a href={company.website_address}>{company.website_address}</a>
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              Email: {company.email}
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              Phone: {company.phone_no}
-            </Typography>
-          </Paper>
-        </Grid>
-      ))}
-    </Grid>
-  </Box>
-);
-
-const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSelectedJob}) => {
+const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSelectedJob,showCompany,setShowCompany}) => {
   const { fetch, setFetch } = useFetch();
   const [selectedList, setSelectedList] = useState('Latest Jobs');
   const [jobData, setJobData] = useState([]);
@@ -61,6 +31,7 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const [isLoadingJobPost,setIsLoadingJobPost] = useState(false);
+  const [isLoadingCompanies,setIsLoadingCompanies] = useState(false);
 
   const JobList = ({ jobs}) => (
       <Box sx={{ width: '100%' }}>
@@ -120,28 +91,88 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
         </Grid>
       </Box>
     );
+    const CompanyList = ({ companies }) => (
+      <Box sx={{ width: '100%' }}>
+        <Grid container spacing={8}>
+          {companies.map((company) => (
+            <Grid item xs={12} sm={6} key={company.company_id}>
+              <Paper
+                elevation={3}
+                sx={{
+                  padding: '20px',
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  height: '100%', // Set a fixed height for the cards
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column', // Display text elements in a column
+                    alignItems: 'flex-start', // Align text elements to the left
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                    transition: 'color 0.3s, background-color 0.3s',
+                    color: 'blue',
+                    backgroundColor: 'transparent',
+                    marginBottom: '16px', // Add spacing between cards
+                  }}
+                >
+                  <Link to={`/company/${company.company_id}`} style={{ textDecoration: 'none' }}>
+                    <Typography variant="h4" gutterBottom>
+                      {company.company_name}
+                    </Typography>
+                  </Link>
+                  {company.avg_stars && (
+                    <Rating name="read-only" value={company.avg_stars} readOnly />
+                  )}
+                </div>
+                {company.about && (
+                  <Typography variant="body0" gutterBottom>
+                    {company.about}
+                  </Typography>
+                )}
+                {company.address && (
+                  <Typography variant="body1" gutterBottom>
+                    Address: {company.address}
+                  </Typography>
+                )}
+                {company.website_address && (
+                  <Typography variant="body1" gutterBottom>
+                    Website: <a href={company.website_address}>{company.website_address}</a>
+                  </Typography>
+                )}
+                {company.phone_no && (
+                  <Typography variant="body1" gutterBottom>
+                    Phone: {company.phone_no}
+                  </Typography>
+                )}
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    );
+    
+    
 
   const fetchJobData = async (listType) => {
     try {
       let response;
       switch (listType) {
         case 'Latest Jobs':
-          setSearchQuery('');
           setIsLoadingJobPost(true);
           response = await axios.get(`/api/jobpost/recent`);
           break;
         case 'Shortlisted Jobs':
-          setSearchQuery('');
           setIsLoadingJobPost(true);
           response = await axios.get(`/api/jobpost/shortlisted`);
           break;
         case 'Followed Jobs':
-          setSearchQuery('');
           setIsLoadingJobPost(true);
           response = await axios.get(`/api/jobpost/followed`);
           break;
         case 'Applied Jobs':
-          setSearchQuery('');
           setIsLoadingJobPost(true);
           response = await axios.get(`/api/jobpost/applied`);
           break;
@@ -162,9 +193,39 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
       setError(`Error fetching ${listType} jobpost information.`);
     }
   };
+  const fetchCompanyData = async (listType) => {
+    try {
+      let response;
+      switch (listType) {
+        case 'Followed Companies':
+          setIsLoadingCompanies(true);
+          response = await axios.get(`/api/follow/followings/${user_id}`);
+          break;
+        case 'Explore Companies':
+          setIsLoadingCompanies(true);
+          response = await axios.get(`/api/company/all`);
+          break;
+        default:
+          // Handle other cases or errors
+          break;
+      }
+
+      const companydata = response.data;
+      // if (jobdata.length > 0) {
+      //   setSelectedJob(jobdata[0]);
+      // } else {
+      //   setSelectedJob(null);
+      // }
+      setCompanyData(companydata);
+      console.log(`Fetched ${listType}:`, companydata);
+    } catch (error) {
+      setError(`Error fetching ${listType} company information.`);
+    }
+  };
   //------------------------- search -------------------------
   
   const fetchSearchedJobPosts = async () => {
+    setShowCompany(false);
     try {
       const response = await axios.get(`/api/jobpost/searched?keyword=${searchQuery}`);
       const jobdata = response.data;
@@ -175,15 +236,46 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
       setError('Error fetching searched job posts.');
     }
   };
+  const fetchSearchedCompany = () => {
+    if (searchQuery && searchQuery.trim() !== '') {
+      // Filter the companies based on the searchQuery
+      const filteredCompanies = companyData.filter((company) => {
+        const query = searchQuery.toLowerCase();
+  
+        // Check if the search query is present in any of the company's properties (with null checks)
+        return (
+          (company.address?.toLowerCase().includes(query) || false) ||
+          (company.phone_no?.toLowerCase().includes(query) || false) ||
+          (company.website_address?.toLowerCase().includes(query) || false) ||
+          (company.trade_license?.toLowerCase().includes(query) || false) ||
+          (company.about?.toLowerCase().includes(query) || false) ||
+          (company.company_name?.toLowerCase().includes(query) || false)
+        );
+      });
+  
+      // Update the companyData state with the filtered companies
+      setCompanyData(filteredCompanies);
+    } else {
+      // If searchQuery is empty or contains only whitespace, reset to the original data
+      setCompanyData(companyData);
+    }
+  };  
+  
   //-----------------------------------------------------------
   useEffect(() => {
     console.log('In Use Effect: ',selectedList);
-    // Fetch data from the database based on the selected list
-    if (selectedList === 'Explore Companies') {
-      // Handle fetching company data here
-      // Example: fetchCompanyData();
-    } else {
+    if (selectedList === 'Explore Companies' || selectedList === 'Followed Companies') {
+      setSearchQuery('');
+      setShowCompany(true);
+      fetchCompanyData(selectedList);
+      setSelectedJob(null);
+    } else if(selectedList === 'Latest Jobs' || selectedList === 'Shortlisted Jobs' ||
+    selectedList === 'Followed Jobs' || selectedList === 'Applied Jobs'){
+      setSearchQuery('');
+      setShowCompany(false);
       fetchJobData(selectedList);
+    }else if(selectedList === ''){
+      
     }
   }, [selectedList]);
   useEffect(()=>{
@@ -191,6 +283,11 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
       setIsLoadingJobPost(false);
     }
   },[jobData]);
+  useEffect(()=>{
+    if(isLoadingCompanies){
+      setIsLoadingCompanies(false);
+    }
+  },[companyData]);
   useEffect(() => {
     if(fetch){
       if (selectedList === 'Latest Jobs' || selectedList === 'Shortlisted Jobs' ||
@@ -216,6 +313,7 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
+            backgroundColor: '#124559',
           },
         }}
         variant="permanent"
@@ -224,71 +322,141 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
         <Toolbar /><Toolbar />
         
         <Box sx={{ overflow: 'auto' }}>
-        <List>
-          {['Latest Jobs', 'Shortlisted Jobs', 'Followed Jobs', 'Applied Jobs'].map((text) => (
+          <List>
+            {['Latest Jobs', 'Shortlisted Jobs', 'Followed Jobs', 'Applied Jobs'].map((text) => (
+              <ListItem
+                button
+                key={text}
+                selected={selectedList === text}
+                onClick={() => {
+                  console.log('Clicked:', text);
+                  setSelectedList(text);
+                }}
+                sx={{
+                  '&.Mui-selected': {
+                    backgroundColor: '#3B7A9F',
+                  },
+                  marginBottom: 2, // Add margin between list items
+                }}
+              >
+                <ListItemText
+                  primary={text}
+                  primaryTypographyProps={{
+                    variant: 'h6',
+                    sx: {
+                      fontFamily: 'Times New Roman, serif',
+                      fontWeight: 'bold',
+                      fontSize: '1.8rem',
+                      color: 'white',
+                      transition: 'color 0.3s, background-color 0.3s',
+                    },
+                  }}
+                />
+              </ListItem>
+            ))}
+            <Divider />
             <ListItem
               button
-              key={text}
-              selected={selectedList === text}
-              onClick={() => {
-                console.log('Clicked:', text);
-                setSelectedList(text);
+              selected={selectedList === 'Followed Companies'}
+              onClick={() => setSelectedList('Followed Companies')}
+              sx={{
+                '&.Mui-selected': {
+                  backgroundColor: '#3B7A9F',
+                },
+                marginBottom: 2, // Add margin between list items
               }}
             >
-              <ListItemText primary={text} />
+              <ListItemText
+                primary="Followed Companies"
+                primaryTypographyProps={{
+                  variant: 'h6',
+                  sx: {
+                    fontFamily: 'Times New Roman, serif',
+                    fontWeight: 'bold',
+                    fontSize: '1.8rem',
+                    color: 'white',
+                    transition: 'color 0.3s, background-color 0.3s',
+                  },
+                }}
+              />
             </ListItem>
-          ))}
-          <Divider />
-          <ListItem
-            button
-            selected={selectedList === 'Followed Companies'}
-            onClick={() => setSelectedList('Followed Companies')}
-          >
-            <ListItemText primary="Followed Companies" />
-          </ListItem>
-          <ListItem
-            button
-            selected={selectedList === 'Explore Companies'}
-            onClick={() => setSelectedList('Explore Companies')}
-          >
-            <ListItemText primary="Explore Companies" />
-          </ListItem>
-        </List>
+            <ListItem
+              button
+              selected={selectedList === 'Explore Companies'}
+              onClick={() => setSelectedList('Explore Companies')}
+              sx={{
+                '&.Mui-selected': {
+                  backgroundColor: '#3B7A9F',
+                },
+                marginBottom: 2, // Add margin between list items
+              }}
+            >
+              <ListItemText
+                primary="Explore Companies"
+                primaryTypographyProps={{
+                  variant: 'h6',
+                  sx: {
+                    fontFamily: 'Times New Roman, serif',
+                    fontWeight: 'bold',
+                    fontSize: '1.8rem',
+                    color: 'white',
+                    transition: 'color 0.3s, background-color 0.3s',
+                  },
+                }}
+              />
+            </ListItem>
+          </List>
         </Box>
       </Drawer>
+
+
+
+
               
       <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: '50px' }}>
       <Toolbar />
       {/* Search Bar */}
       <TextField
-        label="Search Jobs"
-        variant="outlined"
-        fullWidth
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        onKeyPress={(e) => {
-          if (e.key === 'Enter' && searchQuery.trim() !== '') {
-            fetchSearchedJobPosts();
-          }
-        }}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={fetchSearchedJobPosts}>
-                <SearchIcon />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
+  label={showCompany ? 'Search Company' : 'Search Jobs'} // Change the label based on showCompany
+  variant="outlined"
+  fullWidth
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+  onKeyPress={(e) => {
+    if (e.key === 'Enter' && searchQuery.trim() !== '') {
+      if (showCompany) {
+        fetchSearchedCompany(); // Call fetchSearchedCompany if showCompany is true
+      } else {
+        fetchSearchedJobPosts(); // Call fetchSearchedJobPosts if showCompany is false
+      }
+    }
+  }}
+  InputProps={{
+    endAdornment: (
+      <InputAdornment position="end">
+        <IconButton onClick={showCompany ? fetchSearchedCompany : fetchSearchedJobPosts}>
+          <SearchIcon />
+        </IconButton>
+      </InputAdornment>
+    ),
+  }}
+/>
+
 
       <Toolbar />
       {isLoadingJobPost ? (
         <Typography variant="h5">Loading...</Typography>
       ) : (
-        searchQuery ? ( // Display searched jobs when searchQuery is not empty
-          <JobList jobs={jobData} />
+        searchQuery ? (
+          showCompany ? (
+            // Display companyData when searchQuery is not empty and showCompany is true
+            <CompanyList companies={companyData} />
+          ) : (
+            // Display jobData when searchQuery is not empty and showCompany is false
+            <JobList jobs={jobData} />
+          )
         ) : (
+          // Display based on selectedList if searchQuery is empty
           selectedList === 'Latest Jobs' || selectedList === 'Shortlisted Jobs' ||
           selectedList === 'Followed Jobs' || selectedList === 'Applied Jobs' ? (
             <JobList jobs={jobData} />
@@ -297,6 +465,7 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
           )
         )
       )}
+
     </Box>
 
     </Box>
