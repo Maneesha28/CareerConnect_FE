@@ -36,8 +36,11 @@ import BookmarkAddedTwoToneIcon from '@mui/icons-material/BookmarkAddedTwoTone';
 import { StyledTableCell, StyledTableRow, commonStyles } from '../JobSeeker/ComponentStyles';
 import DateComponent from '../../components/DateComponent';
 import { useFetch } from './FetchContext';
+import { storage } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
 
-const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSelectedJob}) => {
+const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSelectedJob,selectedTab,isSelectedListEmpty}) => {
   const { fetch, setFetch } = useFetch();
   const company_id = useParams().company_id;
   const [error, setError] = useState(null);
@@ -53,6 +56,10 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
   const [shortListButtonText,setShortListButtonText] = useState('');
   const [isApplied, setIsApplied] = useState(false);
   const [applyButtonText,setApplyButtonText] = useState('');
+  const [resume,setResume] = useState({
+    'jobpost_id': '',
+    'resume': '',
+  });
   //---------------------------Edit---------------------------------------
   const handleSave = async () => {
     try {
@@ -97,16 +104,48 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
     
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
   const fileInputRef = useRef(null);
-const [selectedFile, setSelectedFile] = useState(null);
-const handleFileChange = (e) => {
-  const file = e.target.files[0];
-  setSelectedFile(file);
-};
+  const [selectedFile, setSelectedFile] = useState(null);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+  };
 
   const handleApply = () => {
     // Open the apply dialog
     if(isApplied == 0) setIsApplyDialogOpen(true);
   };
+
+  const sendResumeToBackend = async (resume) => {
+    try {
+        console.log('resume: ', resume);
+        const response = await axios.post('/api/application', resume, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  async function uploadFileToFirebase(file) {
+    try {
+      // Generate a unique filename using UUID
+      const uniqueFilename = `${uuidv4()}_${file.name}`;
+      
+      const storageRef = ref(storage, `applications/${uniqueFilename}`);
+      await uploadBytes(storageRef, file);
+  
+      const downloadURL = await getDownloadURL(storageRef);
+  
+      return downloadURL;
+    } catch (error) {
+      console.error('Error uploading file to Firebase:', error);
+      throw error;
+    }
+  }
 
   const handleUploadResume = () => {
     // Create an input element dynamically
@@ -114,17 +153,30 @@ const handleFileChange = (e) => {
     input.type = 'file';
   
     // Listen for the 'change' event when the user selects a file
-    input.addEventListener('change', (e) => {
+    input.addEventListener('change', async (e) => {
       const selectedFile = e.target.files[0];
-  
-      // You can now handle the selected file, for example, by uploading it to a server
-      // Here, we're just logging the selected file
-      console.log('Selected file:', selectedFile);
   
       // Close the dialog
       setIsApplyDialogOpen(false);
+      
+      if (selectedFile) {
+        try {
+          // Upload the file to Firebase Storage and get the download URL
+          const downloadURL = await uploadFileToFirebase(selectedFile);         
+          // Now, you have the download URL for the uploaded file, which you can use or store as needed
+          console.log('Uploaded resume to Firebase. Download URL:', downloadURL);
+          console.log('jobpost_id: ',selectedJob.jobpost_id);
+          setResume({
+            'jobpost_id': selectedJob.jobpost_id,
+            'resume': downloadURL
+          });
+          console.log('resume before sending to backend: ',resume);
+          await sendResumeToBackend(resume);
+        } catch (error) {
+          console.error('Error uploading resume to Firebase:', error);
+        }
+      }
     });
-  
     // Trigger a click event on the input element to open the file selection dialog
     input.click();
   };
@@ -137,7 +189,7 @@ const handleFileChange = (e) => {
     setIsApplyDialogOpen(false);
   };
   //--------------------------Application---------------------------------
-  const [selectedTab, setSelectedTab] = useState('Get All');
+  const [selectedApplicantsTab, setselectedApplicantsTab] = useState('Get All');
   const [sortAscending, setSortAscending] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -192,7 +244,7 @@ const handleFileChange = (e) => {
     }
   };
   const handleTabClick = (tab) => {
-    setSelectedTab(tab);
+    setselectedApplicantsTab(tab);
   
     // Perform the corresponding action based on the selected tab
     if (tab === 'Get All') {
@@ -255,7 +307,7 @@ const handleFileChange = (e) => {
       }
       setIsApplied(response.data.is_applied);
       if(response.data.is_applied == 1){
-        setApplyButtonText("Applied");
+        setApplyButtonText("Already Applied");
       }else{
         setApplyButtonText("Apply Now");
       }
@@ -411,14 +463,14 @@ const handleFileChange = (e) => {
               </div>
               }
               
-              {isJobseeker && (
+              {isJobseeker && selectedTab === 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Button variant="contained" startIcon={isShortlisted ? <BookmarkAddedTwoToneIcon /> : <BookmarkAddTwoToneIcon />} onClick={handleShortlist}>
                     {shortListButtonText}
                   </Button>
                 </div>
               )}
-          </Box>
+              </Box>
                 <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
                   <Typography>Description: </Typography>
                   {isEditMode ? (
@@ -536,11 +588,18 @@ const handleFileChange = (e) => {
                 </Box>
             
           </Paper>
-          {isJobseeker && (
+          {isJobseeker && selectedTab===0 && (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              <Button variant="contained" onClick={handleApply}>
+              {isApplied == 0 && (
+                <Button variant="contained" onClick={handleApply}>
                 {applyButtonText}
-              </Button>
+              </Button>)
+                }
+              {isApplied == 1 && (
+                <Button variant="contained" disabled style={{backgroundColor: '#4CAF50'}}>
+                {applyButtonText}
+              </Button>)
+                }
             </div>
           )}
         </Box>
@@ -549,7 +608,7 @@ const handleFileChange = (e) => {
           <Typography variant="h6">Total Applicants ( {applicationCount} ):</Typography>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Tabs
-              value={selectedTab}
+              value={selectedApplicantsTab}
               onChange={(e, newValue) => handleTabClick(newValue)}
               style={{ marginRight: '16px' }} // Add margin to create space
             >
@@ -725,7 +784,11 @@ const handleFileChange = (e) => {
       
       ) : (
         <div style={{ textAlign: 'center', marginTop: '70px' }}>
-          <h1>Select A Post to Show</h1>
+          {isSelectedListEmpty === false ? (
+            <h1>Select A Post to Show</h1>
+          ) : (
+            <h1>This List is Empty</h1>
+          )}
         </div>
       )}
     </>

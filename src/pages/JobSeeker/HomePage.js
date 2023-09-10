@@ -20,6 +20,7 @@ const HomePage = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const [isLoadingUser,setIsLoadingUser] = useState(true);
   const [error,setError] = useState(null);
+  const [isSelectedListEmpty,setIsSelectedListEmpty] = useState(false);
   const [showCompany,setShowCompany] = useState(false);
 
   const [currentUser, setCurrentUser] = useState(null);
@@ -62,14 +63,15 @@ const HomePage = () => {
         <>
         
           <div style={{ display: 'flex' }}>
-          <div style={{ flex: showCompany ? '50' : '2' }}>
+          <div style={{ flex: showCompany ? '50' : '3' }}>
               <AllJobLists user_id={user_id} isCompany={isCompany} isJobseeker={isJobseeker} isLoggedInUser={isLoggedInUser}
                selectedJob={selectedJob} setSelectedJob={setSelectedJob} 
                showCompany={showCompany} setShowCompany={setShowCompany}
+               isSelectedListEmpty={isSelectedListEmpty} setIsSelectedListEmpty={setIsSelectedListEmpty}
                 />
             </div>
             
-            <div style={{ flex: '4', marginTop: '50px' }}>
+            <div style={{ flex: '4', marginTop: '100px' }}>
             {!showCompany && (
               <JobPost
                 user_id={user_id}
@@ -78,6 +80,8 @@ const HomePage = () => {
                 isLoggedInUser={isLoggedInUser}
                 selectedJob={selectedJob}
                 setSelectedJob={setSelectedJob}
+                selectedTab={0}
+                isSelectedListEmpty={isSelectedListEmpty}
               />
             )}
           </div>

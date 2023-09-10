@@ -23,22 +23,29 @@ import { Link } from 'react-router-dom';
 import { useFetch } from '../Company/FetchContext';
 const drawerWidth = 350;
 
-const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSelectedJob,showCompany,setShowCompany}) => {
+const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSelectedJob,showCompany,setShowCompany,isSelectedListEmpty,setIsSelectedListEmpty}) => {
   const { fetch, setFetch } = useFetch();
   const [selectedList, setSelectedList] = useState('Latest Jobs');
   const [jobData, setJobData] = useState([]);
   const [companyData, setCompanyData] = useState([]);
+  const [companyData2, setCompanyData2] = useState([]);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState(''); // State for search query
   const [isLoadingJobPost,setIsLoadingJobPost] = useState(false);
   const [isLoadingCompanies,setIsLoadingCompanies] = useState(false);
 
   const JobList = ({ jobs}) => (
-      <Box sx={{ width: '100%' }}>
-        <Grid container spacing={2}>
-          {jobs.map((job) => (
-            <Grid item xs={12} key={job.jobpost_id}>
-              <Paper elevation={3} sx={{ padding: '16px' }}>
+    <div
+        style={{
+          height: '800px', // Adjust the height as needed
+          overflowY: 'auto',
+        }}
+      >
+        <Box sx={{ width: '100%' }}>
+          <Grid container spacing={2}>
+            {jobs.map((job) => (
+              <Grid item xs={12} key={job.jobpost_id}>
+                <Paper elevation={3} sx={{ padding: '16px' }}>
               <div
                 onClick={() => {
                   setSelectedJob(job);
@@ -85,26 +92,33 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
                 <Typography variant="subtitle1" gutterBottom>
                   Type: {job.employment_type}
                 </Typography>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    );
-    const CompanyList = ({ companies }) => (
-      <Box sx={{ width: '100%' }}>
-        <Grid container spacing={8}>
-          {companies.map((company) => (
-            <Grid item xs={12} sm={6} key={company.company_id}>
-              <Paper
-                elevation={3}
-                sx={{
-                  padding: '20px',
-                  borderRadius: '10px',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  height: '100%', // Set a fixed height for the cards
-                }}
-              >
+                </Paper>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  </div>
+);
+const CompanyList = ({ companies }) => (
+  <div
+    style={{
+      height: '800px', // Adjust the height as needed
+      overflowY: 'auto',
+    }}
+  >
+    <Box sx={{ width: '100%' }}>
+      <Grid container spacing={8}>
+        {companies.map((company) => (
+          <Grid item xs={12} sm={6} key={company.company_id}>
+            <Paper
+              elevation={3}
+              sx={{
+                padding: '20px',
+                borderRadius: '10px',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                height: '100%', // Set a fixed height for the cards
+              }}
+            >
                 <div
                   style={{
                     display: 'flex',
@@ -148,11 +162,12 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
                   </Typography>
                 )}
               </Paper>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    );
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  </div>
+);
     
     
 
@@ -185,6 +200,7 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
       if (jobdata.length > 0) {
         setSelectedJob(jobdata[0]);
       } else {
+        setIsSelectedListEmpty(true);
         setSelectedJob(null);
       }
       setJobData(jobdata);
@@ -217,6 +233,7 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
       //   setSelectedJob(null);
       // }
       setCompanyData(companydata);
+      setCompanyData2(companydata);
       console.log(`Fetched ${listType}:`, companydata);
     } catch (error) {
       setError(`Error fetching ${listType} company information.`);
@@ -237,9 +254,9 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
     }
   };
   const fetchSearchedCompany = () => {
-    if (searchQuery && searchQuery.trim() !== '') {
+    if (searchQuery) {
       // Filter the companies based on the searchQuery
-      const filteredCompanies = companyData.filter((company) => {
+      const filteredCompanies = companyData2.filter((company) => {
         const query = searchQuery.toLowerCase();
   
         // Check if the search query is present in any of the company's properties (with null checks)
@@ -257,7 +274,7 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
       setCompanyData(filteredCompanies);
     } else {
       // If searchQuery is empty or contains only whitespace, reset to the original data
-      setCompanyData(companyData);
+      setCompanyData(companyData2);
     }
   };  
   
@@ -423,7 +440,7 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
   value={searchQuery}
   onChange={(e) => setSearchQuery(e.target.value)}
   onKeyPress={(e) => {
-    if (e.key === 'Enter' && searchQuery.trim() !== '') {
+    if (e.key === 'Enter') {
       if (showCompany) {
         fetchSearchedCompany(); // Call fetchSearchedCompany if showCompany is true
       } else {
