@@ -36,6 +36,7 @@ function App() {
   const [allNotifications, setAllNotifications] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState([]);
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+  const [loggedInUser, setLoggedInUser] = useState();
 
   useEffect(() => {
     if (action !== "POP") {
@@ -73,7 +74,7 @@ function App() {
     // urls are searched & matched in top down fashion (I guess), so "/" need to at first position 
     // if any "localhost:3001/" is used
     //<BrowserRouter>
-    <NotificationContext.Provider value={{allNotifications, setAllNotifications, unreadNotifications, setUnreadNotifications, unreadNotificationsCount, setUnreadNotificationsCount}}>
+    <NotificationContext.Provider value={{allNotifications, setAllNotifications, unreadNotifications, setUnreadNotifications, unreadNotificationsCount, setUnreadNotificationsCount, loggedInUser, setLoggedInUser}}>
       
     <Routes>
       <Route path="/auth/login" element={<SignIn />} />

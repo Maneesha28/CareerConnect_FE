@@ -8,10 +8,11 @@ import { set } from 'date-fns';
 import { Link } from 'react-router-dom';
 
 function Notification() {
-  const { allNotifications, setAllNotifications, unreadNotifications, setUnreadNotifications, unreadNotificationsCount, setUnreadNotificationsCount } = useContext(NotificationContext);
+  const { allNotifications, setAllNotifications, unreadNotifications, setUnreadNotifications, unreadNotificationsCount, setUnreadNotificationsCount, loggedInUser, setLoggedInUser } = useContext(NotificationContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const [click, setClick] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
+  const [isLoadingUser,setIsLoadingUser] = useState(true);
 
   const fetchCurrentUser = async () => {
     try {
@@ -22,13 +23,15 @@ function Notification() {
         withCredentials: true,
       });
       setCurrentUser(response.data);
-      console.log("current user fetched, ",response.data.user_id);
+      setLoggedInUser(response.data);
+      //console.log("current user fetched, ",response.data.user_id);
     } catch (error) {
       console.log(error);
     }
   };
 
   const fetchAllNotifications = async () => {
+    console.log('Fetching All Notifications');
     try {
       const response = await axios.get('/api/notification/all', {
           headers: {
@@ -90,6 +93,7 @@ function Notification() {
 
   useEffect(() => {
     fetchUnreadNotifications();
+    fetchAllNotifications();
     fetchCurrentUser();
     fetchUnreadNotificationsCount();
   }, []);
@@ -168,27 +172,59 @@ function Notification() {
         </List>
 
       </Popover>
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
+      <Dialog open={openDialog} onClose={handleCloseDialog} modal={false}
+      >
         <DialogTitle>All Notifications</DialogTitle>
         <DialogContent>
           <List>
             {allNotifications.map((notification) => (
-              <Link
-                key={notification.notification_id}
-                to={
-                  notification.notification_type === 'jobpost'
-                    ? {
+              <List>
+              {allNotifications.map((notification) => (
+                <React.Fragment key={notification.notification_id}>
+                  {notification.notification_type === 'jobpost' && (
+                    <Link
+                      to={{
                         pathname: `/viewJobPost/${notification.related_id}`,
-                        state: { jobseeker_id: currentUser.user_id },
-                      }
-                    : `/jobseeker/${notification.related_id}`
-                }
-                style={{ textDecoration: 'none' }}
-              >
-                <ListItem>
-                  <ListItemText primary={notification.text} />
-                </ListItem>
-              </Link>
+                        state: { jobseeker_id: currentUser.user_id }
+                      }}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <ListItem>
+                        <ListItemText primary={notification.text} />
+                      </ListItem>
+                    </Link>
+                  )}
+                  {notification.notification_type === 'follow' && (
+                    <Link
+                      to={`/jobseeker/${notification.related_id}`}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <ListItem>
+                        <ListItemText primary={notification.text} />
+                      </ListItem>
+                    </Link>
+                  )}
+                </React.Fragment>
+              ))}
+            </List>
+            
+
+              // <Link
+              //   key={notification.notification_id}
+              //   to={
+              //     notification.notification_type === 'jobpost'
+              //       ? {
+              //           pathname: `/viewJobPost/${notification.related_id}`,
+              //           state: { jobseeker_id: currentUser.user_id }
+              //         }
+              //       : `/jobseeker/${notification.related_id}`
+              //   }
+              //   style={{ textDecoration: 'none' }}
+              // >
+              //   <ListItem>
+              //     <ListItemText primary={notification.text} />
+              //   </ListItem>
+              // </Link>
             ))}
           </List>
         </DialogContent>

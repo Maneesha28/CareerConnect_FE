@@ -20,6 +20,7 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Drawer,
 } from '@mui/material';
 import Header from '../../components/Header';
 import SearchIcon from '@mui/icons-material/Search';
@@ -41,12 +42,14 @@ import { Link } from 'react-router-dom';
 
 const ViewJobPost = () => {
   const location = useLocation();
+  const {loggedInUser} = useContext(NotificationContext);
+  console.log("value from context",loggedInUser);
   const jobseeker_id = location.state?.jobseeker_id;
-  console.log(location.state?.jobseeker_id);
+  console.log("inside jobpost" ,location.state?.jobseeker_id);
   const jobpost_id = useParams().jobpost_id;
-  console.log(jobpost_id);
   const [error, setError] = useState(null);
   const { allNotifications, setAllNotifications, unreadNotifications, setUnreadNotifications, unreadNotificationsCount, setUnreadNotificationsCount } = useContext(NotificationContext);
+  const [isNotificationLoaded,setIsNotificationLoaded] = useState(false);
   const [isLoadingJobPost, setIsLoadingJobPost] = useState(true);
   const [jobPost,setJobPost] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -171,6 +174,11 @@ const ViewJobPost = () => {
   };
  
   //---------------------------------------------------------------
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleDrawer = () => {
+    setIsOpen(!isOpen);
+  };
 
   useEffect(() => {
 
@@ -184,104 +192,119 @@ const ViewJobPost = () => {
     return (<div>Loading JobPost</div>);
   }
 
-  return (
-    <>
-    <Header/>
-    <div style={{ display: 'flex',marginTop: '70px' }}></div>
-    <Container sx={{ marginTop: '40px', marginLeft: '0', marginRight: 'auto', display: 'flex', justifyContent: 'space-between' }}>
-        <Box p={0} width="100%">
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px' }}>
-          <Typography variant="h2" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
-            {jobPost.title}
-          </Typography>
-        </Box>
-          <Paper elevation={3} sx={{ padding: '16px', marginBottom: '16px' }}>
-          <Box p={0} display="flex" alignItems="center" justifyContent="flex-end">
+// ... (previous code)
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Button variant="contained" startIcon={isShortlisted ? <BookmarkAddedTwoToneIcon /> : <BookmarkAddTwoToneIcon />} onClick={handleShortlist}>
-                    {shortListButtonText}
-                  </Button>
-                </div>
-
+return (
+  <>
+    <Header />
+    <div style={{ marginTop: '70px', display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ width: '70%' }}>
+        <Box p={0}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: '16px',
+            }}
+          >
+            <Typography variant="h2" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
+              {jobPost.title}
+            </Typography>
           </Box>
-            <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                    <Typography>company: </Typography>
-                    
-                      <Typography>{jobPost.company_name}</Typography>
-
-                  </Box>
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                  <Typography>Description: </Typography>
-                  
-                    <Typography>{jobPost.description}</Typography>
-
-                </Box>
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                  <Typography>Requirements: </Typography>
- 
-                    <Typography>{jobPost.requirements}</Typography>
-
-                </Box>
-
-
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                  <Typography>Vacancy: </Typography>
-                 
-                    <Typography>{jobPost.vacancy}</Typography>
-
-                </Box>
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                  <Typography>Salary: </Typography>
-                 
-                    <Typography>{jobPost.salary}</Typography>
-
-                </Box>
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                  <Typography>Employment Type: </Typography>
-                 
-                    <Typography>{jobPost.employment_type}</Typography>
-
-                </Box>
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                  <Typography>Application deadline: </Typography>
-                  
-                    <Typography variant="body1">{new Date(jobPost.deadline).toLocaleDateString()} at{' '}
-                    {new Date(jobPost.deadline).toLocaleTimeString([], { timeStyle: 'short' })}</Typography>
-
-                </Box>
-            
+          <Paper elevation={3} sx={{ padding: '16px', marginBottom: '16px' }}>
+            <Box p={0} display="flex" alignItems="center" justifyContent="flex-end">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Button
+                  variant="contained"
+                  startIcon={isShortlisted ? <BookmarkAddedTwoToneIcon /> : <BookmarkAddTwoToneIcon />}
+                  onClick={handleShortlist}
+                >
+                  {shortListButtonText}
+                </Button>
+              </div>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>company: </Typography>
+              <Typography>{jobPost.company_name}</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>Description: </Typography>
+              <Typography>{jobPost.description}</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>Requirements: </Typography>
+              <Typography>{jobPost.requirements}</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>Vacancy: </Typography>
+              <Typography>{jobPost.vacancy}</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>Salary: </Typography>
+              <Typography>{jobPost.salary}</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>Employment Type: </Typography>
+              <Typography>{jobPost.employment_type}</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>Application deadline: </Typography>
+              <Typography variant="body1">
+                {new Date(jobPost.deadline).toLocaleDateString()} at{' '}
+                {new Date(jobPost.deadline).toLocaleTimeString([], { timeStyle: 'short' })}
+              </Typography>
+            </Box>
           </Paper>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              <Button variant="contained" onClick={handleApply}>
-                {applyButtonText}
-              </Button>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <Button variant="contained" onClick={handleApply}>
+              {applyButtonText}
+            </Button>
+          </div>
         </Box>
+      </div>
 
-        {/* Right side: Link List */}
-    <div style={{ width: '30%' }}>
-    <List>
-            {allNotifications.map((notification) => (
-              <a
-                key={notification.notification_id}
-                href={
-                  notification.notification_type === 'jobpost'
-                    ? `/viewJobPost/${notification.related_id}`
-                    : `/jobseeker/${notification.related_id}`
-                }
-                style={{ textDecoration: 'none' }}
-              >
-                <ListItem>
-                  <ListItemText primary={notification.text} />
-                </ListItem>
-              </a>
-            ))}
-          </List>
+      <div style={{ display: 'flex', marginTop: '70px', justifyContent: 'space-between' }}>
+
+      <div style={{ width: '500px', overflowY: 'auto', maxHeight: '700px' }}>
+    <Paper elevation={3} style={{ padding: '16px', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
+        <Divider/>
+        <Typography variant="h4" style={{ marginBottom: '16px' }}>
+          All Notifications
+        </Typography>
+        <Divider/>
+      </div>
+      <List>
+        {allNotifications.map((notification) => (
+          <a
+            key={notification.notification_id}
+            href={
+              notification.notification_type === 'jobpost'
+                ? `/viewJobPost/${notification.related_id}`
+                : `/jobseeker/${notification.related_id}`
+            }
+            style={{ textDecoration: 'none' }}
+          >
+            <ListItem>
+              <ListItemText>
+                <Typography variant="h6" style={{ fontSize: '20px' }}>
+                  {notification.text}
+                </Typography>
+              </ListItemText>
+            </ListItem>
+          </a>
+        ))}
+      </List>
+    </Paper>
+  </div>
+  </div>
+
+
+
     </div>
-  </Container>
-    </>
-  );
-};
+  </>
+);
 
+            }
 export default ViewJobPost;
