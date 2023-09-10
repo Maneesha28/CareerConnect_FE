@@ -20,6 +20,11 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  TableContainer,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell
 } from '@mui/material';
 import Header from '../../components/Header';
 import SearchIcon from '@mui/icons-material/Search';
@@ -535,7 +540,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
                   </Box>
                 )}
 
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
+                {/* <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
                   <Typography>Vacancy: </Typography>
                   {isEditMode ? (
                     <TextField
@@ -598,8 +603,136 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
                     <Typography variant="body1">{new Date(selectedJob.deadline).toLocaleDateString()} at{' '}
                     {new Date(selectedJob.deadline).toLocaleTimeString([], { timeStyle: 'short' })}</Typography>
                   )}
-                </Box>
-            
+                </Box> */}
+            <TableContainer>
+                <Table aria-label="simple table" sx={{ width: 1 }}>
+                  <TableBody>
+                    {selectedJob.description && (
+                      <TableRow
+                        sx={{
+                          "&:last-child td, &:last-child th": {
+                            border: 0,
+                          },
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          <Typography sx={{ color: "gray" }}>
+                            Description
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{selectedJob.description}</TableCell>
+                      </TableRow>
+                    )}
+                    {selectedJob.requirements && (
+                      <TableRow
+                        sx={{
+                          "&:last-child td, &:last-child th": {
+                            border: 0,
+                          },
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          <Typography sx={{ color: "gray" }}>
+                            Requirements
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{selectedJob.requirements}</TableCell>
+                      </TableRow>
+                    )}
+                    {selectedJob.keywords && (
+                      <TableRow
+                        sx={{
+                          "&:last-child td, &:last-child th": {
+                            border: 0,
+                          },
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          <Typography sx={{ color: "gray" }}>
+                            Keywords
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {selectedJob && selectedJob.keywords
+                            ? selectedJob.keywords.split("|").join(",")
+                            : ""}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {selectedJob.vacancy && (
+                      <TableRow
+                        sx={{
+                          "&:last-child td, &:last-child th": {
+                            border: 0,
+                          },
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          <Typography sx={{ color: "gray" }}>
+                            Vacancy
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{selectedJob.vacancy}</TableCell>
+                      </TableRow>
+                    )}
+                    {selectedJob.salary && (
+                      <TableRow
+                        sx={{
+                          "&:last-child td, &:last-child th": {
+                            border: 0,
+                          },
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          <Typography sx={{ color: "gray" }}>Salary</Typography>
+                        </TableCell>
+                        <TableCell>{selectedJob.salary}</TableCell>
+                      </TableRow>
+                    )}
+                    {selectedJob.employment_type && (
+                      <TableRow
+                        sx={{
+                          "&:last-child td, &:last-child th": {
+                            border: 0,
+                          },
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          <Typography sx={{ color: "gray" }}>
+                            Employment Type
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{selectedJob.employment_type}</TableCell>
+                      </TableRow>
+                    )}
+                    {selectedJob.deadline && (
+                      <TableRow
+                        sx={{
+                          "&:last-child td, &:last-child th": {
+                            border: 0,
+                          },
+                        }}
+                      >
+                        <TableCell component="th" scope="row">
+                          <Typography sx={{ color: "gray" }}>
+                            Application Deadline
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(selectedJob.deadline).toLocaleDateString()}{" "}
+                          at{" "}
+                          {new Date(selectedJob.deadline).toLocaleTimeString(
+                            [],
+                            {
+                              timeStyle: "short",
+                            }
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
           </Paper>
           {isJobseeker && selectedTab===0 && (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
