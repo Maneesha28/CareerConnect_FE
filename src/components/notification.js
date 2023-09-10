@@ -5,11 +5,28 @@ import axios from 'axios';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { NotificationContext } from "../context/notificationContext";
 import { set } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 function Notification() {
   const { allNotifications, setAllNotifications, unreadNotifications, setUnreadNotifications, unreadNotificationsCount, setUnreadNotificationsCount } = useContext(NotificationContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const [click, setClick] = useState(0);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await axios.get("/api/auth/user", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      setCurrentUser(response.data);
+      console.log("current user fetched, ",response.data.user_id);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const fetchAllNotifications = async () => {
     try {
@@ -73,6 +90,7 @@ function Notification() {
 
   useEffect(() => {
     fetchUnreadNotifications();
+    fetchCurrentUser();
     fetchUnreadNotificationsCount();
   }, []);
 
@@ -128,7 +146,7 @@ function Notification() {
                 key={notification.notification_id}
                 href={
                 notification.notification_type === 'jobpost'
-                    ? `/companyViewJobPost/${notification.related_id}`
+                    ? `/viewJobPost/${notification.related_id}`
                     : `/jobseeker/${notification.related_id}`
                 }
                 style={{ textDecoration: 'none' }}
@@ -155,11 +173,14 @@ function Notification() {
         <DialogContent>
           <List>
             {allNotifications.map((notification) => (
-              <a
+              <Link
                 key={notification.notification_id}
-                href={
+                to={
                   notification.notification_type === 'jobpost'
-                    ? `/viewJobPost/${notification.related_id}`
+                    ? {
+                        pathname: `/viewJobPost/${notification.related_id}`,
+                        state: { jobseeker_id: currentUser.user_id },
+                      }
                     : `/jobseeker/${notification.related_id}`
                 }
                 style={{ textDecoration: 'none' }}
@@ -167,7 +188,7 @@ function Notification() {
                 <ListItem>
                   <ListItemText primary={notification.text} />
                 </ListItem>
-              </a>
+              </Link>
             ))}
           </List>
         </DialogContent>

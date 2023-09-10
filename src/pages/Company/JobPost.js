@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { useParams } from 'react-router';
 import axios from 'axios';
 import {
@@ -92,6 +92,49 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
   const handleCancel = () => {
     setIsDialogOpen(false);
     setIsEditMode(false);
+  };
+  //---------------------------Apply ---------------
+    
+  const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
+  const fileInputRef = useRef(null);
+const [selectedFile, setSelectedFile] = useState(null);
+const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  setSelectedFile(file);
+};
+
+  const handleApply = () => {
+    // Open the apply dialog
+    if(isApplied == 0) setIsApplyDialogOpen(true);
+  };
+
+  const handleUploadResume = () => {
+    // Create an input element dynamically
+    const input = document.createElement('input');
+    input.type = 'file';
+  
+    // Listen for the 'change' event when the user selects a file
+    input.addEventListener('change', (e) => {
+      const selectedFile = e.target.files[0];
+  
+      // You can now handle the selected file, for example, by uploading it to a server
+      // Here, we're just logging the selected file
+      console.log('Selected file:', selectedFile);
+  
+      // Close the dialog
+      setIsApplyDialogOpen(false);
+    });
+  
+    // Trigger a click event on the input element to open the file selection dialog
+    input.click();
+  };
+  
+
+  const handleBuildResume = () => {
+    // Open the resume builder link in a new tab
+    window.open(`/application/${user_id}`, '_blank');
+    // Close the dialog
+    setIsApplyDialogOpen(false);
   };
   //--------------------------Application---------------------------------
   const [selectedTab, setSelectedTab] = useState('Get All');
@@ -219,14 +262,6 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
       console.log("is applied: ",response.data);
     } catch (error) {
       setError(`Error fetching applied information.`);
-    }
-  };
-  const handleApply = async () => {
-    console.log("is applied", isApplied);
-    if (isApplied == 0) {
-      
-    } else if (isApplied == 1) {
-      
     }
   };
   //---------------------------Shortlist------------------------
@@ -648,21 +683,44 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
           </DialogActions>
         </Dialog>
         <Dialog open={isDeleteDialogOpen} onClose={handleDeleteConfirmationClose}>
-        <DialogTitle>Delete Job Post</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this job post?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteConfirmationClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmDelete} color="secondary">
-            Confirm Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+          <DialogTitle>Delete Job Post</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to delete this job post?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDeleteConfirmationClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmDelete} color="secondary">
+              Confirm Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog open={isApplyDialogOpen} onClose={() => setIsApplyDialogOpen(false)} maxWidth="md" fullWidth>
+    <DialogTitle>Apply for the Job</DialogTitle>
+    <DialogContent>
+      <DialogContentText>Choose how you want to apply for this job:</DialogContentText>
+      <div sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <Button variant="contained" onClick={handleUploadResume} sx={{ fontSize: '1.2rem', marginBottom: '1rem' }}>
+          Upload Resume
+        </Button>
+        <Button variant="contained" onClick={handleBuildResume} sx={{ fontSize: '1.2rem' }}>
+          Build Resume
+        </Button>
+      </div>
+      {/* Add the file input element */}
+      <input type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} />
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={() => setIsApplyDialogOpen(false)} color="primary">
+        Cancel
+      </Button>
+    </DialogActions>
+  </Dialog>
+
+
       </Container>
       
       ) : (

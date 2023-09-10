@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { useParams } from 'react-router';
 import axios from 'axios';
 import {
@@ -35,12 +35,18 @@ import BookmarkAddTwoToneIcon from '@mui/icons-material/BookmarkAddTwoTone';
 import BookmarkAddedTwoToneIcon from '@mui/icons-material/BookmarkAddedTwoTone';
 import { StyledTableCell, StyledTableRow, commonStyles } from '../JobSeeker/ComponentStyles';
 import DateComponent from '../../components/DateComponent';
-
+import { NotificationContext } from "../../context/notificationContext";
+import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const ViewJobPost = () => {
+  const location = useLocation();
+  const jobseeker_id = location.state?.jobseeker_id;
+  console.log(location.state?.jobseeker_id);
   const jobpost_id = useParams().jobpost_id;
   console.log(jobpost_id);
   const [error, setError] = useState(null);
+  const { allNotifications, setAllNotifications, unreadNotifications, setUnreadNotifications, unreadNotificationsCount, setUnreadNotificationsCount } = useContext(NotificationContext);
   const [isLoadingJobPost, setIsLoadingJobPost] = useState(true);
   const [jobPost,setJobPost] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -171,7 +177,7 @@ const ViewJobPost = () => {
       fetchJobPost();
       fetchIsApplied();
       fetchIsShortListed();
-
+      console.log(allNotifications);
   }, [jobpost_id]);
 
   if(isLoadingJobPost) {
@@ -182,7 +188,7 @@ const ViewJobPost = () => {
     <>
     <Header/>
     <div style={{ display: 'flex',marginTop: '70px' }}></div>
-    <Container sx={{ marginTop: '40px', marginLeft: '0', marginRight: 'auto' }}>
+    <Container sx={{ marginTop: '40px', marginLeft: '0', marginRight: 'auto', display: 'flex', justifyContent: 'space-between' }}>
         <Box p={0} width="100%">
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px' }}>
           <Typography variant="h2" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
@@ -253,10 +259,27 @@ const ViewJobPost = () => {
             </div>
         </Box>
 
-
-          
-      </Container>
-
+        {/* Right side: Link List */}
+    <div style={{ width: '30%' }}>
+    <List>
+            {allNotifications.map((notification) => (
+              <a
+                key={notification.notification_id}
+                href={
+                  notification.notification_type === 'jobpost'
+                    ? `/viewJobPost/${notification.related_id}`
+                    : `/jobseeker/${notification.related_id}`
+                }
+                style={{ textDecoration: 'none' }}
+              >
+                <ListItem>
+                  <ListItemText primary={notification.text} />
+                </ListItem>
+              </a>
+            ))}
+          </List>
+    </div>
+  </Container>
     </>
   );
 };
