@@ -213,7 +213,7 @@ const AddJobPost = () => {
         </Paper>
         <Button
           component={Link}
-          to={`/companyVacancy/${id}`}
+          to={`/company/${id}`}
           variant="contained"
           color="success"
           sx={{ float: 'right' }}

@@ -461,25 +461,28 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
   return (
     <>
     {selectedJob !== null? (
-      <Container sx={{ marginTop: '40px' }}>
-        <Box p={0} width="100%">
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px' }}>
-          <Typography variant="h2" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
-            {selectedJob.title}
-          </Typography>
-        </Box>
-          <Paper elevation={3} sx={{ padding: '16px', marginBottom: '16px' }}>
-          <Box p={0} display="flex" alignItems="center" justifyContent="flex-end">
-              {isLoggedInUser && isCompany && isEditMode && 
-                  <>
-                  <IconButton color="primary" onClick={handleSave}>
-                    <SaveIcon />
-                  </IconButton>
-                  <IconButton color="error" onClick={handleCancel}>
-                    <CancelIcon />
-                  </IconButton>
-                </>
-              }
+       <Container sx={{ marginTop: "40px" }}>
+       <Box p={0} width="100%">
+         <Box
+           sx={{
+             display: "flex",
+             justifyContent: "center",
+             alignItems: "center",
+             marginBottom: "16px",
+           }}
+         >
+           <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+             {selectedJob.title}
+           </Typography>
+         </Box>
+         <Paper elevation={3} sx={{ padding: "16px", marginBottom: "16px" }}>
+           <Box
+             p={0}
+             display="flex"
+             alignItems="center"
+             justifyContent="flex-end"
+           >
+              
               {isLoggedInUser && isCompany&& !isEditMode &&
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Button variant="outlined" startIcon={<EditIcon />} onClick={handleEdit}>
@@ -920,13 +923,15 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
     <DialogContent>
       <DialogContentText>Choose how you want to apply for this job:</DialogContentText>
       <div sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <Button variant="contained" onClick={handleUploadResume} sx={{ fontSize: '1.2rem', marginBottom: '1rem' }}>
-          Upload Resume
-        </Button>
-        <Button variant="contained" onClick={handleBuildResume} sx={{ fontSize: '1.2rem' }}>
-          Build Resume
-        </Button>
-      </div>
+  <Button variant="contained" onClick={handleUploadResume} sx={{ fontSize: '1.2rem', marginBottom: '1rem' }}>
+    Upload Resume
+  </Button>
+  <div style={{ margin: '0.5rem' }} /> {/* This div adds space between the buttons */}
+  <Button variant="contained" onClick={handleBuildResume} sx={{ fontSize: '1.2rem' }}>
+    Build Resume
+  </Button>
+</div>
+
       {/* Add the file input element */}
       <input type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} />
     </DialogContent>
