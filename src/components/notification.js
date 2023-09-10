@@ -185,7 +185,7 @@ function Notification() {
                     <Link
                       to={{
                         pathname: `/viewJobPost/${notification.related_id}`,
-                        state: { jobseeker_id: currentUser.user_id }
+                        state: { jobpost_id: notification.related_id }
                       }}
                       style={{ textDecoration: 'none' }}
                     >

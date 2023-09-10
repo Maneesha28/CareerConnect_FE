@@ -39,13 +39,16 @@ import DateComponent from '../../components/DateComponent';
 import { NotificationContext } from "../../context/notificationContext";
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { storage } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
 
 const ViewJobPost = () => {
   const location = useLocation();
   const {loggedInUser} = useContext(NotificationContext);
   console.log("value from context",loggedInUser);
-  const jobseeker_id = location.state?.jobseeker_id;
-  console.log("inside jobpost" ,location.state?.jobseeker_id);
+  // const jobpost_id = location.state?.jobpost_id;
+  // console.log("inside jobpost, jobpost_id" ,location.state?.jobpost_id);
   const jobpost_id = useParams().jobpost_id;
   const [error, setError] = useState(null);
   const { allNotifications, setAllNotifications, unreadNotifications, setUnreadNotifications, unreadNotificationsCount, setUnreadNotificationsCount } = useContext(NotificationContext);
@@ -79,16 +82,20 @@ const ViewJobPost = () => {
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [resume,setResume] = useState({
+    'jobpost_id': '',
+    'resume': '',
+  });
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setSelectedFile(file);
   };
- 
+
   const handleApply = () => {
     // Open the apply dialog
     if(isApplied == 0) setIsApplyDialogOpen(true);
   };
- 
+
   const sendResumeToBackend = async (resume) => {
     try {
         console.log('resume: ', resume);
@@ -98,54 +105,59 @@ const ViewJobPost = () => {
         },
         withCredentials: true,
       });
+      setResume({
+        'jobpost_id': '',
+        'resume': '',
+      });
       console.log(response.data);
+      setIsApplied(1);
+      setApplyButtonText('Applied');
     } catch (error) {
       console.error(error);
     }
   };
- 
+
   async function uploadFileToFirebase(file) {
     try {
       // Generate a unique filename using UUID
       const uniqueFilename = `${uuidv4()}_${file.name}`;
-     
+      
       const storageRef = ref(storage, `applications/${uniqueFilename}`);
       await uploadBytes(storageRef, file);
- 
+  
       const downloadURL = await getDownloadURL(storageRef);
- 
+  
       return downloadURL;
     } catch (error) {
       console.error('Error uploading file to Firebase:', error);
       throw error;
     }
   }
- 
+
   const handleUploadResume = () => {
     // Create an input element dynamically
     const input = document.createElement('input');
     input.type = 'file';
- 
+  
     // Listen for the 'change' event when the user selects a file
     input.addEventListener('change', async (e) => {
       const selectedFile = e.target.files[0];
- 
+  
       // Close the dialog
       setIsApplyDialogOpen(false);
-     
+      
       if (selectedFile) {
         try {
           // Upload the file to Firebase Storage and get the download URL
-          const downloadURL = await uploadFileToFirebase(selectedFile);        
+          const downloadURL = await uploadFileToFirebase(selectedFile);         
           // Now, you have the download URL for the uploaded file, which you can use or store as needed
           console.log('Uploaded resume to Firebase. Download URL:', downloadURL);
-          console.log('jobpost_id: ',selectedJob.jobpost_id);
           setResume({
-            'jobpost_id': selectedJob.jobpost_id,
+            'jobpost_id': jobpost_id,
             'resume': downloadURL
           });
-          console.log('resume before sending to backend: ',resume);
-          await sendResumeToBackend(resume);
+          //console.log('resume before sending to backend: ',resume);
+          //await sendResumeToBackend(resume);
         } catch (error) {
           console.error('Error uploading resume to Firebase:', error);
         }
@@ -154,8 +166,8 @@ const ViewJobPost = () => {
     // Trigger a click event on the input element to open the file selection dialog
     input.click();
   };
- 
- 
+  
+
   const handleBuildResume = () => {
     // Open the resume builder link in a new tab
     window.open(`/application/${user_id}`, '_blank');
@@ -267,7 +279,13 @@ const ViewJobPost = () => {
       fetchIsShortListed();
       console.log(allNotifications);
   }, [jobpost_id]);
-
+  useEffect(() => {
+    // Check if the resume state has changed and is not null
+    if (resume && resume.resume && resume.jobpost_id) {
+      sendResumeToBackend(resume);
+    }
+  }, [resume]);
+  
   if(isLoadingJobPost) {
     return (<div>Loading JobPost</div>);
   }
@@ -306,7 +324,12 @@ return (
             </Box>
             <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
               <Typography>company: </Typography>
-              <Typography>{jobPost.company_name}</Typography>
+              <Link
+                to={`/company/${jobPost.company_id}`}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <Typography>{jobPost.company_name}</Typography>
+              </Link>
             </Box>
             <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
               <Typography>Description: </Typography>
@@ -337,23 +360,40 @@ return (
             </Box>
           </Paper>
 
-            <div  style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               {isApplied == 0 && (
                 <Button variant="contained" onClick={handleApply}>
                 {applyButtonText}
               </Button>)
                 }
-              {isApplied === 1 && (
-                <Button
-                  variant="contained"
-                  disabled
-                  style={{ backgroundColor: '#4CAF50' }}
-                >
-                  {applyButtonText}
-                </Button>
-              )}
+              {isApplied == 1 && (
+                <Button variant="contained" disabled style={{backgroundColor: '#4CAF50'}}>
+                {applyButtonText}
+              </Button>)
+                }
             </div>
         </Box>
+        <Dialog open={isApplyDialogOpen} onClose={() => setIsApplyDialogOpen(false)} maxWidth="md" fullWidth>
+    <DialogTitle>Apply for the Job</DialogTitle>
+    <DialogContent>
+      <DialogContentText>Choose how you want to apply for this job:</DialogContentText>
+      <div sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <Button variant="contained" onClick={handleUploadResume} sx={{ fontSize: '1.2rem', marginBottom: '1rem' }}>
+          Upload Resume
+        </Button>
+        <Button variant="contained" onClick={handleBuildResume} sx={{ fontSize: '1.2rem' }}>
+          Build Resume
+        </Button>
+      </div>
+      {/* Add the file input element */}
+      <input type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} />
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={() => setIsApplyDialogOpen(false)} color="primary">
+        Cancel
+      </Button>
+    </DialogActions>
+  </Dialog>
       </div>
 
       <div style={{ display: 'flex', marginTop: '70px', justifyContent: 'space-between' }}>
