@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useContext } from 'react';
+import React, { useState, useEffect,useContext,useRef } from 'react';
 import { useParams } from 'react-router';
 import axios from 'axios';
 import {
@@ -74,6 +74,94 @@ const ViewJobPost = () => {
       setIsLoadingJobPost(false);
     }
   };
+  //-------------------------Apply JobPost -------------------------------
+     
+  const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
+  const fileInputRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+  };
+ 
+  const handleApply = () => {
+    // Open the apply dialog
+    if(isApplied == 0) setIsApplyDialogOpen(true);
+  };
+ 
+  const sendResumeToBackend = async (resume) => {
+    try {
+        console.log('resume: ', resume);
+        const response = await axios.post('/api/application', resume, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+ 
+  async function uploadFileToFirebase(file) {
+    try {
+      // Generate a unique filename using UUID
+      const uniqueFilename = `${uuidv4()}_${file.name}`;
+     
+      const storageRef = ref(storage, `applications/${uniqueFilename}`);
+      await uploadBytes(storageRef, file);
+ 
+      const downloadURL = await getDownloadURL(storageRef);
+ 
+      return downloadURL;
+    } catch (error) {
+      console.error('Error uploading file to Firebase:', error);
+      throw error;
+    }
+  }
+ 
+  const handleUploadResume = () => {
+    // Create an input element dynamically
+    const input = document.createElement('input');
+    input.type = 'file';
+ 
+    // Listen for the 'change' event when the user selects a file
+    input.addEventListener('change', async (e) => {
+      const selectedFile = e.target.files[0];
+ 
+      // Close the dialog
+      setIsApplyDialogOpen(false);
+     
+      if (selectedFile) {
+        try {
+          // Upload the file to Firebase Storage and get the download URL
+          const downloadURL = await uploadFileToFirebase(selectedFile);        
+          // Now, you have the download URL for the uploaded file, which you can use or store as needed
+          console.log('Uploaded resume to Firebase. Download URL:', downloadURL);
+          console.log('jobpost_id: ',selectedJob.jobpost_id);
+          setResume({
+            'jobpost_id': selectedJob.jobpost_id,
+            'resume': downloadURL
+          });
+          console.log('resume before sending to backend: ',resume);
+          await sendResumeToBackend(resume);
+        } catch (error) {
+          console.error('Error uploading resume to Firebase:', error);
+        }
+      }
+    });
+    // Trigger a click event on the input element to open the file selection dialog
+    input.click();
+  };
+ 
+ 
+  const handleBuildResume = () => {
+    // Open the resume builder link in a new tab
+    window.open(`/application/${user_id}`, '_blank');
+    // Close the dialog
+    setIsApplyDialogOpen(false);
+  };
   //--------------------------Application---------------------------------
 
   const fetchIsApplied = async () => {
@@ -98,14 +186,6 @@ const ViewJobPost = () => {
       console.log("is applied: ",response.data);
     } catch (error) {
       setError(`Error fetching applied information.`);
-    }
-  };
-  const handleApply = async () => {
-    console.log("is applied", isApplied);
-    if (isApplied == 0) {
-      
-    } else if (isApplied == 1) {
-      
     }
   };
   //---------------------------Shortlist------------------------
@@ -256,11 +336,23 @@ return (
               </Typography>
             </Box>
           </Paper>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-            <Button variant="contained" onClick={handleApply}>
-              {applyButtonText}
-            </Button>
-          </div>
+
+            <div  style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              {isApplied == 0 && (
+                <Button variant="contained" onClick={handleApply}>
+                {applyButtonText}
+              </Button>)
+                }
+              {isApplied === 1 && (
+                <Button
+                  variant="contained"
+                  disabled
+                  style={{ backgroundColor: '#4CAF50' }}
+                >
+                  {applyButtonText}
+                </Button>
+              )}
+            </div>
         </Box>
       </div>
 
