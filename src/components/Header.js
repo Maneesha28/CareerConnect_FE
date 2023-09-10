@@ -117,7 +117,7 @@ const Header = () => {
           )}
           {currentUser && currentUser.role === "jobseeker" && (
             <Box>
-              <IconButton color="inherit"  component={Link} to={`/jobseeker/${currentUser.user_id}`}>
+              <IconButton color="inherit"  component={Link} to={`/home/${currentUser.user_id}`}>
 
                 <Home />
               </IconButton>
