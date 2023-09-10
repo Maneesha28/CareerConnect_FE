@@ -1,6 +1,6 @@
-import React, { useState, useEffect,useRef } from 'react';
-import { useParams } from 'react-router';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from "react";
+import { useParams } from "react-router";
+import axios from "axios";
 import {
   Box,
   Container,
@@ -44,16 +44,16 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
   const { fetch, setFetch } = useFetch();
   const company_id = useParams().company_id;
   const [error, setError] = useState(null);
-  const [applications,setApplications] = useState([]);
-  const [applications2,setApplications2] = useState([]);
-  const [applicationCount,setApplicationCount] = useState(0);
+  const [applications, setApplications] = useState([]);
+  const [applications2, setApplications2] = useState([]);
+  const [applicationCount, setApplicationCount] = useState(0);
   const [isLoadingJobPost, setIsLoadingJobPost] = useState(true);
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editedInfo, setEditedInfo] = useState({});
-  const [isShortlisted,setIsShortListed] = useState(false);
-  const [shortListButtonText,setShortListButtonText] = useState('');
+  const [isShortlisted, setIsShortListed] = useState(false);
+  const [shortListButtonText, setShortListButtonText] = useState("");
   const [isApplied, setIsApplied] = useState(false);
   const [applyButtonText,setApplyButtonText] = useState('');
   const [resume,setResume] = useState({
@@ -65,30 +65,34 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
     try {
       let updatedInfo;
       if (editedInfo.keywords) {
-        console.log('here');
+        console.log("here");
         const words = editedInfo.keywords.split(",").join("|");
         updatedInfo = { ...editedInfo, keywords: words };
         // Now, you can use the updatedInfo object as needed
         console.log(updatedInfo);
-      }else{
+      } else {
         updatedInfo = editedInfo;
       }
       setIsDialogOpen(false);
       setIsEditMode(false);
-      console.log('They should be | separated: ',updatedInfo);
-      
+      console.log("They should be | separated: ", updatedInfo);
+
       // Send editedInfo to the backend
-      const response = await axios.put(`/api/jobpost/${selectedJob.jobpost_id}`, updatedInfo, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
+      const response = await axios.put(
+        `/api/jobpost/${selectedJob.jobpost_id}`,
+        updatedInfo,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
       setSelectedJob(editedInfo);
-      console.log('1)fetch: ',fetch);
+      console.log("1)fetch: ", fetch);
       setFetch(true);
     } catch (error) {
-      console.error('Error updating jobpost info:', error);
+      console.error("Error updating jobpost info:", error);
     }
   };
 
@@ -101,7 +105,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
     setIsEditMode(false);
   };
   //---------------------------Apply ---------------
-    
+
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -112,7 +116,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
 
   const handleApply = () => {
     // Open the apply dialog
-    if(isApplied == 0) setIsApplyDialogOpen(true);
+    if (isApplied == 0) setIsApplyDialogOpen(true);
   };
 
   const sendResumeToBackend = async (resume) => {
@@ -149,9 +153,9 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
 
   const handleUploadResume = () => {
     // Create an input element dynamically
-    const input = document.createElement('input');
-    input.type = 'file';
-  
+    const input = document.createElement("input");
+    input.type = "file";
+
     // Listen for the 'change' event when the user selects a file
     input.addEventListener('change', async (e) => {
       const selectedFile = e.target.files[0];
@@ -180,63 +184,62 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
     // Trigger a click event on the input element to open the file selection dialog
     input.click();
   };
-  
 
   const handleBuildResume = () => {
     // Open the resume builder link in a new tab
-    window.open(`/application/${user_id}`, '_blank');
+    window.open(`/application/${user_id}`, "_blank");
     // Close the dialog
     setIsApplyDialogOpen(false);
   };
   //--------------------------Application---------------------------------
   const [selectedApplicantsTab, setselectedApplicantsTab] = useState('Get All');
   const [sortAscending, setSortAscending] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchAllApplications = async () => {
     const endpoint = `/api/application/${selectedJob.jobpost_id}`;
     try {
       const response = await axios.get(endpoint, {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         withCredentials: true,
       });
-  
+
       // Modify data (e.g., remove columns containing "_id")
-      if(response.data.status === 'Access Denied') {
+      if (response.data.status === "Access Denied") {
         setError(response.data.status);
         setIsLoadingJobPost(false);
         return;
       }
       setApplications(response.data);
       setApplications2(response.data);
-      console.log("Application: ",response.data);
+      console.log("Application: ", response.data);
       setIsLoadingJobPost(false);
     } catch (error) {
       setError(`Error fetching all applications.`);
       setIsLoadingJobPost(false);
     }
   };
-  const fetchSuggestedApplications = async () =>{
+  const fetchSuggestedApplications = async () => {
     const endpoint = `/api/application/suggested/${selectedJob.jobpost_id}`;
     try {
       const response = await axios.get(endpoint, {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         withCredentials: true,
       });
-  
+
       // Modify data (e.g., remove columns containing "_id")
-      if(response.data.status === 'Access Denied') {
+      if (response.data.status === "Access Denied") {
         setError(response.data.status);
         setIsLoadingJobPost(false);
         return;
       }
       setApplications(response.data);
       setApplications2(response.data);
-      console.log("Application: ",response.data);
+      console.log("Application: ", response.data);
       setIsLoadingJobPost(false);
     } catch (error) {
       setError(`Error fetching suggested applications.`);
@@ -247,49 +250,52 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
     setselectedApplicantsTab(tab);
   
     // Perform the corresponding action based on the selected tab
-    if (tab === 'Get All') {
+    if (tab === "Get All") {
       fetchAllApplications();
-    } else if (tab === 'Get Suggested') {
+    } else if (tab === "Get Suggested") {
       fetchSuggestedApplications();
     }
   };
-  
+
   const handleSortClick = () => {
     // Toggle sorting order
     setSortAscending(!sortAscending);
-  
+
     // Sort applications based on the sorting order and re-render
     const sortedApplications = [...applications].sort((a, b) => {
       const compareResult = a.name.localeCompare(b.name);
       return sortAscending ? compareResult : -compareResult;
     });
-  
+
     setApplications(sortedApplications);
   };
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-  
+
     // Filter applications based on the search query
     const filteredApplications = applications2.filter((applicant) =>
       applicant.name.toLowerCase().includes(query.toLowerCase())
     );
-  
+
     setApplications(filteredApplications);
   };
-  
+
   const fetchApplicationsCount = async () => {
     try {
-      const response = await axios.get(`/api/application/count/${selectedJob.jobpost_id}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
-      console.log('response ', response.data);
+      const response = await axios.get(
+        `/api/application/count/${selectedJob.jobpost_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("response ", response.data);
       setApplicationCount(response.data.application_count);
     } catch (error) {
-      console.error('Error fetching count:', error);
+      console.error("Error fetching count:", error);
     }
   };
   const fetchIsApplied = async () => {
@@ -297,12 +303,12 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
     try {
       const response = await axios.get(endpoint, {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         withCredentials: true,
       });
-  
-      if(response.data.status === 'Access Denied') {
+
+      if (response.data.status === "Access Denied") {
         setError(response.data.status);
       }
       setIsApplied(response.data.is_applied);
@@ -311,7 +317,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
       }else{
         setApplyButtonText("Apply Now");
       }
-      console.log("is applied: ",response.data);
+      console.log("is applied: ", response.data);
     } catch (error) {
       setError(`Error fetching applied information.`);
     }
@@ -323,26 +329,26 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
     try {
       const response = await axios.get(endpoint, {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         withCredentials: true,
       });
-  
-      if(response.data.status === 'Access Denied') {
+
+      if (response.data.status === "Access Denied") {
         setError(response.data.status);
       }
       setIsShortListed(response.data.is_shortlisted);
-      if(response.data.is_shortlisted == 1){
-        setShortListButtonText('Shortlisted');
-      }else{
-        setShortListButtonText('Shortlist');
+      if (response.data.is_shortlisted == 1) {
+        setShortListButtonText("Shortlisted");
+      } else {
+        setShortListButtonText("Shortlist");
       }
-      console.log("is shortlisted: ",response.data);
+      console.log("is shortlisted: ", response.data);
     } catch (error) {
       setError(`Error fetching shortlisted information.`);
     }
   };
-  
+
   const handleShortlist = async () => {
     const requestData = {
       jobpost_id: selectedJob.jobpost_id,
@@ -350,14 +356,18 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
     console.log("is shortlisted ", isShortlisted);
     if (isShortlisted == 0) {
       try {
-        const response = await axios.post("/api/jobpost/shortlisted", requestData, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        });
+        const response = await axios.post(
+          "/api/jobpost/shortlisted",
+          requestData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
         console.log(response.data);
-        setShortListButtonText('Shortlisted');
+        setShortListButtonText("Shortlisted");
         setIsShortListed(1);
         setFetch(true);
       } catch (error) {
@@ -374,7 +384,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
         });
         console.log(requestData);
         console.log(response.data);
-        setShortListButtonText('Shortlist');
+        setShortListButtonText("Shortlist");
         setIsShortListed(0);
         setFetch(true);
       } catch (error) {
@@ -393,39 +403,42 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
   const handleConfirmDelete = async () => {
     try {
       // Send a DELETE request to delete the job post by its ID
-      const response = await axios.delete(`/api/jobpost/${selectedJob.jobpost_id}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
+      const response = await axios.delete(
+        `/api/jobpost/${selectedJob.jobpost_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
 
-      console.log('Job post deleted successfully:', response.data);
+      console.log("Job post deleted successfully:", response.data);
       setIsDeleteDialogOpen(false);
       setSelectedJob(null);
       setFetch(true); // Trigger a fetch after deletion
     } catch (error) {
       // Handle error
-      console.error('Error deleting job post:', error);
+      console.error("Error deleting job post:", error);
       setIsDeleteDialogOpen(false);
     }
   };
   //---------------------------------------------------------------
 
   useEffect(() => {
-  if(selectedJob){
-    fetchAllApplications();
-    fetchApplicationsCount();
-    console.log('2)fetch: ',fetch);
-    if(isJobseeker){
-      fetchIsApplied();
-      fetchIsShortListed();
+    if (selectedJob) {
+      fetchAllApplications();
+      fetchApplicationsCount();
+      console.log("2)fetch: ", fetch);
+      if (isJobseeker) {
+        fetchIsApplied();
+        fetchIsShortListed();
+      }
     }
-  }
   }, [selectedJob]);
 
-  if(selectedJob && isLoadingJobPost) {
-    return (<div>Loading JobPost</div>);
+  if (selectedJob && isLoadingJobPost) {
+    return <div>Loading JobPost</div>;
   }
 
   return (
