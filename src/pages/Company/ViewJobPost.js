@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useContext } from 'react';
+import React, { useState, useEffect,useContext,useRef } from 'react';
 import { useParams } from 'react-router';
 import axios from 'axios';
 import {
@@ -20,6 +20,7 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Drawer,
 } from '@mui/material';
 import Header from '../../components/Header';
 import SearchIcon from '@mui/icons-material/Search';
@@ -38,15 +39,20 @@ import DateComponent from '../../components/DateComponent';
 import { NotificationContext } from "../../context/notificationContext";
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { storage } from '../../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
 
 const ViewJobPost = () => {
   const location = useLocation();
-  const jobseeker_id = location.state?.jobseeker_id;
-  console.log(location.state?.jobseeker_id);
+  const {loggedInUser} = useContext(NotificationContext);
+  console.log("value from context",loggedInUser);
+  // const jobpost_id = location.state?.jobpost_id;
+  // console.log("inside jobpost, jobpost_id" ,location.state?.jobpost_id);
   const jobpost_id = useParams().jobpost_id;
-  console.log(jobpost_id);
   const [error, setError] = useState(null);
   const { allNotifications, setAllNotifications, unreadNotifications, setUnreadNotifications, unreadNotificationsCount, setUnreadNotificationsCount } = useContext(NotificationContext);
+  const [isNotificationLoaded,setIsNotificationLoaded] = useState(false);
   const [isLoadingJobPost, setIsLoadingJobPost] = useState(true);
   const [jobPost,setJobPost] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -70,6 +76,103 @@ const ViewJobPost = () => {
       setError('Error fetching jobpost information.');
       setIsLoadingJobPost(false);
     }
+  };
+  //-------------------------Apply JobPost -------------------------------
+     
+  const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
+  const fileInputRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [resume,setResume] = useState({
+    'jobpost_id': '',
+    'resume': '',
+  });
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+  };
+
+  const handleApply = () => {
+    // Open the apply dialog
+    if(isApplied == 0) setIsApplyDialogOpen(true);
+  };
+
+  const sendResumeToBackend = async (resume) => {
+    try {
+        console.log('resume: ', resume);
+        const response = await axios.post('/api/application', resume, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      setResume({
+        'jobpost_id': '',
+        'resume': '',
+      });
+      console.log(response.data);
+      setIsApplied(1);
+      setApplyButtonText('Applied');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  async function uploadFileToFirebase(file) {
+    try {
+      // Generate a unique filename using UUID
+      const uniqueFilename = `${uuidv4()}_${file.name}`;
+      
+      const storageRef = ref(storage, `applications/${uniqueFilename}`);
+      await uploadBytes(storageRef, file);
+  
+      const downloadURL = await getDownloadURL(storageRef);
+  
+      return downloadURL;
+    } catch (error) {
+      console.error('Error uploading file to Firebase:', error);
+      throw error;
+    }
+  }
+
+  const handleUploadResume = () => {
+    // Create an input element dynamically
+    const input = document.createElement('input');
+    input.type = 'file';
+  
+    // Listen for the 'change' event when the user selects a file
+    input.addEventListener('change', async (e) => {
+      const selectedFile = e.target.files[0];
+  
+      // Close the dialog
+      setIsApplyDialogOpen(false);
+      
+      if (selectedFile) {
+        try {
+          // Upload the file to Firebase Storage and get the download URL
+          const downloadURL = await uploadFileToFirebase(selectedFile);         
+          // Now, you have the download URL for the uploaded file, which you can use or store as needed
+          console.log('Uploaded resume to Firebase. Download URL:', downloadURL);
+          setResume({
+            'jobpost_id': jobpost_id,
+            'resume': downloadURL
+          });
+          //console.log('resume before sending to backend: ',resume);
+          //await sendResumeToBackend(resume);
+        } catch (error) {
+          console.error('Error uploading resume to Firebase:', error);
+        }
+      }
+    });
+    // Trigger a click event on the input element to open the file selection dialog
+    input.click();
+  };
+  
+
+  const handleBuildResume = () => {
+    // Open the resume builder link in a new tab
+    window.open(`/application/${user_id}`, '_blank');
+    // Close the dialog
+    setIsApplyDialogOpen(false);
   };
   //--------------------------Application---------------------------------
 
@@ -95,14 +198,6 @@ const ViewJobPost = () => {
       console.log("is applied: ",response.data);
     } catch (error) {
       setError(`Error fetching applied information.`);
-    }
-  };
-  const handleApply = async () => {
-    console.log("is applied", isApplied);
-    if (isApplied == 0) {
-      
-    } else if (isApplied == 1) {
-      
     }
   };
   //---------------------------Shortlist------------------------
@@ -171,6 +266,11 @@ const ViewJobPost = () => {
   };
  
   //---------------------------------------------------------------
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleDrawer = () => {
+    setIsOpen(!isOpen);
+  };
 
   useEffect(() => {
 
@@ -179,109 +279,164 @@ const ViewJobPost = () => {
       fetchIsShortListed();
       console.log(allNotifications);
   }, [jobpost_id]);
-
+  useEffect(() => {
+    // Check if the resume state has changed and is not null
+    if (resume && resume.resume && resume.jobpost_id) {
+      sendResumeToBackend(resume);
+    }
+  }, [resume]);
+  
   if(isLoadingJobPost) {
     return (<div>Loading JobPost</div>);
   }
 
-  return (
-    <>
-    <Header/>
-    <div style={{ display: 'flex',marginTop: '70px' }}></div>
-    <Container sx={{ marginTop: '40px', marginLeft: '0', marginRight: 'auto', display: 'flex', justifyContent: 'space-between' }}>
-        <Box p={0} width="100%">
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '16px' }}>
-          <Typography variant="h2" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
-            {jobPost.title}
-          </Typography>
-        </Box>
-          <Paper elevation={3} sx={{ padding: '16px', marginBottom: '16px' }}>
-          <Box p={0} display="flex" alignItems="center" justifyContent="flex-end">
+// ... (previous code)
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Button variant="contained" startIcon={isShortlisted ? <BookmarkAddedTwoToneIcon /> : <BookmarkAddTwoToneIcon />} onClick={handleShortlist}>
-                    {shortListButtonText}
-                  </Button>
-                </div>
-
+return (
+  <>
+    <Header />
+    <div style={{ marginTop: '70px', display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ width: '70%' }}>
+        <Box p={0}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: '16px',
+            }}
+          >
+            <Typography variant="h2" sx={{ fontWeight: 'bold', textDecoration: 'underline' }}>
+              {jobPost.title}
+            </Typography>
           </Box>
-            <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                    <Typography>company: </Typography>
-                    
-                      <Typography>{jobPost.company_name}</Typography>
-
-                  </Box>
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                  <Typography>Description: </Typography>
-                  
-                    <Typography>{jobPost.description}</Typography>
-
-                </Box>
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                  <Typography>Requirements: </Typography>
- 
-                    <Typography>{jobPost.requirements}</Typography>
-
-                </Box>
-
-
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                  <Typography>Vacancy: </Typography>
-                 
-                    <Typography>{jobPost.vacancy}</Typography>
-
-                </Box>
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                  <Typography>Salary: </Typography>
-                 
-                    <Typography>{jobPost.salary}</Typography>
-
-                </Box>
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                  <Typography>Employment Type: </Typography>
-                 
-                    <Typography>{jobPost.employment_type}</Typography>
-
-                </Box>
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
-                  <Typography>Application deadline: </Typography>
-                  
-                    <Typography variant="body1">{new Date(jobPost.deadline).toLocaleDateString()} at{' '}
-                    {new Date(jobPost.deadline).toLocaleTimeString([], { timeStyle: 'short' })}</Typography>
-
-                </Box>
-            
+          <Paper elevation={3} sx={{ padding: '16px', marginBottom: '16px' }}>
+            <Box p={0} display="flex" alignItems="center" justifyContent="flex-end">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Button
+                  variant="contained"
+                  startIcon={isShortlisted ? <BookmarkAddedTwoToneIcon /> : <BookmarkAddTwoToneIcon />}
+                  onClick={handleShortlist}
+                >
+                  {shortListButtonText}
+                </Button>
+              </div>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>company: </Typography>
+              <Link
+                to={`/company/${jobPost.company_id}`}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <Typography>{jobPost.company_name}</Typography>
+              </Link>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>Description: </Typography>
+              <Typography>{jobPost.description}</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>Requirements: </Typography>
+              <Typography>{jobPost.requirements}</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>Vacancy: </Typography>
+              <Typography>{jobPost.vacancy}</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>Salary: </Typography>
+              <Typography>{jobPost.salary}</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>Employment Type: </Typography>
+              <Typography>{jobPost.employment_type}</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" sx={{ ...commonStyles.box }}>
+              <Typography>Application deadline: </Typography>
+              <Typography variant="body1">
+                {new Date(jobPost.deadline).toLocaleDateString()} at{' '}
+                {new Date(jobPost.deadline).toLocaleTimeString([], { timeStyle: 'short' })}
+              </Typography>
+            </Box>
           </Paper>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              <Button variant="contained" onClick={handleApply}>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              {isApplied == 0 && (
+                <Button variant="contained" onClick={handleApply}>
                 {applyButtonText}
-              </Button>
+              </Button>)
+                }
+              {isApplied == 1 && (
+                <Button variant="contained" disabled style={{backgroundColor: '#4CAF50'}}>
+                {applyButtonText}
+              </Button>)
+                }
             </div>
         </Box>
+        <Dialog open={isApplyDialogOpen} onClose={() => setIsApplyDialogOpen(false)} maxWidth="md" fullWidth>
+    <DialogTitle>Apply for the Job</DialogTitle>
+    <DialogContent>
+      <DialogContentText>Choose how you want to apply for this job:</DialogContentText>
+      <div sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <Button variant="contained" onClick={handleUploadResume} sx={{ fontSize: '1.2rem', marginBottom: '1rem' }}>
+          Upload Resume
+        </Button>
+        <Button variant="contained" onClick={handleBuildResume} sx={{ fontSize: '1.2rem' }}>
+          Build Resume
+        </Button>
+      </div>
+      {/* Add the file input element */}
+      <input type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} />
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={() => setIsApplyDialogOpen(false)} color="primary">
+        Cancel
+      </Button>
+    </DialogActions>
+  </Dialog>
+      </div>
 
-        {/* Right side: Link List */}
-    <div style={{ width: '30%' }}>
-    <List>
-            {allNotifications.map((notification) => (
-              <a
-                key={notification.notification_id}
-                href={
-                  notification.notification_type === 'jobpost'
-                    ? `/viewJobPost/${notification.related_id}`
-                    : `/jobseeker/${notification.related_id}`
-                }
-                style={{ textDecoration: 'none' }}
-              >
-                <ListItem>
-                  <ListItemText primary={notification.text} />
-                </ListItem>
-              </a>
-            ))}
-          </List>
+      <div style={{ display: 'flex', marginTop: '70px', justifyContent: 'space-between' }}>
+
+      <div style={{ width: '500px', overflowY: 'auto', maxHeight: '700px' }}>
+    <Paper elevation={3} style={{ padding: '16px', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
+        <Divider/>
+        <Typography variant="h4" style={{ marginBottom: '16px' }}>
+          All Notifications
+        </Typography>
+        <Divider/>
+      </div>
+      <List>
+        {allNotifications.map((notification) => (
+          <a
+            key={notification.notification_id}
+            href={
+              notification.notification_type === 'jobpost'
+                ? `/viewJobPost/${notification.related_id}`
+                : `/jobseeker/${notification.related_id}`
+            }
+            style={{ textDecoration: 'none' }}
+          >
+            <ListItem>
+              <ListItemText>
+                <Typography variant="h6" style={{ fontSize: '20px' }}>
+                  {notification.text}
+                </Typography>
+              </ListItemText>
+            </ListItem>
+          </a>
+        ))}
+      </List>
+    </Paper>
+  </div>
+  </div>
+
+
+
     </div>
-  </Container>
-    </>
-  );
-};
+  </>
+);
 
+            }
 export default ViewJobPost;

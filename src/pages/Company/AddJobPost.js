@@ -73,7 +73,7 @@ const AddJobPost = () => {
   const handlePostJob = async () => {
     const requirementText = jobRequirements.map((req, index) => `${index + 1}. ${req}`).join('\n');
     setRequirementText(requirementText);
-    const keywordText = jobKeywords.map((req, index) => ` ${req}`).join('|');
+    const keywordText = jobKeywords.map((req, index) => req.trim()).join('|');
     setKeywordText(keywordText);
 
     const updatedTransformedData = {

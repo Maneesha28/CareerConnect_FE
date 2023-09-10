@@ -133,7 +133,13 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
         },
         withCredentials: true,
       });
+      setResume({
+        'jobpost_id': '',
+        'resume': '',
+      });
       console.log(response.data);
+      setIsApplied(1);
+      setApplyButtonText('Applied');
     } catch (error) {
       console.error(error);
     }
@@ -179,8 +185,8 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
             'jobpost_id': selectedJob.jobpost_id,
             'resume': downloadURL
           });
-          console.log('resume before sending to backend: ',resume);
-          await sendResumeToBackend(resume);
+          //console.log('resume before sending to backend: ',resume);
+          //await sendResumeToBackend(resume);
         } catch (error) {
           console.error('Error uploading resume to Firebase:', error);
         }
@@ -441,6 +447,12 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
       }
     }
   }, [selectedJob]);
+  useEffect(() => {
+    // Check if the resume state has changed and is not null
+    if (resume && resume.resume && resume.jobpost_id) {
+      sendResumeToBackend(resume);
+    }
+  }, [resume]);
 
   if (selectedJob && isLoadingJobPost) {
     return <div>Loading JobPost</div>;
