@@ -166,6 +166,7 @@ function PersonalInfo({ isLoggedInUser }) {
 
   return (
     <>
+    <div style={{marginTop: '80px'}}>
       <Box display="flex">
         <Box p={0} width="100%">
           <Paper elevation={3}>
@@ -196,7 +197,7 @@ function PersonalInfo({ isLoggedInUser }) {
               )}
             </Box>
             <Box p={3} display="flex">
-              <Box flex={1} paddingLeft={15} paddingTop={20}>
+              <Box flex={1} paddingLeft={30} paddingTop={20}>
                 {isLoggedInUser && isImageEditMode ? (
                   <Box
                     display="flex"
@@ -269,7 +270,7 @@ function PersonalInfo({ isLoggedInUser }) {
                   </Box>
                 )}
               </Box>
-              <TableContainer sx={{ paddingLeft: 50 }}>
+              <TableContainer sx={{ paddingLeft: 30 }}>
                 <Table aria-label="simple table" sx={{ width: 1, fontSize:"8px" }}>
                   <TableBody>
                     {jobseekerData.name && (
@@ -445,6 +446,7 @@ function PersonalInfo({ isLoggedInUser }) {
           </Paper>
         </Box>
       </Box>
+    </div>
       <Dialog
         open={isDialogOpen}
         onClose={handleCancel}

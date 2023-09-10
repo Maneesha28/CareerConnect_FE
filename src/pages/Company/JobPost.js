@@ -489,7 +489,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
                 </div>
               )}
               </Box>
-                <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
+                {/* <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
                   <Typography>Description: </Typography>
                   {isEditMode ? (
                     <TextField
@@ -538,7 +538,7 @@ const JobPost = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSe
 
                     )}
                   </Box>
-                )}
+                )} */}
 
                 {/* <Box display="flex" alignItems="center" sx={{...commonStyles.box}}>
                   <Typography>Vacancy: </Typography>
