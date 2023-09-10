@@ -346,7 +346,7 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
                     sx: {
                       fontFamily: 'Times New Roman, serif',
                       fontWeight: 'bold',
-                      fontSize: '1.8rem',
+                      fontSize: '1.4rem',
                       color: 'white',
                       transition: 'color 0.3s, background-color 0.3s',
                     },
@@ -373,7 +373,7 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
                   sx: {
                     fontFamily: 'Times New Roman, serif',
                     fontWeight: 'bold',
-                    fontSize: '1.8rem',
+                    fontSize: '1.4rem',
                     color: 'white',
                     transition: 'color 0.3s, background-color 0.3s',
                   },
@@ -398,7 +398,7 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
                   sx: {
                     fontFamily: 'Times New Roman, serif',
                     fontWeight: 'bold',
-                    fontSize: '1.8rem',
+                    fontSize: '1.4rem',
                     color: 'white',
                     transition: 'color 0.3s, background-color 0.3s',
                   },
@@ -408,10 +408,6 @@ const AllJobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,s
           </List>
         </Box>
       </Drawer>
-
-
-
-
               
       <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: '50px' }}>
       <Toolbar />

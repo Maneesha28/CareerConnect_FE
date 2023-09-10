@@ -240,6 +240,7 @@ const JobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setS
               onChange={(event, newValue) => setSelectedTab(newValue)}
               indicatorColor="primary"
               textColor="primary"
+              sx={{paddingLeft:23}}
             >
               <Tab
                   label="Job List"
