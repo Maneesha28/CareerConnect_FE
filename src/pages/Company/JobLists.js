@@ -29,9 +29,8 @@ import axios from 'axios';
 
 import { useFetch } from './FetchContext';
 
-const JobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSelectedJob}) => {
+const JobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setSelectedJob,selectedTab,setSelectedTab}) => {
   const { fetch, setFetch } = useFetch();
-  const [selectedTab, setSelectedTab] = useState(0); // 0 for Job List, 1 for Archived Job List
   const [searchKeyword, setSearchKeyword] = useState('');
   const [jobPostData,setJobPostData] = useState([]);
   const [archivedJobPostData,setArchivedJobPostData] = useState([]);
@@ -261,9 +260,9 @@ const JobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setS
                 />
             </Tabs>
           </Box>
-        <Box sx={{ display: 'flex', marginBottom: '16px' }}>
+        <Box sx={{ display: 'flex', height: '300px', padding: '10px'}}>
           {/* Sidebar */}
-          <Paper elevation={3} sx={{ width: '300px', marginRight: '16px', padding: '16px' }}>
+          <Paper elevation={3} sx={{ width: '500px', marginRight: '20px', padding: '16px' }}>
             <Typography variant="h6">Employment Type</Typography>
             <FormGroup>
               <FormControlLabel
@@ -321,42 +320,56 @@ const JobLists = ({user_id,isCompany,isJobseeker,isLoggedInUser,selectedJob,setS
             </Button> */}
           </Paper>
           {/* Job Lists */}
-          <Box sx={{ width: '100%' }}>
-          <Grid container spacing={2}>
-            {jobsToShow.map((job) => (
-              <Grid item xs={12} key={job.jobpost_id}>
-                <Paper elevation={3} sx={{ padding: '16px' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    {/* <Link to={`/companyJobPosts/${id}`} style={{ textDecoration: 'none' }}>
-                      <Typography variant="h6" gutterBottom>
-                        {job.title}
+          <div
+            style={{
+              height: '700px', // Adjust the height as needed
+              overflowY: 'auto',
+            }}
+          >
+            <Box sx={{ width: '100%' }}>
+              <Grid container spacing={2}>
+                {jobsToShow.map((job) => (
+                  <Grid item xs={12} key={job.jobpost_id}>
+                    <Paper elevation={3} sx={{ padding: '16px' }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}
+                      >
+                        {/* <Link to={`/companyJobPosts/${id}`} style={{ textDecoration: 'none' }}>
+                          <Typography variant="h6" gutterBottom>
+                            {job.title}
+                          </Typography>
+                        </Link> */}
+                        <div
+                          onClick={() => {
+                            setSelectedJob(job);
+                          }}
+                          style={{ textDecoration: 'none', cursor: 'pointer' }}
+                        >
+                          <Typography variant="h6" gutterBottom style={{ color: 'blue' }}>
+                            {job.title}
+                          </Typography>
+                        </div>
+                      </Box>
+                      <Typography variant="subtitle1" gutterBottom>
+                        Vacancy: {job.vacancy}
                       </Typography>
-                    </Link> */}
-                    <div
-                    onClick={() => {
-                        setSelectedJob(job);
-                    }}
-                    style={{ textDecoration: 'none', cursor: 'pointer' }}
-                    >
-                    <Typography variant="h6" gutterBottom style={{ color: 'blue' }}>
-                        {job.title}
-                    </Typography>
-                    </div>
-                                      </Box>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Vacancy: {job.vacancy}
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Salary: {job.salary}
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Type: {job.employment_type}
-                  </Typography>
-                </Paper>
+                      <Typography variant="subtitle1" gutterBottom>
+                        Salary: {job.salary}
+                      </Typography>
+                      <Typography variant="subtitle1" gutterBottom>
+                        Type: {job.employment_type}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
-        </Box>
+            </Box>
+          </div>
+
         </Box>
       </Container>
     </>

@@ -241,16 +241,22 @@ const CompanyReviews = ({ isLoggedInUser, isJobseeker }) => {
             )}
           </div>
           {/* Display Reviews */}
-          {reviewData.map((review, index) => (
-            <Paper
-              key={index}
-              sx={{
-                padding: "15px",
-                marginBottom: "15px",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+          <div
+            style={{
+              height: '400px', // Adjust the height as needed
+              overflowY: 'auto',
+            }}
+          >
+            {reviewData.map((review, index) => (
+              <Paper
+                key={index}
+                sx={{
+                  padding: '15px',
+                  marginBottom: '15px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
               {currentUser && currentUser.user_id === review.jobseeker_id && (
                 <div>
                   {/* Edit icon/button */}
@@ -313,8 +319,9 @@ const CompanyReviews = ({ isLoggedInUser, isJobseeker }) => {
                   {review.comment}
                 </Typography>
               </Box>
-            </Paper>
-          ))}
+              </Paper>
+              ))}
+            </div>
         </Paper>
       </Container>
 

@@ -23,6 +23,7 @@ const JobListsAndPost = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const [companyData,setCompanyData] = useState({});
   const [fetch,setFetch] = useState(true);
+  const [selectedTab, setSelectedTab] = useState(0); // 0 for Job List, 1 for Archived Job List
   const [isLoadingCompany,setIsLoadingCompany] = useState(true);
   const [isLoadingJobPost,setIsLoadingJobpost] = useState(true);
   const [isLoadingUser,setIsLoadingUser] = useState(true);
@@ -125,14 +126,18 @@ const JobListsAndPost = () => {
         </Link>
       </Box>
           <div style={{ display: 'flex' }}>
-            <div style={{ flex: '1' }}>
+            <div style={{ flex: '2' }}>
               <JobLists user_id={user_id} isCompany={isCompany} isJobseeker={isJobseeker} isLoggedInUser={isLoggedInUser}
                selectedJob={selectedJob} setSelectedJob={setSelectedJob}
+               selectedTab={selectedTab} setSelectedTab={setSelectedTab}
                 />
             </div>
             <div style={{ flex: '3' }}>
               <JobPost user_id={user_id} isCompany={isCompany} isJobseeker={isJobseeker} isLoggedInUser={isLoggedInUser}
-              selectedJob={selectedJob} setSelectedJob={setSelectedJob}/>
+              selectedJob={selectedJob} setSelectedJob={setSelectedJob}
+              selectedTab={selectedTab}
+              isSelectedListEmpty={false}
+              />
             </div>
           </div>
         </>

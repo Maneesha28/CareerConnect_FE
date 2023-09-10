@@ -423,50 +423,59 @@ const CompanyVacancy = ({isLoggedInUser}) => {
             </Button> */}
           </Paper>
           {/* Job Lists */}
-          <Box sx={{ width: '100%' }}>
-          <Grid container spacing={2}>
-            {jobsToShow.map((job) => (
-              <Grid item xs={12} sm={6} md={6} key={job.jobpost_id}>
-                <Paper elevation={3} sx={{ padding: '16px' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Link to={`/companyJobPosts/${id}`} state={{ jobpost_id: job.jobpost_id }} style={{ textDecoration: 'none' }}>
-                      <Typography variant="h6" gutterBottom>
-                        {job.title}
-                      </Typography>
-                    </Link>
-                    {isLoggedInUser && (
-                      <div>
-                        <IconButton color="primary" onClick={() => handleEditJobPost(job)}>
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton color="error" onClick={() => handleOpenDeleteConfirmation(job.jobpost_id)}>
-                          <DeleteIcon />
-                        </IconButton>
-                      </div>
-                    )}
-                    <DeleteConfirmationDialogue
-                      isOpen={isDeleteConfirmationOpen[job.jobpost_id]}
-                      onClose={() => handleCloseDeleteConfirmation(job.jobpost_id)}
-                      onDelete={() => handleDeleteJobPost(job.jobpost_id)}
-                    />
-                                      </Box>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Vacancy: {job.vacancy}
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Salary: {job.salary}
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Type: {job.employment_type}
-                  </Typography>
-                  {/* <Typography variant="subtitle1" gutterBottom>
-                    Applicants: {getApplicantsCount(job.jobpost_id)}
-                  </Typography> */}
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
+          <div
+  style={{
+    height: '400px', // Adjust the height as needed
+    overflowY: 'auto',
+  }}
+>
+  <Box sx={{ width: '100%' }}>
+    <Grid container spacing={2}>
+      {jobsToShow.map((job) => (
+        <Grid item xs={12} sm={6} md={6} key={job.jobpost_id}>
+          <Paper elevation={3} sx={{ padding: '16px' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Link to={`/companyJobPosts/${id}`} state={{ jobpost_id: job.jobpost_id }} style={{ textDecoration: 'none' }}>
+                <Typography variant="h6" gutterBottom>
+                  {job.title}
+                </Typography>
+              </Link>
+              {isLoggedInUser && (
+                <div>
+                  <IconButton color="primary" onClick={() => handleEditJobPost(job)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => handleOpenDeleteConfirmation(job.jobpost_id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </div>
+              )}
+            </Box>
+            <Typography variant="subtitle1" gutterBottom>
+              Vacancy: {job.vacancy}
+            </Typography>
+            <Typography variant="subtitle1" gutterBottom>
+              Salary: {job.salary}
+            </Typography>
+            <Typography variant="subtitle1" gutterBottom>
+              Type: {job.employment_type}
+            </Typography>
+            {/* <Typography variant="subtitle1" gutterBottom>
+              Applicants: {getApplicantsCount(job.jobpost_id)}
+            </Typography> */}
+          </Paper>
+        </Grid>
+      ))}
+    </Grid>
+  </Box>
+</div>
+
         </Box>
       </Container>
 
