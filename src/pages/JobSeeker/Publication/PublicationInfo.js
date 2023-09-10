@@ -247,7 +247,7 @@ function PublicationInfo({isLoggedInUser}) {
             onChange={(e) => setNewPublicationInfo({ ...newPublicationInfo, journal: e.target.value })}
           />
           <TextField
-            label="PDF Link"
+            label="Paper Link"
             fullWidth
             margin="dense"
             value={newPublicationInfo.pdfLink}
@@ -260,6 +260,11 @@ function PublicationInfo({isLoggedInUser}) {
             type="date"
             value={newPublicationInfo.publicationDate}
             onChange={(e) => setNewPublicationInfo({ ...newPublicationInfo, publicationDate: e.target.value })}
+            InputProps={{
+              inputProps: {
+                max: new Date().toISOString().split('T')[0], // Set the max date to today
+              },
+            }}
           />
         </DialogContent>
         <DialogActions>
@@ -299,7 +304,7 @@ function PublicationInfo({isLoggedInUser}) {
                 onChange={(e) => setNewPublicationInfo({ ...newPublicationInfo, journal: e.target.value })}
               />
               <TextField
-                label="PDF Link"
+                label="Paper Link"
                 fullWidth
                 margin="dense"
                 value={newPublicationInfo.pdfLink}
@@ -312,6 +317,11 @@ function PublicationInfo({isLoggedInUser}) {
                 type="date"
                 value={newPublicationInfo.publicationDate}
                 onChange={(e) => setNewPublicationInfo({ ...newPublicationInfo, publicationDate: e.target.value })}
+                InputProps={{
+                  inputProps: {
+                    max: new Date().toISOString().split('T')[0], // Set the max date to today
+                  },
+                }}
               />
             </Box>
           )}

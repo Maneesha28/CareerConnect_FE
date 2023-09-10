@@ -120,6 +120,7 @@ function EduInfo({isLoggedInUser}) {
       startDate: '',
       endDate: '',
     });
+    setError(null);
   };
 
   // Transform the data order to match the backend order
@@ -137,7 +138,7 @@ function EduInfo({isLoggedInUser}) {
       console.log('newEduInfo: ', newEduInfo);
       
       // Check if endDate is empty or null, or if startDate is less than endDate
-      if (!newEduInfo.endDate || new Date(newEduInfo.startDate) < new Date(newEduInfo.endDate)) {
+      if ((newEduInfo.degree && newEduInfo.subject && newEduInfo.institution && newEduInfo.result && newEduInfo.startDate && newEduInfo.endDate) && (!newEduInfo.endDate || new Date(newEduInfo.startDate) < new Date(newEduInfo.endDate))) {
         const response = await axios.post("/api/education", transformedData, {
           headers: {
             'Content-Type': 'application/json',
@@ -147,9 +148,12 @@ function EduInfo({isLoggedInUser}) {
         console.log('response:', response);
         fetchEducationData();
         handleCloseDialog();
-      } else {
-        console.error('End date should be greater than start date');
+      } else if(!newEduInfo.degree || !newEduInfo.subject || !newEduInfo.institution || !newEduInfo.result || !newEduInfo.startDate) {
+        setError('Please fill up the required fields');
         // You can add code here to display an error message to the user.
+      }
+      else {
+        setError('End date should be greater than start date');
       }
     } catch (error) {
       console.error('Error saving eduInfo:', error);
@@ -252,6 +256,7 @@ function EduInfo({isLoggedInUser}) {
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Add New Education Information</DialogTitle>
         <DialogContent>
+          {error && <Typography color="error">{error}</Typography>}
           {/* Add text fields for education details */}
           <TextField
             label="Degree"
@@ -259,6 +264,7 @@ function EduInfo({isLoggedInUser}) {
             margin="dense"
             value={newEduInfo.degree}
             onChange={(e) => setNewEduInfo({ ...newEduInfo, degree: e.target.value })}
+            required
           />
           <TextField
             label="Subject"
@@ -266,6 +272,7 @@ function EduInfo({isLoggedInUser}) {
             margin="dense"
             value={newEduInfo.subject}
             onChange={(e) => setNewEduInfo({ ...newEduInfo, subject: e.target.value })}
+            required
           />
           <TextField
             label="Institution"
@@ -273,6 +280,7 @@ function EduInfo({isLoggedInUser}) {
             margin="dense"
             value={newEduInfo.institution}
             onChange={(e) => setNewEduInfo({ ...newEduInfo, institution: e.target.value })}
+            required
           />
           <TextField
             label="Result"
@@ -280,6 +288,7 @@ function EduInfo({isLoggedInUser}) {
             margin="dense"
             value={newEduInfo.result}
             onChange={(e) => setNewEduInfo({ ...newEduInfo, result: e.target.value })}
+            required
           />
           <TextField
             label="Start Date"
@@ -293,6 +302,7 @@ function EduInfo({isLoggedInUser}) {
                   max: new Date().toISOString().split('T')[0], // Set the max date to today
                 },
               }}
+              required
           />
           <TextField
             label="End Date"

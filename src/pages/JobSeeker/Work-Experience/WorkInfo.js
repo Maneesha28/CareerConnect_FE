@@ -66,7 +66,7 @@ function WorkInfo({isLoggedInUser}) {
 
   useEffect(() => {
   fetchWorkExperienceData();
-  }, [id]);
+  }, []);
 
   if (isLoadingWorkExperience) {
     return <div>Loading...</div>;
@@ -118,6 +118,7 @@ function WorkInfo({isLoggedInUser}) {
       startDate: '',
       endDate: '',
     });
+    setError(null);
   };
 
   const transformedData = {
@@ -131,16 +132,23 @@ function WorkInfo({isLoggedInUser}) {
   const handleSaveWorkInfo = async () => {
     try {
       console.log('newWorkInfo: ', newWorkInfo);
-      const response = await axios.post("/api/workexperience", transformedData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
-      console.log('response:', response);
-      fetchWorkExperienceData();
-      handleCloseDialog();
-    } catch (error) {
+      if((!newWorkInfo.designation || !newWorkInfo.organization || !newWorkInfo.employmentType || !newWorkInfo.startDate) 
+      || (!newWorkInfo.endDate || new Date(newWorkInfo.startDate) < new Date(newWorkInfo.endDate))) {
+        const response = await axios.post("/api/workexperience", transformedData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        });
+        console.log('response:', response);
+        fetchWorkExperienceData();
+        handleCloseDialog();
+      } else if(new Date(newWorkInfo.startDate) > new Date(newWorkInfo.endDate)) {
+        setError('Start date cannot be later than end date.');
+      } else {
+        setError('Please fill in all required fields.');
+      }
+    }catch (error) {
       console.error('Error saving workInfo:', error);
     }
   };
@@ -215,19 +223,22 @@ function WorkInfo({isLoggedInUser}) {
         <DialogTitle>Add New Work Information</DialogTitle>
         <DialogContent>
           {/* Add text fields for work details */}
-          <TextField
-            label="Organization"
-            fullWidth
-            margin="dense"
-            value={newWorkInfo.organization}
-            onChange={(e) => setNewWorkInfo({ ...newWorkInfo, organization: e.target.value })}
-          />
+          {error && <Typography color="error">{error}</Typography>}
           <TextField
             label="Designation"
             fullWidth
             margin="dense"
             value={newWorkInfo.designation}
             onChange={(e) => setNewWorkInfo({ ...newWorkInfo, designation: e.target.value })}
+            required
+          />
+          <TextField
+            label="Organization"
+            fullWidth
+            margin="dense"
+            value={newWorkInfo.organization}
+            onChange={(e) => setNewWorkInfo({ ...newWorkInfo, organization: e.target.value })}
+            required
           />
           <TextField
             label="Employment Type"
@@ -235,6 +246,7 @@ function WorkInfo({isLoggedInUser}) {
             margin="dense"
             value={newWorkInfo.employmentType}
             onChange={(e) => setNewWorkInfo({ ...newWorkInfo, employmentType: e.target.value })}
+            required
           />
           <TextField
             label="Start Date"
@@ -243,6 +255,12 @@ function WorkInfo({isLoggedInUser}) {
             type="date"
             value={newWorkInfo.startDate}
             onChange={(e) => setNewWorkInfo({ ...newWorkInfo, startDate: e.target.value })}
+            required
+            InputProps={{
+              inputProps: {
+                max: new Date().toISOString().split('T')[0], // Set the max date to today
+              },
+            }}
           />
           <TextField
             label="End Date"
@@ -251,6 +269,11 @@ function WorkInfo({isLoggedInUser}) {
             type="date"
             value={newWorkInfo.endDate}
             onChange={(e) => setNewWorkInfo({ ...newWorkInfo, endDate: e.target.value })}
+            InputProps={{
+              inputProps: {
+                max: new Date().toISOString().split('T')[0], // Set the max date to today
+              },
+            }}
           />
         </DialogContent>
         <DialogActions>
@@ -294,16 +317,26 @@ function WorkInfo({isLoggedInUser}) {
                 fullWidth
                 margin="dense"
                 type="date"
-                value={newWorkInfo.startDate}
+                value={new Date(newWorkInfo.startDate).toLocaleDateString('en-CA')}
                 onChange={(e) => setNewWorkInfo({ ...newWorkInfo, startDate: e.target.value })}
+                InputProps={{
+                  inputProps: {
+                    max: new Date().toISOString().split('T')[0], // Set the max date to today
+                  },
+                }}
               />
               <TextField
                 label="End Date"
                 fullWidth
                 margin="dense"
                 type="date"
-                value={newWorkInfo.endDate}
+                value={new Date(newWorkInfo.endDate).toLocaleDateString('en-CA')}
                 onChange={(e) => setNewWorkInfo({ ...newWorkInfo, endDate: e.target.value })}
+                InputProps={{
+                  inputProps: {
+                    max: new Date().toISOString().split('T')[0], // Set the max date to today
+                  },
+                }}
               />
             </Box>
           )}

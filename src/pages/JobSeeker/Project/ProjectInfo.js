@@ -22,6 +22,7 @@ import ButtonBase from '@mui/material/ButtonBase';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
+import { set } from 'date-fns';
 
 function ProjectInfo({isLoggedInUser}) {
   const id = useParams().jobseeker_id;
@@ -121,6 +122,7 @@ function ProjectInfo({isLoggedInUser}) {
       startDate: '',
       endDate: '',
     });
+    setError(null);
   };
 
   // Transform the data order to match the backend order
@@ -136,15 +138,23 @@ function ProjectInfo({isLoggedInUser}) {
   const handleSaveProjectInfo = async () => {
     try {
       console.log('newProjectInfo: ', newProjectInfo);
-      const response = await axios.post("/api/project", transformedData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
-      console.log('response:', response);
-      fetchProjectData();
-      handleCloseDialog();
+      if ((newProjectInfo.title && newProjectInfo.description && newProjectInfo.technologies && newProjectInfo.startDate && newProjectInfo.endDate) && (!newProjectInfo.endDate || new Date(newProjectInfo.startDate) < new Date(newProjectInfo.endDate))) {
+        const response = await axios.post("/api/project", transformedData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        });
+        console.log('response:', response);
+        fetchProjectData();
+        handleCloseDialog();
+      } else if(!newProjectInfo.title || !newProjectInfo.description || !newProjectInfo.technologies || !newProjectInfo.startDate) {
+        setError('Please fill up the required fields');
+        // You can add code here to display an error message to the user.
+      }
+      else {
+        setError('End date should be greater than start date');
+      }
     } catch (error) {
       console.error('Error saving projectInfo:', error);
     }
@@ -189,6 +199,7 @@ function ProjectInfo({isLoggedInUser}) {
       startDate: '',
       endDate: '',
     });
+    setError(null);
   };
 
   return (
@@ -224,7 +235,7 @@ function ProjectInfo({isLoggedInUser}) {
                     secondary={
                       <>
                         <div>{info.description}</div>
-                        <div>Project Link: <a href={`http://${info.project_link}`} target="_blank" rel="noopener noreferrer">{info.projectLink}</a></div>
+                        {info.project_link && <div>Project Link: <a href={`http://${info.project_link}`} target="_blank" rel="noopener noreferrer">{info.project_link}</a></div>}
                         <div>Technologies: {info.technologies}</div>
                         <div>
                           Dates: <DateComponent isoDate={info.start_date} /> - <DateComponent isoDate={info.end_date} />
@@ -255,12 +266,14 @@ function ProjectInfo({isLoggedInUser}) {
         <DialogTitle>Add New Project Information</DialogTitle>
         <DialogContent>
           {/* Add text fields for project details */}
+          {error && <Typography color="error">{error}</Typography>}
           <TextField
             label="Title"
             fullWidth
             margin="dense"
             value={newProjectInfo.title}
             onChange={(e) => setNewProjectInfo({ ...newProjectInfo, title: e.target.value })}
+            required
           />
           <TextField
             label="Description"
@@ -270,6 +283,7 @@ function ProjectInfo({isLoggedInUser}) {
             rows={4}
             value={newProjectInfo.description}
             onChange={(e) => setNewProjectInfo({ ...newProjectInfo, description: e.target.value })}
+            required
           />
           <TextField
             label="Project Link"
@@ -284,6 +298,7 @@ function ProjectInfo({isLoggedInUser}) {
             margin="dense"
             value={newProjectInfo.technologies}
             onChange={(e) => setNewProjectInfo({ ...newProjectInfo, technologies: e.target.value })}
+            required
           />
           <TextField
             label="Start Date"
@@ -292,6 +307,12 @@ function ProjectInfo({isLoggedInUser}) {
             type="date"
             value={newProjectInfo.startDate}
             onChange={(e) => setNewProjectInfo({ ...newProjectInfo, startDate: e.target.value })}
+            InputProps={{
+              inputProps: {
+                max: new Date().toISOString().split('T')[0], // Set the max date to today
+              },
+            }}
+            required
           />
           <TextField
             label="End Date"
@@ -300,6 +321,11 @@ function ProjectInfo({isLoggedInUser}) {
             type="date"
             value={newProjectInfo.endDate}
             onChange={(e) => setNewProjectInfo({ ...newProjectInfo, endDate: e.target.value })}
+            InputProps={{
+              inputProps: {
+                max: new Date().toISOString().split('T')[0], // Set the max date to today
+              },
+            }}
           />
         </DialogContent>
         <DialogActions>
@@ -352,16 +378,26 @@ function ProjectInfo({isLoggedInUser}) {
                 fullWidth
                 margin="dense"
                 type="date"
-                value={newProjectInfo.startDate}
+                value={new Date(newProjectInfo.startDate).toLocaleDateString('en-CA')}
                 onChange={(e) => setNewProjectInfo({ ...newProjectInfo, startDate: e.target.value })}
+                InputProps={{
+                  inputProps: {
+                    max: new Date().toISOString().split('T')[0], // Set the max date to today
+                  },
+                }}
               />
               <TextField
                 label="End Date"
                 fullWidth
                 margin="dense"
                 type="date"
-                value={newProjectInfo.endDate}
+                value={new Date(newProjectInfo.endDate).toLocaleDateString('en-CA')}
                 onChange={(e) => setNewProjectInfo({ ...newProjectInfo, endDate: e.target.value })}
+                InputProps={{
+                  inputProps: {
+                    max: new Date().toISOString().split('T')[0], // Set the max date to today
+                  },
+                }}
               />
             </Box>
           )}
